@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JUDDEV CORPORATION - Agence Digitale Premium</title>
+  <meta name="description" content="JUDDEV CORPORATION - Votre partenaire technologique d'excellence. Développement web, mobile, SaaS, UI/UX, Cloud, IA et Marketing Digital." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-content">
+    <div class="loader-logo">JUDDEV<span>CORPORATION</span></div>
+    <div class="loader-ring"></div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="navbar-container">
+    <a href="index.html" class="navbar-logo">JUDDEV<span> CORPORATION</span></a>
+    <div class="navbar-links">
+      <a href="index.html" class="active">Accueil</a>
+      <a href="a-propos.html">À Propos</a>
+      <a href="services.html">Services</a>
+      <a href="realisations.html">Réalisations</a>
+      <a href="blog.html">Blog</a>
+      <a href="formations.html">Formations</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div class="navbar-cta">
+      <a href="#devis" class="btn-devis-nav">Demander un Devis</a>
+    </div>
+    <button class="navbar-hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE NAV -->
+<div class="navbar-mobile">
+  <a href="index.html" class="active">Accueil</a>
+  <a href="a-propos.html">À Propos</a>
+  <a href="services.html">Services</a>
+  <a href="realisations.html">Réalisations</a>
+  <a href="blog.html">Blog</a>
+  <a href="formations.html">Formations</a>
+  <a href="contact.html">Contact</a>
+  <a href="#devis" class="btn-devis-nav">Demander un Devis</a>
+</div>
+
+<!-- HERO SECTION -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-grid"></div>
+    <div class="hero-gradient"></div>
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-orb hero-orb-3"></div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-text">
+      <div class="hero-badge" data-i18n="hero.badge">AGENCE DIGITALE PREMIUM</div>
+      <h1 class="hero-title">
+        PROPULSEZ VOTRE ACTIVITÉ AVEC NOS
+        <span>SOLUTIONS NUMÉRIQUES</span>
+      </h1>
+      <p class="hero-subtitle" data-i18n="hero.subtitle">
+        JUDDEV CORPORATION — Votre partenaire technologique d'excellence pour transformer vos idées en solutions digitales innovantes qui créent de la valeur.
+      </p>
+      <div class="hero-actions">
+        <a href="services.html" class="btn btn-primary">
+          <i class="fas fa-rocket"></i> <span data-i18n="hero.cta.services">Découvrir nos Services</span>
+        </a>
+        <a href="realisations.html" class="btn btn-outline">
+          <i class="fas fa-eye"></i> <span data-i18n="hero.cta.realisations">Voir nos Réalisations</span>
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat-item">
+          <div class="hero-stat-number counter" data-target="50" data-suffix="+">50+</div>
+          <div class="hero-stat-label" data-i18n="hero.stat.projects">Projets Livrés</div>
+        </div>
+        <div class="hero-stat-item">
+          <div class="hero-stat-number counter" data-target="30" data-suffix="+">30+</div>
+          <div class="hero-stat-label" data-i18n="hero.stat.clients">Clients Satisfaits</div>
+        </div>
+        <div class="hero-stat-item">
+          <div class="hero-stat-number counter" data-target="3" data-suffix="">3</div>
+          <div class="hero-stat-label" data-i18n="hero.stat.experts">Experts Dédiés</div>
+        </div>
+        <div class="hero-stat-item">
+          <div class="hero-stat-number counter" data-target="100" data-suffix="%">100%</div>
+          <div class="hero-stat-label" data-i18n="hero.stat.satisfaction">Satisfaction Client</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-device-wrap">
+        <img src="images/ordi9-removebg-preview.png" alt="Solutions digitales JUDDEV - Ordinateur et téléphone" />
+
+        <div class="hero-floating-badge hero-floating-badge-1">
+          <span class="badge-icon">⚡</span>
+          <div>
+            <div style="font-size:0.7rem;color:var(--text-dim);font-weight:500">Projet livré</div>
+            <div style="font-size:0.9rem;font-weight:700;color:var(--text-primary)">En 4 semaines</div>
+          </div>
+        </div>
+
+        <div class="hero-floating-badge hero-floating-badge-2">
+          <span class="badge-icon">🚀</span>
+          <div>
+            <div style="font-size:0.7rem;color:var(--text-dim);font-weight:500">Technologies</div>
+            <div style="font-size:0.9rem;font-weight:700;color:var(--text-primary)">React & Node.js</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CE QUE NOUS FAISONS -->
+<section class="section" id="services-section">
+  <div class="container">
+    <div class="section-header reveal-left">
+      <span class="section-badge">NOS EXPERTISES</span>
+      <h2 class="section-title">CE QUE NOUS <span>FAISONS</span></h2>
+      <p class="section-subtitle">Des solutions digitales complètes, de la conception à la livraison, pour propulser votre croissance.</p>
+    </div>
+    <div class="grid-4" id="services-grid">
+      <!-- Populated by JS -->
+    </div>
+    <div style="text-align:center;margin-top:3rem">
+      <a href="services.html" class="btn btn-blue-outline">
+        Voir tous nos Services <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- TECHNOLOGIES TICKER -->
+<section class="tech-ticker-section">
+  <div class="tech-ticker-header">
+    <h2>TECHNOLOGIES QUE NOUS <span>MAÎTRISONS</span></h2>
+  </div>
+
+  <div class="ticker-wrapper">
+    <div class="ticker-track ticker-track-right" id="ticker-1">
+      <div class="tech-pill"><span class="tech-icon">⚛️</span> React</div>
+      <div class="tech-pill"><span class="tech-icon">💚</span> Vue.js</div>
+      <div class="tech-pill"><span class="tech-icon">🟢</span> Node.js</div>
+      <div class="tech-pill"><span class="tech-icon">🐍</span> Python</div>
+      <div class="tech-pill"><span class="tech-icon">☕</span> Java</div>
+      <div class="tech-pill"><span class="tech-icon">🐳</span> Docker</div>
+      <div class="tech-pill"><span class="tech-icon">☁️</span> AWS</div>
+      <div class="tech-pill"><span class="tech-icon">🔥</span> Firebase</div>
+      <div class="tech-pill"><span class="tech-icon">🍃</span> MongoDB</div>
+      <div class="tech-pill"><span class="tech-icon">🐘</span> PostgreSQL</div>
+      <div class="tech-pill"><span class="tech-icon">▲</span> Next.js</div>
+      <div class="tech-pill"><span class="tech-icon">💎</span> TypeScript</div>
+      <!-- Duplicate for infinite loop -->
+      <div class="tech-pill"><span class="tech-icon">⚛️</span> React</div>
+      <div class="tech-pill"><span class="tech-icon">💚</span> Vue.js</div>
+      <div class="tech-pill"><span class="tech-icon">🟢</span> Node.js</div>
+      <div class="tech-pill"><span class="tech-icon">🐍</span> Python</div>
+      <div class="tech-pill"><span class="tech-icon">☕</span> Java</div>
+      <div class="tech-pill"><span class="tech-icon">🐳</span> Docker</div>
+      <div class="tech-pill"><span class="tech-icon">☁️</span> AWS</div>
+      <div class="tech-pill"><span class="tech-icon">🔥</span> Firebase</div>
+      <div class="tech-pill"><span class="tech-icon">🍃</span> MongoDB</div>
+      <div class="tech-pill"><span class="tech-icon">🐘</span> PostgreSQL</div>
+      <div class="tech-pill"><span class="tech-icon">▲</span> Next.js</div>
+      <div class="tech-pill"><span class="tech-icon">💎</span> TypeScript</div>
+    </div>
+  </div>
+
+  <div class="ticker-wrapper" style="margin-top:1rem">
+    <div class="ticker-track ticker-track-left" id="ticker-2">
+      <div class="tech-pill"><span class="tech-icon">📱</span> React Native</div>
+      <div class="tech-pill"><span class="tech-icon">🦋</span> Flutter</div>
+      <div class="tech-pill"><span class="tech-icon">🎨</span> Figma</div>
+      <div class="tech-pill"><span class="tech-icon">🔷</span> TypeScript</div>
+      <div class="tech-pill"><span class="tech-icon">🐘</span> PHP</div>
+      <div class="tech-pill"><span class="tech-icon">🔴</span> Laravel</div>
+      <div class="tech-pill"><span class="tech-icon">🔺</span> Angular</div>
+      <div class="tech-pill"><span class="tech-icon">🟥</span> Redis</div>
+      <div class="tech-pill"><span class="tech-icon">⚙️</span> Kubernetes</div>
+      <div class="tech-pill"><span class="tech-icon">🌍</span> Terraform</div>
+      <div class="tech-pill"><span class="tech-icon">🤖</span> OpenAI</div>
+      <div class="tech-pill"><span class="tech-icon">⚡</span> GraphQL</div>
+      <!-- Duplicate -->
+      <div class="tech-pill"><span class="tech-icon">📱</span> React Native</div>
+      <div class="tech-pill"><span class="tech-icon">🦋</span> Flutter</div>
+      <div class="tech-pill"><span class="tech-icon">🎨</span> Figma</div>
+      <div class="tech-pill"><span class="tech-icon">🔷</span> TypeScript</div>
+      <div class="tech-pill"><span class="tech-icon">🐘</span> PHP</div>
+      <div class="tech-pill"><span class="tech-icon">🔴</span> Laravel</div>
+      <div class="tech-pill"><span class="tech-icon">🔺</span> Angular</div>
+      <div class="tech-pill"><span class="tech-icon">🟥</span> Redis</div>
+      <div class="tech-pill"><span class="tech-icon">⚙️</span> Kubernetes</div>
+      <div class="tech-pill"><span class="tech-icon">🌍</span> Terraform</div>
+      <div class="tech-pill"><span class="tech-icon">🤖</span> OpenAI</div>
+      <div class="tech-pill"><span class="tech-icon">⚡</span> GraphQL</div>
+    </div>
+  </div>
+</section>
+
+<!-- NOS RÉALISATIONS -->
+<section class="section" style="background:var(--bg-secondary)">
+  <div class="container">
+    <div class="section-header reveal-left">
+      <span class="section-badge">PORTFOLIO</span>
+      <h2 class="section-title">NOTRE <span>TRAVAIL</span></h2>
+      <p class="section-subtitle">Découvrez quelques-uns de nos projets phares qui illustrent notre expertise.</p>
+    </div>
+    <div class="grid-3" id="realisations-grid">
+      <!-- Populated by JS -->
+    </div>
+    <div style="text-align:center;margin-top:3rem">
+      <a href="realisations.html" class="btn btn-primary">
+        Voir toutes nos Réalisations <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- PARTENAIRES -->
+<section class="partners-section">
+  <div class="container">
+    <div class="section-header reveal-left">
+      <span class="section-badge">CONFIANCE</span>
+      <h2 class="section-title">Un partenariat basé sur la <span>CONFIANCE</span></h2>
+      <p class="section-subtitle">Ils nous ont fait confiance pour transformer leur présence digitale.</p>
+    </div>
+    <div class="partners-grid reveal">
+      <div class="partner-logo"><img src="images/téléchargement (7).jpg" alt="Partenaire 1" onerror="this.parentElement.innerHTML='<span>PARTNER 1</span>'" /></div>
+      <div class="partner-logo"><img src="images/téléchargement (8).jpg" alt="Partenaire 2" onerror="this.parentElement.innerHTML='<span>PARTNER 2</span>'" /></div>
+      <div class="partner-logo"><img src="images/téléchargement (9).jpg" alt="Partenaire 3" onerror="this.parentElement.innerHTML='<span>PARTNER 3</span>'" /></div>
+      <div class="partner-logo"><img src="images/téléchargement (10).jpg" alt="Partenaire 4" onerror="this.parentElement.innerHTML='<span>PARTNER 4</span>'" /></div>
+      <div class="partner-logo"><img src="images/téléchargement (4).jpg" alt="Partenaire 5" onerror="this.parentElement.innerHTML='<span>PARTNER 5</span>'" /></div>
+      <div class="partner-logo"><img src="images/JUDDEV.jpg" alt="JUDDEV" onerror="this.parentElement.innerHTML='<span>JUDDEV</span>'" /></div>
+    </div>
+  </div>
+</section>
+
+<!-- ARTICLES BLOG -->
+<section class="section">
+  <div class="container">
+    <div class="section-header reveal-left">
+      <span class="section-badge">INSIGHTS</span>
+      <h2 class="section-title">Derniers <span>Articles de Blog</span></h2>
+      <p class="section-subtitle">Restez à la pointe de l'innovation avec nos articles experts.</p>
+    </div>
+    <div class="grid-3" id="articles-grid">
+      <!-- Populated by JS -->
+    </div>
+    <div style="text-align:center;margin-top:3rem">
+      <a href="blog.html" class="btn btn-blue-outline">
+        Voir tous les Articles <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA SECTION -->
+<section class="cta-section">
+  <div class="container">
+    <span class="section-badge" style="margin-bottom:1rem;display:inline-block">DÉMARRONS ENSEMBLE</span>
+    <h2 class="cta-title reveal">Prêt à <span style="background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">digitaliser</span> votre activité ?</h2>
+    <p class="cta-subtitle reveal stagger-2">Discutons de votre projet et construisons ensemble votre future présence digitale.</p>
+    <div class="cta-buttons reveal stagger-3">
+      <button class="btn btn-primary btn-lg" onclick="window.openDevisModal && window.openDevisModal()">
+        <i class="fas fa-paper-plane"></i> Demander un Devis Gratuit
+      </button>
+      <a href="contact.html" class="btn btn-outline btn-lg">
+        <i class="fas fa-phone"></i> Nous Contacter
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="index.html" class="footer-logo">JUDDEV<span>CORPORATION</span></a>
+        <p class="footer-desc">Votre partenaire technologique d'excellence. Nous transformons vos idées en solutions digitales innovantes qui propulsent votre croissance.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        </div>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Navigation</h4>
+        <div class="footer-links">
+          <a href="index.html">Accueil</a>
+          <a href="a-propos.html">À Propos</a>
+          <a href="services.html">Services</a>
+          <a href="realisations.html">Réalisations</a>
+          <a href="blog.html">Blog</a>
+          <a href="formations.html">Formations</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Services</h4>
+        <div class="footer-links">
+          <a href="service-detail.html?id=dev-web">Développement Web</a>
+          <a href="service-detail.html?id=dev-mobile">Applications Mobiles</a>
+          <a href="service-detail.html?id=saas">Produits SaaS</a>
+          <a href="service-detail.html?id=ux-design">UI/UX Design</a>
+          <a href="service-detail.html?id=cloud">Cloud Engineering</a>
+          <a href="service-detail.html?id=ia-solutions">IA & Automatisation</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Contact</h4>
+        <div class="footer-contact-item">
+          <i class="fas fa-envelope"></i>
+          <span>contact@juddev.com</span>
+        </div>
+        <div class="footer-contact-item">
+          <i class="fas fa-phone"></i>
+          <span>+237 6XX XXX XXX</span>
+        </div>
+        <div class="footer-contact-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Yaoundé, Cameroun</span>
+        </div>
+        <div class="footer-contact-item">
+          <i class="fas fa-clock"></i>
+          <span>Lun - Ven: 8h00 - 18h00</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copyright">© 2025 JUDDEV CORPORATION. Tous droits réservés.</span>
+      <div class="footer-bottom-links">
+        <a href="#">Mentions légales</a>
+        <a href="#">Politique de confidentialité</a>
+        <a href="#">CGU</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- DEVIS MODAL -->
+<div id="devis-modal" class="modal">
+  <div class="modal-backdrop"></div>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title">Demander un Devis</h2>
+      <button class="modal-close" aria-label="Fermer">✕</button>
+    </div>
+    <form id="devis-form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Nom complet *</label>
+          <input type="text" class="form-input" placeholder="Jean Dupont" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email *</label>
+          <input type="email" class="form-input" placeholder="jean@exemple.com" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Téléphone</label>
+          <input type="tel" class="form-input" placeholder="+237 6XX XXX XXX" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Entreprise</label>
+          <input type="text" class="form-input" placeholder="Nom de votre entreprise" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Service souhaité *</label>
+          <select class="form-input" required>
+            <option value="">Sélectionnez un service</option>
+            <option>Développement Web</option>
+            <option>Applications Mobiles</option>
+            <option>Produits SaaS</option>
+            <option>UI/UX Design</option>
+            <option>Cloud Engineering</option>
+            <option>Développement MVP</option>
+            <option>Marketing Digital & SEO</option>
+            <option>IA & Automatisation</option>
+            <option>Formation</option>
+            <option>Autre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Budget estimé</label>
+          <select class="form-input">
+            <option value="">Sélectionnez un budget</option>
+            <option>Moins de 500 000 FCFA</option>
+            <option>500 000 - 1 000 000 FCFA</option>
+            <option>1 000 000 - 5 000 000 FCFA</option>
+            <option>Plus de 5 000 000 FCFA</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Délai souhaité</label>
+          <select class="form-input">
+            <option value="">Sélectionnez un délai</option>
+            <option>Le plus tôt possible (ASAP)</option>
+            <option>1 à 3 mois</option>
+            <option>3 à 6 mois</option>
+            <option>Plus de 6 mois</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cible visée</label>
+          <input type="text" class="form-input" placeholder="Ex: Entreprises B2B, Grand public..." />
+        </div>
+        <div class="form-group full-width">
+          <label class="form-label">Description du projet *</label>
+          <textarea class="form-input" rows="3" placeholder="Décrivez votre projet en quelques lignes..." required></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label class="form-label">Contexte du projet</label>
+          <textarea class="form-input" rows="2" placeholder="Contexte, problème à résoudre, objectifs..."></textarea>
+        </div>
+      </div>
+      <button type="submit" class="modal-submit">
+        <i class="fas fa-paper-plane"></i> Envoyer ma demande
+      </button>
+    </form>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/main.js"></script>
+<script>
+// Populate Home Page sections
+document.addEventListener('DOMContentLoaded', () => {
+  // Services Grid
+  const servicesGrid = document.getElementById('services-grid');
+  if (servicesGrid && typeof JUDDEV_DATA !== 'undefined') {
+    servicesGrid.innerHTML = JUDDEV_DATA.services.map((s, i) => `
+      <a href="service-detail.html?id=${s.id}" class="service-card reveal stagger-${(i % 8) + 1}" style="text-decoration:none">
+        <span class="service-card-icon">${s.icon}</span>
+        <div>
+          <div class="service-card-title">${s.title}</div>
+          <div class="service-card-subtitle">${s.subtitle}</div>
+        </div>
+        <p class="service-card-desc">${s.shortDesc}</p>
+        <span class="service-card-link">Voir les détails <i class="fas fa-arrow-right"></i></span>
+      </a>
+    `).join('');
+  }
+
+  // Realisations Grid (first 3)
+  const realisationsGrid = document.getElementById('realisations-grid');
+  if (realisationsGrid && typeof JUDDEV_DATA !== 'undefined') {
+    realisationsGrid.innerHTML = JUDDEV_DATA.realisations.slice(0, 3).map((r, i) => `
+      <a href="realisation-detail.html?id=${r.id}" class="realisation-card reveal stagger-${i + 1}" style="text-decoration:none">
+        <div class="realisation-card-img">
+          <img src="${r.image}" alt="${r.title}" loading="lazy" onerror="this.style.background='linear-gradient(135deg,#0066ff22,#00d4ff22)'" />
+          <div class="realisation-card-overlay">
+            <span class="overlay-btn">Voir la Réalisation</span>
+          </div>
+        </div>
+        <div class="realisation-card-body">
+          <span class="category-tag">${r.category}</span>
+          <h3 class="realisation-card-title">${r.title}</h3>
+          <p class="realisation-card-desc">${r.shortDesc}</p>
+        </div>
+      </a>
+    `).join('');
+  }
+
+  // Articles Grid (first 3)
+  const articlesGrid = document.getElementById('articles-grid');
+  if (articlesGrid && typeof JUDDEV_DATA !== 'undefined') {
+    articlesGrid.innerHTML = JUDDEV_DATA.articles.slice(0, 3).map((a, i) => `
+      <a href="article-detail.html?id=${a.id}" class="blog-card reveal stagger-${i + 1}" style="text-decoration:none">
+        <div class="blog-card-img">
+          <img src="${a.image}" alt="${a.title}" loading="lazy" onerror="this.style.background='var(--bg-secondary)'" />
+        </div>
+        <div class="blog-card-body">
+          <div class="blog-card-meta">
+            <span class="blog-card-category">${a.category}</span>
+            <span class="blog-card-date">${formatDate(a.date)}</span>
+          </div>
+          <h3 class="blog-card-title">${a.title}</h3>
+          <p class="blog-card-excerpt">${a.shortDesc}</p>
+          <div class="blog-card-author">
+            <div class="author-avatar">${getAuthorInitials(a.author)}</div>
+            <span class="author-name">${a.author}</span>
+            <span class="blog-card-link">Lire <i class="fas fa-arrow-right"></i></span>
+          </div>
+        </div>
+      </a>
+    `).join('');
+  }
+
+  // Re-init scroll animations after dynamic content
+  setTimeout(() => {
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+      obs.observe(el);
+    });
+  }, 200);
+});
+</script>
+</body>
+</html>

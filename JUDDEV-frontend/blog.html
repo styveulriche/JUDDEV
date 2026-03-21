@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog - JUDDEV CORPORATION</title>
+  <meta name="description" content="Blog JUDDEV CORPORATION : articles experts sur le développement web, mobile, l'IA, le cloud et le design digital." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+</head>
+<body>
+
+<div id="loader"><div class="loader-content"><div class="loader-logo">JUDDEV<span>CORPORATION</span></div><div class="loader-ring"></div></div></div>
+
+<nav id="navbar">
+  <div class="navbar-container">
+    <a href="index.html" class="navbar-logo">JUDDEV<span> CORPORATION</span></a>
+    <div class="navbar-links">
+      <a href="index.html">Accueil</a><a href="a-propos.html">À Propos</a>
+      <a href="services.html">Services</a><a href="realisations.html">Réalisations</a>
+      <a href="blog.html" class="active">Blog</a><a href="formations.html">Formations</a><a href="contact.html">Contact</a>
+    </div>
+    <div class="navbar-cta"><a href="#devis" class="btn-devis-nav">Demander un Devis</a></div>
+    <button class="navbar-hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="navbar-mobile">
+  <a href="index.html">Accueil</a><a href="a-propos.html">À Propos</a>
+  <a href="services.html">Services</a><a href="realisations.html">Réalisations</a>
+  <a href="blog.html" class="active">Blog</a><a href="formations.html">Formations</a><a href="contact.html">Contact</a>
+  <a href="#devis" class="btn-devis-nav">Demander un Devis</a>
+</div>
+
+<!-- BLOG CAROUSEL -->
+<div class="carousel" id="blog-carousel" style="margin-top:var(--navbar-height)">
+  <div class="carousel-track" id="carousel-track">
+    <!-- Populated by JS -->
+  </div>
+  <button class="carousel-nav carousel-prev" aria-label="Previous">
+    <i class="fas fa-chevron-left"></i>
+  </button>
+  <button class="carousel-nav carousel-next" aria-label="Next">
+    <i class="fas fa-chevron-right"></i>
+  </button>
+  <div class="carousel-dots" id="carousel-dots">
+    <!-- Populated by JS -->
+  </div>
+</div>
+
+<!-- ARTICLES GRID -->
+<section class="section">
+  <div class="container">
+    <div class="section-header reveal-left">
+      <span class="section-badge">INSIGHTS & EXPERTISES</span>
+      <h2 class="section-title">Tous nos <span>Articles</span></h2>
+      <p class="section-subtitle">Restez à la pointe de l'innovation avec nos publications expertes.</p>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="filter-bar reveal" id="blog-filters">
+      <button class="filter-btn active" data-filter="all">Tous</button>
+      <button class="filter-btn" data-filter="Intelligence Artificielle">IA</button>
+      <button class="filter-btn" data-filter="Architecture">Architecture</button>
+      <button class="filter-btn" data-filter="Mobile">Mobile</button>
+      <button class="filter-btn" data-filter="Cloud">Cloud</button>
+      <button class="filter-btn" data-filter="Design">Design</button>
+      <button class="filter-btn" data-filter="Startup">Startup</button>
+    </div>
+
+    <div class="grid-3" id="articles-grid">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section style="padding:5rem 0;background:var(--bg-secondary);border-top:1px solid var(--border-color)">
+  <div class="container">
+    <div style="max-width:600px;margin:0 auto;text-align:center">
+      <span class="section-badge" style="margin-bottom:1rem;display:inline-block">NEWSLETTER</span>
+      <h2 class="section-title reveal">Restez <span>informé</span></h2>
+      <p style="color:var(--text-muted);margin:1rem 0 2rem;reveal">Recevez nos derniers articles et insights directement dans votre boîte mail.</p>
+      <form style="display:flex;gap:0.75rem;max-width:450px;margin:0 auto" onsubmit="event.preventDefault();showNotification('success','Abonnement réussi !','Vous recevrez nos prochains articles par email.')">
+        <input type="email" class="form-input" placeholder="votre@email.com" required style="flex:1" />
+        <button type="submit" class="btn btn-primary" style="white-space:nowrap;padding:0.75rem 1.5rem">
+          <i class="fas fa-paper-plane"></i> S'abonner
+        </button>
+      </form>
+      <p style="font-size:0.75rem;color:var(--text-dim);margin-top:1rem">Pas de spam, désinscription facile à tout moment.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="index.html" class="footer-logo">JUDDEV<span>CORPORATION</span></a>
+        <p class="footer-desc">Votre partenaire technologique d'excellence.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        </div>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Navigation</h4>
+        <div class="footer-links">
+          <a href="index.html">Accueil</a><a href="a-propos.html">À Propos</a>
+          <a href="services.html">Services</a><a href="realisations.html">Réalisations</a>
+          <a href="blog.html">Blog</a><a href="contact.html">Contact</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Services</h4>
+        <div class="footer-links">
+          <a href="service-detail.html?id=dev-web">Développement Web</a>
+          <a href="service-detail.html?id=dev-mobile">Applications Mobiles</a>
+          <a href="service-detail.html?id=saas">Produits SaaS</a>
+          <a href="service-detail.html?id=ux-design">UI/UX Design</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Contact</h4>
+        <div class="footer-contact-item"><i class="fas fa-envelope"></i><span>contact@juddev.com</span></div>
+        <div class="footer-contact-item"><i class="fas fa-phone"></i><span>+237 6XX XXX XXX</span></div>
+        <div class="footer-contact-item"><i class="fas fa-map-marker-alt"></i><span>Yaoundé, Cameroun</span></div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copyright">© 2025 JUDDEV CORPORATION. Tous droits réservés.</span>
+      <div class="footer-bottom-links"><a href="#">Mentions légales</a><a href="#">Confidentialité</a></div>
+    </div>
+  </div>
+</footer>
+
+<!-- DEVIS MODAL -->
+<div id="devis-modal" class="modal">
+  <div class="modal-backdrop"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h2 class="modal-title">Demander un Devis</h2><button class="modal-close">✕</button></div>
+    <form id="devis-form">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Nom complet *</label><input type="text" class="form-input" placeholder="Jean Dupont" required /></div>
+        <div class="form-group"><label class="form-label">Email *</label><input type="email" class="form-input" placeholder="jean@exemple.com" required /></div>
+        <div class="form-group"><label class="form-label">Téléphone</label><input type="tel" class="form-input" placeholder="+237 6XX XXX XXX" /></div>
+        <div class="form-group"><label class="form-label">Entreprise</label><input type="text" class="form-input" placeholder="Votre entreprise" /></div>
+        <div class="form-group"><label class="form-label">Service *</label>
+          <select class="form-input" required><option value="">Sélectionnez</option>
+            <option>Développement Web</option><option>Applications Mobiles</option><option>Produits SaaS</option>
+            <option>UI/UX Design</option><option>Cloud Engineering</option><option>IA & Automatisation</option><option>Autre</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Budget</label>
+          <select class="form-input"><option>Moins de 500 000 FCFA</option><option>500k - 1M FCFA</option>
+            <option>1M - 5M FCFA</option><option>Plus de 5M FCFA</option>
+          </select>
+        </div>
+        <div class="form-group full-width"><label class="form-label">Description *</label><textarea class="form-input" rows="3" placeholder="Décrivez votre projet..." required></textarea></div>
+      </div>
+      <button type="submit" class="modal-submit"><i class="fas fa-paper-plane"></i> Envoyer</button>
+    </form>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof JUDDEV_DATA === 'undefined') return;
+
+  // Build carousel
+  const carouselTrack = document.getElementById('carousel-track');
+  const carouselDots = document.getElementById('carousel-dots');
+  const featuredArticles = JUDDEV_DATA.articles.slice(0, 3);
+
+  if (carouselTrack) {
+    carouselTrack.innerHTML = featuredArticles.map(a => `
+      <div class="carousel-slide">
+        <img src="${a.image}" alt="${a.title}" onerror="this.style.background='var(--bg-secondary)'" />
+        <div class="carousel-overlay"></div>
+        <div class="carousel-content">
+          <div class="carousel-meta">
+            <span class="category-tag">${a.category}</span>
+            <span style="font-size:0.875rem;color:rgba(255,255,255,0.7)">${formatDate(a.date)}</span>
+          </div>
+          <h2 class="carousel-title">${a.title}</h2>
+          <p style="color:rgba(255,255,255,0.7);margin-bottom:1.5rem;max-width:600px;font-size:1rem;line-height:1.6">${a.shortDesc}</p>
+          <a href="article-detail.html?id=${a.id}" class="carousel-btn">
+            Lire l'article <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  if (carouselDots) {
+    carouselDots.innerHTML = featuredArticles.map((_, i) =>
+      `<div class="carousel-dot${i === 0 ? ' active' : ''}" data-index="${i}"></div>`
+    ).join('');
+  }
+
+  // Init carousel
+  const carousel = document.getElementById('blog-carousel');
+  if (carousel) initCarousel(carousel);
+
+  // Build articles grid
+  const grid = document.getElementById('articles-grid');
+
+  function renderArticles(items) {
+    if (!grid) return;
+    grid.innerHTML = items.map((a, i) => `
+      <a href="article-detail.html?id=${a.id}" class="blog-card reveal stagger-${(i % 3) + 1}" style="text-decoration:none" data-filter-cat="${a.category}">
+        <div class="blog-card-img">
+          <img src="${a.image}" alt="${a.title}" loading="lazy" onerror="this.style.background='var(--bg-secondary)'" />
+        </div>
+        <div class="blog-card-body">
+          <div class="blog-card-meta">
+            <span class="blog-card-category">${a.category}</span>
+            <span class="blog-card-date">${formatDate(a.date)}</span>
+          </div>
+          <h3 class="blog-card-title">${a.title}</h3>
+          <p class="blog-card-excerpt">${a.shortDesc}</p>
+          <div class="blog-card-author">
+            <div class="author-avatar">${getAuthorInitials(a.author)}</div>
+            <span class="author-name">${a.author}</span>
+            <span class="blog-card-link">Lire <i class="fas fa-arrow-right"></i></span>
+          </div>
+        </div>
+      </a>
+    `).join('');
+
+    setTimeout(() => {
+      grid.querySelectorAll('.reveal').forEach(el => {
+        const obs = new IntersectionObserver((entries) => {
+          entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+        }, { threshold: 0.05 });
+        obs.observe(el);
+      });
+    }, 50);
+  }
+
+  renderArticles(JUDDEV_DATA.articles);
+
+  // Blog category filters
+  document.querySelectorAll('#blog-filters .filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#blog-filters .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      const filtered = filter === 'all'
+        ? JUDDEV_DATA.articles
+        : JUDDEV_DATA.articles.filter(a => a.category === filter);
+      renderArticles(filtered);
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connexion - JUDDEV CORPORATION Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #080c18;
+      --bg2: #0d1526;
+      --card: #111827;
+      --blue: #0066ff;
+      --cyan: #00d4ff;
+      --gradient: linear-gradient(135deg, #0066ff, #00d4ff);
+      --text: #ffffff;
+      --text2: #e2e8f0;
+      --muted: #94a3b8;
+      --dim: #475569;
+      --border: rgba(0,102,255,0.2);
+      --error: #ef4444;
+      --success: #22c55e;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Animated background */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,102,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,102,255,0.05) 1px, transparent 1px);
+      background-size: 50px 50px;
+    }
+
+    .bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      animation: orbFloat 8s ease-in-out infinite;
+    }
+
+    .bg-orb-1 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(0,102,255,0.15) 0%, transparent 70%);
+      top: -100px; left: -100px;
+    }
+
+    .bg-orb-2 {
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, rgba(0,212,255,0.1) 0%, transparent 70%);
+      bottom: -80px; right: -80px;
+      animation-delay: -4s;
+    }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, 20px) scale(1.05); }
+    }
+
+    /* Login Card */
+    .login-wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      padding: 1.5rem;
+    }
+
+    .login-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      padding: 2.5rem;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.5), 0 0 60px rgba(0,102,255,0.1);
+      animation: cardIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Logo */
+    .login-logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-logo-text {
+      font-family: 'Poppins', sans-serif;
+      font-size: 2rem;
+      font-weight: 900;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.05em;
+      line-height: 1;
+    }
+
+    .login-logo-sub {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-top: 0.25rem;
+    }
+
+    .login-divider {
+      width: 60px;
+      height: 2px;
+      background: var(--gradient);
+      margin: 1rem auto;
+      border-radius: 2px;
+    }
+
+    .login-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text2);
+      text-align: center;
+      margin-bottom: 0.25rem;
+    }
+
+    .login-subtitle {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    /* Form */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.02em;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--dim);
+      font-size: 0.9rem;
+      pointer-events: none;
+      transition: color 0.2s;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.85rem 1rem 0.85rem 2.75rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 0.625rem;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      outline: none;
+    }
+
+    .form-input:focus {
+      background: rgba(0,102,255,0.08);
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(0,102,255,0.15);
+    }
+
+    .form-input:focus + .input-icon,
+    .input-wrapper:focus-within .input-icon {
+      color: var(--blue);
+    }
+
+    .form-input::placeholder {
+      color: var(--dim);
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--dim);
+      cursor: pointer;
+      padding: 0.25rem;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    .toggle-password:hover { color: var(--muted); }
+
+    /* Error Alert */
+    .alert {
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.825rem;
+      margin-bottom: 1.25rem;
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      animation: slideIn 0.3s ease;
+    }
+
+    .alert.show { display: flex; }
+
+    .alert-error {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #fca5a5;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Submit Button */
+    .btn-login {
+      width: 100%;
+      padding: 0.9rem 1.5rem;
+      background: var(--gradient);
+      border: none;
+      border-radius: 0.625rem;
+      color: white;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      box-shadow: 0 4px 20px rgba(0,102,255,0.4);
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0,102,255,0.5);
+    }
+
+    .btn-login:active { transform: translateY(0); }
+
+    .btn-login:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-login .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    .btn-login.loading .btn-text { display: none; }
+    .btn-login.loading .spinner { display: block; }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Footer */
+    .login-footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--dim);
+    }
+
+    .login-footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .login-footer a:hover { color: var(--blue); }
+
+    .admin-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: rgba(0,102,255,0.1);
+      border: 1px solid var(--border);
+      border-radius: 2rem;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--blue);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-layer">
+  <div class="bg-grid"></div>
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+</div>
+
+<div class="login-wrapper">
+  <div class="login-card">
+
+    <div class="login-logo">
+      <div class="admin-badge">
+        <i class="fas fa-shield-halved"></i>
+        Panneau d'administration
+      </div>
+      <div class="login-logo-text">JUDDEV</div>
+      <div class="login-logo-sub">CORPORATION</div>
+      <div class="login-divider"></div>
+    </div>
+
+    <div class="login-title">Connexion Administrateur</div>
+    <div class="login-subtitle">Accédez au tableau de bord de gestion du site</div>
+
+    <div class="alert alert-error" id="error-alert">
+      <i class="fas fa-circle-exclamation"></i>
+      <span id="error-msg">Identifiants incorrects.</span>
+    </div>
+
+    <form id="login-form" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label class="form-label" for="email">
+          <i class="fas fa-envelope" style="margin-right:0.35rem;color:var(--blue)"></i>
+          Adresse Email
+        </label>
+        <div class="input-wrapper">
+          <input
+            type="email"
+            id="email"
+            name="email"
+            class="form-input"
+            placeholder="admin@juddev.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">
+          <i class="fas fa-lock" style="margin-right:0.35rem;color:var(--blue)"></i>
+          Mot de Passe
+        </label>
+        <div class="input-wrapper">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="form-input"
+            placeholder="••••••••••••"
+            autocomplete="current-password"
+            required
+          />
+          <button type="button" class="toggle-password" onclick="togglePwd()" id="pwd-toggle" title="Afficher/masquer">
+            <i class="fas fa-eye" id="pwd-icon"></i>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-login" id="login-btn">
+        <div class="spinner"></div>
+        <span class="btn-text">
+          <i class="fas fa-arrow-right-to-bracket"></i>
+          Se Connecter
+        </span>
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <a href="../JUDDEV-frontend/index.html">
+        <i class="fas fa-arrow-left" style="margin-right:0.3rem"></i>
+        Retour au site
+      </a>
+      &nbsp;·&nbsp;
+      <span>© 2025 JUDDEV CORPORATION</span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const API_URL = 'http://localhost:5000/api';
+
+  // Check if already logged in
+  (function checkAuth() {
+    const token = localStorage.getItem('juddev_token');
+    if (token) {
+      // Verify token is still valid
+      fetch(API_URL + '/auth/verify', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      }).then(res => {
+        if (res.ok) {
+          window.location.href = 'index.html';
+        } else {
+          localStorage.removeItem('juddev_token');
+        }
+      }).catch(() => {
+        // API offline - don't redirect
+      });
+    }
+  })();
+
+  function togglePwd() {
+    const input = document.getElementById('password');
+    const icon = document.getElementById('pwd-icon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.className = 'fas fa-eye-slash';
+    } else {
+      input.type = 'password';
+      icon.className = 'fas fa-eye';
+    }
+  }
+
+  async function handleLogin(e) {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const btn = document.getElementById('login-btn');
+    const alert = document.getElementById('error-alert');
+    const errorMsg = document.getElementById('error-msg');
+
+    // Hide error
+    alert.classList.remove('show');
+
+    // Show loading
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(API_URL + '/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.token) {
+        localStorage.setItem('juddev_token', data.token);
+        localStorage.setItem('juddev_user', JSON.stringify(data.user));
+        // Smooth redirect
+        btn.innerHTML = '<i class="fas fa-check"></i> Connexion réussie...';
+        btn.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+        setTimeout(() => { window.location.href = 'index.html'; }, 800);
+      } else {
+        errorMsg.textContent = data.message || 'Identifiants incorrects.';
+        alert.classList.add('show');
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    } catch (err) {
+      errorMsg.textContent = 'Impossible de contacter le serveur. Vérifiez que le backend est démarré.';
+      alert.classList.add('show');
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+  }
+</script>
+
+</body>
+</html>

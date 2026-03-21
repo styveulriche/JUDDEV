@@ -1,0 +1,1053 @@
+/* ============================================================
+   JUDDEV CORPORATION - Dashboard JavaScript
+   Full CRUD management via Backend API
+   ============================================================ */
+
+'use strict';
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!checkAuth()) return;
+
+  // Update user info in sidebar
+  const user = JSON.parse(localStorage.getItem('juddev_user') || '{}');
+  const avatarEl = document.querySelector('.sidebar-footer-avatar');
+  const userNameEl = document.querySelector('.sidebar-footer-user > div > div:first-child');
+  if (user.email && userNameEl) {
+    userNameEl.textContent = user.email.split('@')[0];
+  }
+
+  initNavigation();
+  await loadDashboardStats();
+  updateSyncTime();
+});
+
+function updateSyncTime() {
+  const el = document.getElementById('sync-time');
+  if (el) el.textContent = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+}
+
+// ============================================================
+// TOAST NOTIFICATIONS
+// ============================================================
+function showToast(type, title, message) {
+  const existing = document.querySelector('.toast-notification');
+  if (existing) existing.remove();
+
+  const icons = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info', warning: 'fa-triangle-exclamation' };
+  const colors = { success: '#22c55e', error: '#ef4444', info: '#3b82f6', warning: '#f59e0b' };
+
+  const toast = document.createElement('div');
+  toast.className = 'toast-notification';
+  toast.style.cssText = `
+    position:fixed;top:1.5rem;right:1.5rem;z-index:9999;
+    background:var(--bg-card);border:1px solid var(--border-color);
+    border-radius:0.75rem;padding:1rem 1.25rem;
+    display:flex;align-items:flex-start;gap:0.75rem;min-width:280px;max-width:380px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.5);
+    animation:toastIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  `;
+  toast.innerHTML = `
+    <style>@keyframes toastIn{from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:translateX(0)}}</style>
+    <i class="fas ${icons[type] || icons.info}" style="color:${colors[type] || colors.info};font-size:1.1rem;margin-top:0.1rem;flex-shrink:0"></i>
+    <div style="flex:1">
+      <div style="font-weight:600;font-size:0.875rem;color:var(--text-primary);margin-bottom:0.2rem">${title}</div>
+      <div style="font-size:0.8rem;color:var(--text-muted)">${message}</div>
+    </div>
+    <button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:0.9rem;flex-shrink:0">
+      <i class="fas fa-xmark"></i>
+    </button>
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => { if (toast.parentElement) toast.remove(); }, 5000);
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function initNavigation() {
+  document.querySelectorAll('[data-section]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      navigateTo(link.dataset.section);
+    });
+  });
+
+  const hamburger = document.getElementById('sidebar-hamburger');
+  const sidebar = document.querySelector('.sidebar');
+  if (hamburger && sidebar) {
+    hamburger.addEventListener('click', () => sidebar.classList.toggle('open'));
+  }
+}
+
+async function navigateTo(sectionId) {
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  const activeLink = document.querySelector(`[data-section="${sectionId}"]`);
+  if (activeLink) activeLink.classList.add('active');
+
+  document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
+  const section = document.getElementById(`section-${sectionId}`);
+  if (section) section.classList.add('active');
+
+  const titles = {
+    'dashboard': 'Tableau de Bord',
+    'services': 'Services',
+    'realisations': 'Réalisations',
+    'articles': 'Articles de Blog',
+    'formations': 'Formations',
+    'contacts': 'Contacts & Infos',
+    'messages': 'Messages Reçus'
+  };
+  const titleEl = document.getElementById('topbar-title');
+  if (titleEl) titleEl.textContent = titles[sectionId] || sectionId;
+
+  // Load section data
+  switch (sectionId) {
+    case 'dashboard': await loadDashboardStats(); break;
+    case 'services': await loadServices(); break;
+    case 'realisations': await loadRealisations(); break;
+    case 'articles': await loadArticles(); break;
+    case 'formations': await loadFormations(); break;
+    case 'contacts': await loadContacts(); break;
+    case 'messages': await loadMessages(); break;
+  }
+}
+
+// ============================================================
+// DASHBOARD STATS
+// ============================================================
+async function loadDashboardStats() {
+  const section = document.getElementById('section-dashboard');
+  if (!section) return;
+
+  section.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:200px">
+    <div style="text-align:center"><i class="fas fa-circle-notch fa-spin" style="font-size:2rem;color:var(--accent-blue)"></i>
+    <p style="color:var(--text-muted);margin-top:1rem">Chargement...</p></div></div>`;
+
+  try {
+    const [services, realisations, articles, formations, messages] = await Promise.all([
+      apiGet('/services').catch(() => []),
+      apiGet('/realisations').catch(() => []),
+      apiGet('/articles').catch(() => []),
+      apiGet('/formations').catch(() => []),
+      apiGet('/contact/messages').catch(() => [])
+    ]);
+
+    const unread = (messages || []).filter(m => !m.read).length;
+    const stats = [
+      { icon: 'fa-gears', label: 'Services', count: (services||[]).length, color: '#0066ff', section: 'services' },
+      { icon: 'fa-trophy', label: 'Réalisations', count: (realisations||[]).length, color: '#00d4ff', section: 'realisations' },
+      { icon: 'fa-newspaper', label: 'Articles', count: (articles||[]).length, color: '#8b5cf6', section: 'articles' },
+      { icon: 'fa-graduation-cap', label: 'Formations', count: (formations||[]).length, color: '#22c55e', section: 'formations' },
+      { icon: 'fa-envelope', label: 'Messages', count: (messages||[]).length, color: '#f59e0b', section: 'messages', badge: unread }
+    ];
+
+    // Update nav badges
+    const badgeMap = { services: services?.length, realisations: realisations?.length, articles: articles?.length, messages: unread };
+    Object.entries(badgeMap).forEach(([key, val]) => {
+      const badge = document.getElementById(`badge-${key}`);
+      if (badge) badge.textContent = val || 0;
+    });
+
+    section.innerHTML = `
+      <div style="margin-bottom:2rem">
+        <h2 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);margin-bottom:0.25rem">
+          Bonjour, <span style="background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">JUDDEV Admin</span> 👋
+        </h2>
+        <p style="color:var(--text-muted);font-size:0.875rem">Bienvenue dans votre espace d'administration</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;margin-bottom:2rem">
+        ${stats.map(s => `
+          <div onclick="navigateTo('${s.section}')" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden"
+               onmouseover="this.style.borderColor='${s.color}';this.style.transform='translateY(-2px)'"
+               onmouseout="this.style.borderColor='var(--border-color)';this.style.transform='translateY(0)'">
+            <div style="width:44px;height:44px;border-radius:0.75rem;background:${s.color}20;display:flex;align-items:center;justify-content:center;margin-bottom:1rem">
+              <i class="fas ${s.icon}" style="color:${s.color};font-size:1.1rem"></i>
+            </div>
+            <div style="font-size:2rem;font-weight:800;color:var(--text-primary);line-height:1">${s.count}</div>
+            <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.25rem">${s.label}</div>
+            ${s.badge ? `<div style="position:absolute;top:1rem;right:1rem;background:${s.color};color:white;border-radius:999px;min-width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;padding:0 0.35rem">${s.badge}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem">
+          <h3 style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem">
+            <i class="fas fa-bolt" style="color:var(--accent-blue)"></i> Actions Rapides
+          </h3>
+          <div style="display:flex;flex-direction:column;gap:0.5rem">
+            ${[
+              {icon:'fa-plus',label:'Ajouter un Service',section:'services'},
+              {icon:'fa-plus',label:'Ajouter un Article',section:'articles'},
+              {icon:'fa-plus',label:'Ajouter une Réalisation',section:'realisations'},
+              {icon:'fa-envelope',label:'Voir les Messages',section:'messages'}
+            ].map(a => `
+              <button onclick="navigateTo('${a.section}')" style="background:rgba(0,102,255,0.05);border:1px solid var(--border-color);border-radius:0.5rem;padding:0.65rem 1rem;color:var(--text-muted);font-size:0.8rem;cursor:pointer;text-align:left;display:flex;align-items:center;gap:0.6rem;transition:all 0.2s;font-family:inherit"
+                onmouseover="this.style.background='rgba(0,102,255,0.12)';this.style.color='var(--text-primary)'"
+                onmouseout="this.style.background='rgba(0,102,255,0.05)';this.style.color='var(--text-muted)'">
+                <i class="fas ${a.icon}" style="color:var(--accent-blue)"></i> ${a.label}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
+        <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem">
+          <h3 style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem">
+            <i class="fas fa-circle-info" style="color:var(--accent-cyan)"></i> Système
+          </h3>
+          <div style="display:flex;flex-direction:column;gap:0.75rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:0.5rem;border-bottom:1px solid rgba(255,255,255,0.04)">
+              <span style="font-size:0.8rem;color:var(--text-muted)">API Backend</span>
+              <span style="font-size:0.75rem;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#4ade80;border-radius:999px;padding:0.15rem 0.6rem;font-weight:600">✓ Connecté</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:0.5rem;border-bottom:1px solid rgba(255,255,255,0.04)">
+              <span style="font-size:0.8rem;color:var(--text-muted)">Base de données</span>
+              <span style="font-size:0.75rem;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#4ade80;border-radius:999px;padding:0.15rem 0.6rem;font-weight:600">✓ MongoDB</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:0.8rem;color:var(--text-muted)">Dernière synchro</span>
+              <span style="font-size:0.75rem;color:var(--text-muted)">${new Date().toLocaleString('fr-FR')}</span>
+            </div>
+          </div>
+          <div style="margin-top:1rem">
+            <a href="http://localhost:5000" target="_blank" style="display:flex;align-items:center;gap:0.5rem;background:var(--gradient-primary);color:white;border-radius:0.5rem;padding:0.6rem 1rem;text-decoration:none;font-size:0.8rem;font-weight:600">
+              <i class="fas fa-arrow-up-right-from-square"></i> Voir le site vitrine
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    section.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text-muted)">
+      <i class="fas fa-triangle-exclamation" style="font-size:2rem;color:var(--accent-blue);margin-bottom:1rem"></i>
+      <p>Erreur de chargement. Vérifiez que le backend est démarré.</p>
+      <p style="font-size:0.8rem;margin-top:0.5rem">${err.message}</p>
+    </div>`;
+  }
+}
+
+// ============================================================
+// GENERIC LIST VIEW BUILDER
+// ============================================================
+function buildListSection(containerId, { title, addLabel, onAdd, items, renderItem }) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+      <h2 style="font-size:1.25rem;font-weight:700;color:var(--text-primary)">${title}</h2>
+      <button onclick="${onAdd}()" class="btn-add" style="background:var(--gradient-primary);border:none;color:white;padding:0.65rem 1.25rem;border-radius:0.5rem;font-size:0.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.5rem;font-family:inherit">
+        <i class="fas fa-plus"></i> ${addLabel}
+      </button>
+    </div>
+    <div id="${containerId}-list" style="display:flex;flex-direction:column;gap:0.75rem">
+      ${items.length === 0 ? `<div style="text-align:center;padding:3rem;color:var(--text-muted);border:1px dashed var(--border-color);border-radius:1rem">Aucun élément. Cliquez sur "Ajouter" pour commencer.</div>` : items.map(renderItem).join('')}
+    </div>
+  `;
+}
+
+function itemCard(opts) {
+  const { image, title, subtitle, badge, onEdit, onDelete, extra = '' } = opts;
+  const imgHtml = image
+    ? `<img src="${resolveImageUrl(image)}" style="width:56px;height:56px;object-fit:cover;border-radius:0.5rem;flex-shrink:0" onerror="this.style.background='var(--bg-secondary)';this.src=''" />`
+    : `<div style="width:56px;height:56px;background:rgba(0,102,255,0.1);border-radius:0.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.5rem">${opts.icon || '📄'}</div>`;
+
+  return `
+    <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:0.75rem;padding:1rem;display:flex;align-items:center;gap:1rem;transition:border-color 0.2s"
+         onmouseover="this.style.borderColor='rgba(0,102,255,0.4)'" onmouseout="this.style.borderColor='var(--border-color)'">
+      ${imgHtml}
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;color:var(--text-primary);font-size:0.9rem;margin-bottom:0.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${title}</div>
+        <div style="font-size:0.78rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${subtitle || ''}</div>
+        ${extra}
+      </div>
+      ${badge ? `<span style="background:rgba(0,102,255,0.1);border:1px solid rgba(0,102,255,0.2);color:var(--accent-light);border-radius:999px;padding:0.2rem 0.65rem;font-size:0.72rem;font-weight:600;flex-shrink:0">${badge}</span>` : ''}
+      <div style="display:flex;gap:0.5rem;flex-shrink:0">
+        <button onclick="${onEdit}" style="background:rgba(0,102,255,0.1);border:1px solid rgba(0,102,255,0.2);color:var(--accent-light);border-radius:0.375rem;padding:0.45rem 0.7rem;cursor:pointer;font-size:0.8rem;transition:all 0.2s;font-family:inherit"
+          onmouseover="this.style.background='rgba(0,102,255,0.2)'" onmouseout="this.style.background='rgba(0,102,255,0.1)'">
+          <i class="fas fa-pen"></i>
+        </button>
+        <button onclick="${onDelete}" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;border-radius:0.375rem;padding:0.45rem 0.7rem;cursor:pointer;font-size:0.8rem;transition:all 0.2s;font-family:inherit"
+          onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='rgba(239,68,68,0.1)'">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// MODAL SYSTEM
+// ============================================================
+function openModal(title, bodyHTML, onSubmit, submitLabel = 'Sauvegarder') {
+  let modal = document.getElementById('dash-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'dash-modal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:1000;display:flex;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto';
+    document.body.appendChild(modal);
+  }
+
+  modal.innerHTML = `
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px)" onclick="closeModal()"></div>
+    <div style="position:relative;background:var(--bg-card);border:1px solid var(--border-color);border-radius:1.25rem;width:100%;max-width:640px;margin:auto;padding:2rem;box-shadow:0 25px 80px rgba(0,0,0,0.6)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+        <h2 style="font-size:1.1rem;font-weight:700;color:var(--text-primary)">${title}</h2>
+        <button onclick="closeModal()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:var(--text-muted);width:32px;height:32px;border-radius:0.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit">
+          <i class="fas fa-xmark"></i>
+        </button>
+      </div>
+      <form id="dash-form" onsubmit="return false">
+        ${bodyHTML}
+        <div style="display:flex;gap:0.75rem;margin-top:1.5rem;justify-content:flex-end">
+          <button type="button" onclick="closeModal()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:var(--text-muted);padding:0.65rem 1.25rem;border-radius:0.5rem;cursor:pointer;font-family:inherit;font-size:0.85rem">
+            Annuler
+          </button>
+          <button type="button" id="modal-submit-btn" onclick="${onSubmit}()" style="background:var(--gradient-primary);border:none;color:white;padding:0.65rem 1.5rem;border-radius:0.5rem;cursor:pointer;font-weight:600;font-family:inherit;font-size:0.85rem;display:flex;align-items:center;gap:0.5rem">
+            <i class="fas fa-check"></i> ${submitLabel}
+          </button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  const modal = document.getElementById('dash-modal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function formField(label, input, hint = '') {
+  return `<div style="margin-bottom:1rem">
+    <label style="display:block;font-size:0.8rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem">${label}</label>
+    ${input}
+    ${hint ? `<div style="font-size:0.73rem;color:var(--text-dim);margin-top:0.25rem">${hint}</div>` : ''}
+  </div>`;
+}
+
+const inputStyle = 'width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:0.5rem;padding:0.65rem 0.85rem;color:var(--text-primary);font-family:inherit;font-size:0.875rem;outline:none;transition:border-color 0.2s';
+const textareaStyle = inputStyle + ';resize:vertical;min-height:80px';
+
+// ============================================================
+// SERVICES
+// ============================================================
+let allServices = [];
+
+async function loadServices() {
+  const section = document.getElementById('section-services');
+  if (!section) return;
+  section.innerHTML = `<div style="text-align:center;padding:2rem"><i class="fas fa-circle-notch fa-spin" style="color:var(--accent-blue);font-size:1.5rem"></i></div>`;
+
+  try {
+    allServices = await apiGet('/services') || [];
+    renderServices();
+  } catch (err) {
+    section.innerHTML = `<p style="color:var(--text-muted)">Erreur: ${err.message}</p>`;
+  }
+}
+
+function renderServices() {
+  buildListSection('section-services', {
+    title: `Services <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">(${allServices.length})</span>`,
+    addLabel: 'Nouveau Service',
+    onAdd: 'showAddService',
+    items: allServices,
+    renderItem: (s) => itemCard({
+      image: s.image, icon: s.icon,
+      title: `${s.icon || ''} ${s.title}`,
+      subtitle: s.subtitle,
+      badge: s.category,
+      onEdit: `editService('${s.id}')`,
+      onDelete: `deleteService('${s.id}')`
+    })
+  });
+}
+
+function getServiceForm(s = {}) {
+  return `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      ${formField('Titre *', `<input id="s-title" style="${inputStyle}" value="${s.title||''}" placeholder="Ex: Développement Web" required />`)}
+      ${formField('Sous-titre', `<input id="s-subtitle" style="${inputStyle}" value="${s.subtitle||''}" placeholder="Ex: Maîtrisez votre présence en ligne" />`)}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      ${formField('Icône (emoji)', `<input id="s-icon" style="${inputStyle}" value="${s.icon||'⚙️'}" placeholder="💻" />`)}
+      ${formField('Catégorie', `<select id="s-category" style="${inputStyle}">
+        <option value="web" ${s.category==='web'?'selected':''}>Web</option>
+        <option value="mobile" ${s.category==='mobile'?'selected':''}>Mobile</option>
+        <option value="cloud" ${s.category==='cloud'?'selected':''}>Cloud/SaaS</option>
+        <option value="design" ${s.category==='design'?'selected':''}>Design</option>
+        <option value="marketing" ${s.category==='marketing'?'selected':''}>Marketing</option>
+        <option value="ia" ${s.category==='ia'?'selected':''}>IA</option>
+      </select>`)}
+    </div>
+    ${formField('Image', `<input type="file" id="s-image" accept="image/*" style="${inputStyle};padding:0.5rem" />${s.image ? `<div style="margin-top:0.5rem"><img src="${resolveImageUrl(s.image)}" style="height:60px;border-radius:0.375rem;object-fit:cover" onerror="this.style.display='none'" /></div>` : ''}`, 'Laissez vide pour garder l\'image actuelle')}
+    ${formField('Description courte *', `<textarea id="s-shortdesc" style="${textareaStyle};min-height:60px" placeholder="Description courte...">${s.shortDesc||''}</textarea>`)}
+    ${formField('Description longue', `<textarea id="s-longdesc" style="${textareaStyle}" placeholder="Description détaillée...">${s.longDesc||''}</textarea>`)}
+    ${formField('Fonctionnalités', `<textarea id="s-features" style="${textareaStyle};min-height:80px" placeholder="Une fonctionnalité par ligne...">${(s.features||[]).join('\n')}</textarea>`, 'Une fonctionnalité par ligne')}
+    ${formField('Technologies', `<input id="s-techs" style="${inputStyle}" value="${(s.technologies||[]).join(', ')}" placeholder="React, Node.js, MongoDB..." />`, 'Séparées par des virgules')}
+  `;
+}
+
+function showAddService() {
+  openModal('➕ Nouveau Service', getServiceForm(), 'saveNewService');
+}
+
+async function saveNewService() {
+  const btn = document.getElementById('modal-submit-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
+
+  try {
+    const fd = new FormData();
+    fd.append('title', document.getElementById('s-title').value);
+    fd.append('subtitle', document.getElementById('s-subtitle').value);
+    fd.append('icon', document.getElementById('s-icon').value);
+    fd.append('category', document.getElementById('s-category').value);
+    fd.append('shortDesc', document.getElementById('s-shortdesc').value);
+    fd.append('longDesc', document.getElementById('s-longdesc').value);
+    fd.append('features', document.getElementById('s-features').value);
+    fd.append('technologies', document.getElementById('s-techs').value);
+    const imgFile = document.getElementById('s-image').files[0];
+    if (imgFile) fd.append('image', imgFile);
+
+    await apiPostForm('/services', fd);
+    closeModal();
+    showToast('success', 'Service créé', 'Le service a été ajouté avec succès.');
+    await loadServices();
+    updateSyncTime();
+  } catch (err) {
+    showToast('error', 'Erreur', err.message);
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
+  }
+}
+
+function editService(id) {
+  const s = allServices.find(x => x.id === id);
+  if (!s) return;
+  openModal('✏️ Modifier le Service', getServiceForm(s), `() => saveEditService('${id}')`);
+  // Fix the onclick since we can't pass function directly
+  document.getElementById('modal-submit-btn').onclick = () => saveEditService(id);
+}
+
+async function saveEditService(id) {
+  const btn = document.getElementById('modal-submit-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
+
+  try {
+    const fd = new FormData();
+    fd.append('title', document.getElementById('s-title').value);
+    fd.append('subtitle', document.getElementById('s-subtitle').value);
+    fd.append('icon', document.getElementById('s-icon').value);
+    fd.append('category', document.getElementById('s-category').value);
+    fd.append('shortDesc', document.getElementById('s-shortdesc').value);
+    fd.append('longDesc', document.getElementById('s-longdesc').value);
+    fd.append('features', document.getElementById('s-features').value);
+    fd.append('technologies', document.getElementById('s-techs').value);
+    const imgFile = document.getElementById('s-image').files[0];
+    if (imgFile) fd.append('image', imgFile);
+
+    await apiPutForm('/services/' + id, fd);
+    closeModal();
+    showToast('success', 'Service mis à jour', 'Les modifications ont été sauvegardées.');
+    await loadServices();
+    updateSyncTime();
+  } catch (err) {
+    showToast('error', 'Erreur', err.message);
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
+  }
+}
+
+async function deleteService(id) {
+  if (!confirm('Supprimer ce service ? Cette action est irréversible.')) return;
+  try {
+    await apiDelete('/services/' + id);
+    showToast('success', 'Supprimé', 'Service supprimé.');
+    await loadServices();
+  } catch (err) {
+    showToast('error', 'Erreur', err.message);
+  }
+}
+
+// ============================================================
+// REALISATIONS
+// ============================================================
+let allRealisations = [];
+
+async function loadRealisations() {
+  const section = document.getElementById('section-realisations');
+  if (!section) return;
+  section.innerHTML = `<div style="text-align:center;padding:2rem"><i class="fas fa-circle-notch fa-spin" style="color:var(--accent-blue);font-size:1.5rem"></i></div>`;
+
+  try {
+    allRealisations = await apiGet('/realisations') || [];
+    buildListSection('section-realisations', {
+      title: `Réalisations <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">(${allRealisations.length})</span>`,
+      addLabel: 'Nouvelle Réalisation',
+      onAdd: 'showAddRealisation',
+      items: allRealisations,
+      renderItem: (r) => itemCard({
+        image: r.image, title: r.title, subtitle: `${r.client || ''} · ${r.year || ''} · ${r.sector || ''}`, badge: r.category,
+        onEdit: `editRealisation('${r.id}')`, onDelete: `deleteRealisation('${r.id}')`
+      })
+    });
+  } catch (err) {
+    section.innerHTML = `<p style="color:var(--text-muted)">Erreur: ${err.message}</p>`;
+  }
+}
+
+function getRealisationForm(r = {}) {
+  return `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      ${formField('Titre *', `<input id="r-title" style="${inputStyle}" value="${r.title||''}" required />`)}
+      ${formField('Catégorie', `<input id="r-category" style="${inputStyle}" value="${r.category||''}" placeholder="E-commerce, Mobile, SaaS..." />`)}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
+      ${formField('Client', `<input id="r-client" style="${inputStyle}" value="${r.client||''}" />`)}
+      ${formField('Année', `<input id="r-year" style="${inputStyle}" value="${r.year||''}" placeholder="2025" />`)}
+      ${formField('Secteur', `<input id="r-sector" style="${inputStyle}" value="${r.sector||''}" placeholder="Commerce, Finance..." />`)}
+    </div>
+    ${formField('Image principale', `<input type="file" id="r-image" accept="image/*" style="${inputStyle};padding:0.5rem" />${r.image ? `<div style="margin-top:0.5rem"><img src="${resolveImageUrl(r.image)}" style="height:60px;border-radius:0.375rem;object-fit:cover" onerror="this.style.display='none'" /></div>` : ''}`)}
+    ${formField('Description courte', `<textarea id="r-shortdesc" style="${textareaStyle};min-height:60px">${r.shortDesc||''}</textarea>`)}
+    ${formField('Description longue', `<textarea id="r-longdesc" style="${textareaStyle}">${r.longDesc||''}</textarea>`)}
+    ${formField('Points forts', `<textarea id="r-highlights" style="${textareaStyle};min-height:60px" placeholder="Un point par ligne...">${(r.highlights||[]).join('\n')}</textarea>`, 'Un point fort par ligne')}
+    ${formField('Technologies', `<input id="r-techs" style="${inputStyle}" value="${(r.technologies||[]).join(', ')}" placeholder="React, Node.js..." />`)}
+    ${formField('URL', `<input id="r-url" style="${inputStyle}" value="${r.url||'#'}" placeholder="https://..." />`)}
+  `;
+}
+
+function showAddRealisation() {
+  openModal('➕ Nouvelle Réalisation', getRealisationForm(), 'saveNewRealisation');
+}
+
+async function saveNewRealisation() {
+  const btn = document.getElementById('modal-submit-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
+  try {
+    const fd = new FormData();
+    ['title','category','client','year','sector','shortDesc','longDesc','highlights','technologies','url'].forEach(k => {
+      const el = document.getElementById('r-' + k.toLowerCase().replace('shortdesc','shortdesc').replace('longdesc','longdesc'));
+      if (el) fd.append(k, el.value);
+    });
+    fd.set('title', document.getElementById('r-title').value);
+    fd.set('category', document.getElementById('r-category').value);
+    fd.set('client', document.getElementById('r-client').value);
+    fd.set('year', document.getElementById('r-year').value);
+    fd.set('sector', document.getElementById('r-sector').value);
+    fd.set('shortDesc', document.getElementById('r-shortdesc').value);
+    fd.set('longDesc', document.getElementById('r-longdesc').value);
+    fd.set('highlights', document.getElementById('r-highlights').value);
+    fd.set('technologies', document.getElementById('r-techs').value);
+    fd.set('url', document.getElementById('r-url').value);
+    const imgFile = document.getElementById('r-image').files[0];
+    if (imgFile) fd.append('image', imgFile);
+
+    await apiPostForm('/realisations', fd);
+    closeModal();
+    showToast('success', 'Réalisation créée', 'La réalisation a été ajoutée.');
+    await loadRealisations();
+  } catch (err) {
+    showToast('error', 'Erreur', err.message);
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
+  }
+}
+
+function editRealisation(id) {
+  const r = allRealisations.find(x => x.id === id);
+  if (!r) return;
+  openModal('✏️ Modifier la Réalisation', getRealisationForm(r), '');
+  document.getElementById('modal-submit-btn').onclick = () => saveEditRealisation(id);
+}
+
+async function saveEditRealisation(id) {
+  const btn = document.getElementById('modal-submit-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
+  try {
+    const fd = new FormData();
+    fd.append('title', document.getElementById('r-title').value);
+    fd.append('category', document.getElementById('r-category').value);
+    fd.append('client', document.getElementById('r-client').value);
+    fd.append('year', document.getElementById('r-year').value);
+    fd.append('sector', document.getElementById('r-sector').value);
+    fd.append('shortDesc', document.getElementById('r-shortdesc').value);
+    fd.append('longDesc', document.getElementById('r-longdesc').value);
+    fd.append('highlights', document.getElementById('r-highlights').value);
+    fd.append('technologies', document.getElementById('r-techs').value);
+    fd.append('url', document.getElementById('r-url').value);
+    const imgFile = document.getElementById('r-image').files[0];
+    if (imgFile) fd.append('image', imgFile);
+
+    await apiPutForm('/realisations/' + id, fd);
+    closeModal();
+    showToast('success', 'Réalisation mise à jour', 'Modifications sauvegardées.');
+    await loadRealisations();
+  } catch (err) {
+    showToast('error', 'Erreur', err.message);
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
+  }
+}
+
+async function deleteRealisation(id) {
+  if (!confirm('Supprimer cette réalisation ?')) return;
+  try {
+    await apiDelete('/realisations/' + id);
+    showToast('success', 'Supprimé', 'Réalisation supprimée.');
+    await loadRealisations();
+  } catch (err) {
+    showToast('error', 'Erreur', err.message);
+  }
+}
+
+// ============================================================
+// ARTICLES
+// ============================================================
+let allArticles = [];
+let articleMode = 'manual'; // 'manual' | 'pdf'
+
+async function loadArticles() {
+  const section = document.getElementById('section-articles');
+  if (!section) return;
+  section.innerHTML = `<div style="text-align:center;padding:2rem"><i class="fas fa-circle-notch fa-spin" style="color:var(--accent-blue);font-size:1.5rem"></i></div>`;
+
+  try {
+    allArticles = await apiGet('/articles') || [];
+    buildListSection('section-articles', {
+      title: `Articles de Blog <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">(${allArticles.length})</span>`,
+      addLabel: 'Nouvel Article',
+      onAdd: 'showAddArticle',
+      items: allArticles,
+      renderItem: (a) => itemCard({
+        image: a.image, title: a.title,
+        subtitle: `${a.author || ''} · ${new Date(a.date).toLocaleDateString('fr-FR')}`,
+        badge: a.category,
+        extra: a.sourceType === 'pdf' ? '<span style="font-size:0.7rem;color:#f59e0b;margin-top:0.3rem;display:block"><i class="fas fa-file-pdf"></i> PDF</span>' : '',
+        onEdit: `editArticle('${a.id}')`, onDelete: `deleteArticle('${a.id}')`
+      })
+    });
+  } catch (err) {
+    section.innerHTML = `<p style="color:var(--text-muted)">Erreur: ${err.message}</p>`;
+  }
+}
+
+function showAddArticle() {
+  articleMode = 'manual';
+  openModal('➕ Nouvel Article de Blog', getArticleForm(), '');
+  document.getElementById('modal-submit-btn').onclick = saveNewArticle;
+}
+
+function getArticleForm(a = {}) {
+  return `
+    <!-- Mode Toggle -->
+    <div style="display:flex;background:rgba(0,0,0,0.2);border-radius:0.625rem;padding:0.25rem;margin-bottom:1.25rem;border:1px solid var(--border-color)">
+      <button type="button" id="mode-manual" onclick="switchArticleMode('manual')"
+        style="flex:1;padding:0.5rem;border-radius:0.375rem;border:none;font-family:inherit;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.2s;background:var(--gradient-primary);color:white">
+        ✏️ Saisie Manuelle
+      </button>
+      <button type="button" id="mode-pdf" onclick="switchArticleMode('pdf')"
+        style="flex:1;padding:0.5rem;border-radius:0.375rem;border:none;font-family:inherit;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.2s;background:none;color:var(--text-muted)">
+        📄 Importer un PDF
+      </button>
+    </div>
+
+    <!-- Common fields (always required) -->
+    ${formField('Titre *', `<input id="a-title" style="${inputStyle}" value="${a.title||''}" placeholder="Titre de l'article" required />`)}
+    ${formField('Image de couverture * <span style="color:var(--accent-blue);font-size:0.72rem">(obligatoire)</span>', `<input type="file" id="a-image" accept="image/*" style="${inputStyle};padding:0.5rem" ${!a.id ? '' : ''} />${a.image ? `<div style="margin-top:0.5rem"><img src="${resolveImageUrl(a.image)}" style="height:60px;border-radius:0.375rem;object-fit:cover" onerror="this.style.display='none'" /></div>` : ''}`)}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      ${formField('Catégorie', `<input id="a-category" style="${inputStyle}" value="${a.category||''}" placeholder="IA, Architecture, Mobile..." />`)}
+      ${formField('Auteur', `<input id="a-author" style="${inputStyle}" value="${a.author||''}" placeholder="JAYSON STANLEY" />`)}
+    </div>
+    ${formField('Tags', `<input id="a-tags" style="${inputStyle}" value="${(a.tags||[]).join(', ')}" placeholder="IA, Web, Innovation..." />`, 'Séparés par des virgules')}
+    ${formField('Description courte', `<textarea id="a-shortdesc" style="${textareaStyle};min-height:60px" placeholder="Résumé de l'article...">${a.shortDesc||''}</textarea>`)}
+
+    <!-- Manual mode content -->
+    <div id="manual-section">
+      ${formField('Contenu de l\'article (HTML) *', `<textarea id="a-content" style="${textareaStyle};min-height:150px;font-family:monospace;font-size:0.78rem" placeholder="<h2>Titre</h2><p>Contenu...">${a.content||''}</textarea>`, 'Vous pouvez utiliser des balises HTML: &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;blockquote&gt;...')}
+    </div>
+
+    <!-- PDF mode content -->
+    <div id="pdf-section" style="display:none">
+      <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:0.75rem;padding:1rem;margin-bottom:1rem">
+        <p style="font-size:0.82rem;color:#fbbf24;margin-bottom:0.5rem;font-weight:600"><i class="fas fa-circle-info"></i> Comment ça marche ?</p>
+        <p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6">Le système va extraire automatiquement le texte de votre PDF et le formater en contenu HTML pour votre article. Vous devrez toujours ajouter le titre et l'image.</p>
+      </div>
+      ${formField('Fichier PDF *', `<input type="file" id="a-pdf" accept=".pdf,application/pdf" style="${inputStyle};padding:0.5rem" />`, 'Taille max: 50MB')}
+    </div>
+  `;
+}
+
+function switchArticleMode(mode) {
+  articleMode = mode;
+  const manualBtn = document.getElementById('mode-manual');
+  const pdfBtn = document.getElementById('mode-pdf');
+  const manualSection = document.getElementById('manual-section');
+  const pdfSection = document.getElementById('pdf-section');
+
+  if (mode === 'manual') {
+    manualBtn.style.background = 'var(--gradient-primary)';
+    manualBtn.style.color = 'white';
+    pdfBtn.style.background = 'none';
+    pdfBtn.style.color = 'var(--text-muted)';
+    if (manualSection) manualSection.style.display = 'block';
+    if (pdfSection) pdfSection.style.display = 'none';
+  } else {
+    pdfBtn.style.background = 'var(--gradient-primary)';
+    pdfBtn.style.color = 'white';
+    manualBtn.style.background = 'none';
+    manualBtn.style.color = 'var(--text-muted)';
+    if (manualSection) manualSection.style.display = 'none';
+    if (pdfSection) pdfSection.style.display = 'block';
+  }
+}
+
+async function saveNewArticle() {
+  const btn = document.getElementById('modal-submit-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Création...';
+
+  try {
+    const fd = new FormData();
+    fd.append('title', document.getElementById('a-title').value);
+    fd.append('category', document.getElementById('a-category').value);
+    fd.append('author', document.getElementById('a-author').value);
+    fd.append('tags', document.getElementById('a-tags').value);
+    fd.append('shortDesc', document.getElementById('a-shortdesc').value);
+
+    const imgFile = document.getElementById('a-image')?.files[0];
+    if (imgFile) fd.append('image', imgFile);
+
+    let endpoint = '/articles';
+
+    if (articleMode === 'pdf') {
+      const pdfFile = document.getElementById('a-pdf')?.files[0];
+      if (!pdfFile) {
+        showToast('error', 'Fichier manquant', 'Veuillez sélectionner un fichier PDF.');
+        btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Créer l\'article';
+        return;
+      }
+      fd.append('pdfFile', pdfFile);
+      endpoint = '/articles/from-pdf';
+    } else {
+      fd.append('content', document.getElementById('a-content')?.value || '');
+      fd.append('sourceType', 'manual');
+    }
+
+    await apiPostForm(endpoint, fd);
+    closeModal();
+    showToast('success', 'Article créé', articleMode === 'pdf' ? 'Article créé depuis le PDF avec succès.' : 'Article créé avec succès.');
+    await loadArticles();
+    updateSyncTime();
+  } catch (err) {
+    showToast('error', 'Erreur', err.message);
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Créer l\'article';
+  }
+}
+
+function editArticle(id) {
+  const a = allArticles.find(x => x.id === id);
+  if (!a) return;
+  articleMode = 'manual';
+  openModal('✏️ Modifier l\'Article', getArticleForm(a), '');
+  document.getElementById('modal-submit-btn').onclick = () => saveEditArticle(id);
+}
+
+async function saveEditArticle(id) {
+  const btn = document.getElementById('modal-submit-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
+
+  try {
+    const fd = new FormData();
+    fd.append('title', document.getElementById('a-title').value);
+    fd.append('category', document.getElementById('a-category').value);
+    fd.append('author', document.getElementById('a-author').value);
+    fd.append('tags', document.getElementById('a-tags').value);
+    fd.append('shortDesc', document.getElementById('a-shortdesc').value);
+    fd.append('content', document.getElementById('a-content')?.value || '');
+    const imgFile = document.getElementById('a-image')?.files[0];
+    if (imgFile) fd.append('image', imgFile);
+
+    await apiPutForm('/articles/' + id, fd);
+    closeModal();
+    showToast('success', 'Article mis à jour', 'Modifications sauvegardées.');
+    await loadArticles();
+  } catch (err) {
+    showToast('error', 'Erreur', err.message);
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
+  }
+}
+
+async function deleteArticle(id) {
+  if (!confirm('Supprimer cet article ?')) return;
+  try {
+    await apiDelete('/articles/' + id);
+    showToast('success', 'Supprimé', 'Article supprimé.');
+    await loadArticles();
+  } catch (err) {
+    showToast('error', 'Erreur', err.message);
+  }
+}
+
+// ============================================================
+// FORMATIONS
+// ============================================================
+let allFormations = [];
+
+async function loadFormations() {
+  const section = document.getElementById('section-formations');
+  if (!section) return;
+  section.innerHTML = `<div style="text-align:center;padding:2rem"><i class="fas fa-circle-notch fa-spin" style="color:var(--accent-blue);font-size:1.5rem"></i></div>`;
+
+  try {
+    allFormations = await apiGet('/formations') || [];
+    buildListSection('section-formations', {
+      title: `Formations <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">(${allFormations.length})</span>`,
+      addLabel: 'Nouvelle Formation',
+      onAdd: 'showAddFormation',
+      items: allFormations,
+      renderItem: (f) => itemCard({
+        icon: f.icon, title: `${f.icon || '📚'} ${f.title}`,
+        subtitle: `${f.duration || ''} · ${f.level || ''} · ${f.price || ''}`,
+        onEdit: `editFormation('${f.id}')`, onDelete: `deleteFormation('${f.id}')`
+      })
+    });
+  } catch (err) {
+    section.innerHTML = `<p style="color:var(--text-muted)">Erreur: ${err.message}</p>`;
+  }
+}
+
+function getFormationForm(f = {}) {
+  return `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      ${formField('Titre *', `<input id="f-title" style="${inputStyle}" value="${f.title||''}" required />`)}
+      ${formField('Icône (emoji)', `<input id="f-icon" style="${inputStyle}" value="${f.icon||'📚'}" />`)}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
+      ${formField('Durée', `<input id="f-duration" style="${inputStyle}" value="${f.duration||''}" placeholder="3 mois" />`)}
+      ${formField('Niveau', `<input id="f-level" style="${inputStyle}" value="${f.level||''}" placeholder="Débutant à Avancé" />`)}
+      ${formField('Prix', `<input id="f-price" style="${inputStyle}" value="${f.price||'Sur devis'}" placeholder="Sur devis" />`)}
+    </div>
+    ${formField('Description', `<textarea id="f-description" style="${textareaStyle};min-height:80px">${f.description||''}</textarea>`)}
+    ${formField('Programme', `<textarea id="f-program" style="${textareaStyle}" placeholder="Un module par ligne...">${(f.program||[]).join('\n')}</textarea>`, 'Un module par ligne')}
+  `;
+}
+
+function showAddFormation() {
+  openModal('➕ Nouvelle Formation', getFormationForm(), '');
+  document.getElementById('modal-submit-btn').onclick = saveNewFormation;
+}
+
+async function saveNewFormation() {
+  const btn = document.getElementById('modal-submit-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
+  try {
+    await apiPost('/formations', {
+      title: document.getElementById('f-title').value,
+      icon: document.getElementById('f-icon').value,
+      duration: document.getElementById('f-duration').value,
+      level: document.getElementById('f-level').value,
+      price: document.getElementById('f-price').value,
+      description: document.getElementById('f-description').value,
+      program: document.getElementById('f-program').value.split('\n').filter(Boolean)
+    });
+    closeModal();
+    showToast('success', 'Formation créée', 'La formation a été ajoutée.');
+    await loadFormations();
+  } catch (err) {
+    showToast('error', 'Erreur', err.message);
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
+  }
+}
+
+function editFormation(id) {
+  const f = allFormations.find(x => x.id === id);
+  if (!f) return;
+  openModal('✏️ Modifier la Formation', getFormationForm(f), '');
+  document.getElementById('modal-submit-btn').onclick = () => saveEditFormation(id);
+}
+
+async function saveEditFormation(id) {
+  const btn = document.getElementById('modal-submit-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
+  try {
+    await apiPut('/formations/' + id, {
+      title: document.getElementById('f-title').value,
+      icon: document.getElementById('f-icon').value,
+      duration: document.getElementById('f-duration').value,
+      level: document.getElementById('f-level').value,
+      price: document.getElementById('f-price').value,
+      description: document.getElementById('f-description').value,
+      program: document.getElementById('f-program').value.split('\n').filter(Boolean)
+    });
+    closeModal();
+    showToast('success', 'Formation mise à jour', 'Modifications sauvegardées.');
+    await loadFormations();
+  } catch (err) {
+    showToast('error', 'Erreur', err.message);
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
+  }
+}
+
+async function deleteFormation(id) {
+  if (!confirm('Supprimer cette formation ?')) return;
+  try {
+    await apiDelete('/formations/' + id);
+    showToast('success', 'Supprimé', 'Formation supprimée.');
+    await loadFormations();
+  } catch (err) {
+    showToast('error', 'Erreur', err.message);
+  }
+}
+
+// ============================================================
+// CONTACTS & INFO
+// ============================================================
+async function loadContacts() {
+  const section = document.getElementById('section-contacts');
+  if (!section) return;
+  section.innerHTML = `<div style="text-align:center;padding:2rem"><i class="fas fa-circle-notch fa-spin" style="color:var(--accent-blue);font-size:1.5rem"></i></div>`;
+
+  try {
+    const info = await apiPublicGet('/contact/info');
+    section.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+        <h2 style="font-size:1.25rem;font-weight:700;color:var(--text-primary)">Informations de Contact</h2>
+        <button onclick="saveContactInfo()" style="background:var(--gradient-primary);border:none;color:white;padding:0.65rem 1.25rem;border-radius:0.5rem;font-size:0.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.5rem;font-family:inherit">
+          <i class="fas fa-floppy-disk"></i> Sauvegarder
+        </button>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+          ${formField('<i class="fas fa-envelope" style="color:var(--accent-blue)"></i> Email', `<input id="c-email" style="${inputStyle}" value="${info.email||''}" type="email" />`)}
+          ${formField('<i class="fas fa-phone" style="color:var(--accent-blue)"></i> Téléphone', `<input id="c-phone" style="${inputStyle}" value="${info.phone||''}" />`)}
+          ${formField('<i class="fas fa-location-dot" style="color:var(--accent-blue)"></i> Adresse', `<input id="c-address" style="${inputStyle}" value="${info.address||''}" />`)}
+          ${formField('<i class="fas fa-clock" style="color:var(--accent-blue)"></i> Horaires', `<input id="c-hours" style="${inputStyle}" value="${info.hours||''}" />`)}
+        </div>
+        <h3 style="font-size:0.9rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem">Réseaux Sociaux</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          ${formField('<i class="fab fa-linkedin" style="color:#0077b5"></i> LinkedIn', `<input id="c-linkedin" style="${inputStyle}" value="${info.social?.linkedin||''}" placeholder="https://linkedin.com/..." />`)}
+          ${formField('<i class="fab fa-twitter" style="color:#1da1f2"></i> Twitter/X', `<input id="c-twitter" style="${inputStyle}" value="${info.social?.twitter||''}" placeholder="https://x.com/..." />`)}
+          ${formField('<i class="fab fa-github" style="color:#6e5494"></i> GitHub', `<input id="c-github" style="${inputStyle}" value="${info.social?.github||''}" placeholder="https://github.com/..." />`)}
+          ${formField('<i class="fab fa-instagram" style="color:#e4405f"></i> Instagram', `<input id="c-instagram" style="${inputStyle}" value="${info.social?.instagram||''}" placeholder="https://instagram.com/..." />`)}
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    section.innerHTML = `<p style="color:var(--text-muted)">Erreur: ${err.message}</p>`;
+  }
+}
+
+async function saveContactInfo() {
+  try {
+    await apiPut('/contact/info', {
+      email: document.getElementById('c-email')?.value,
+      phone: document.getElementById('c-phone')?.value,
+      address: document.getElementById('c-address')?.value,
+      hours: document.getElementById('c-hours')?.value,
+      social: {
+        linkedin: document.getElementById('c-linkedin')?.value,
+        twitter: document.getElementById('c-twitter')?.value,
+        github: document.getElementById('c-github')?.value,
+        instagram: document.getElementById('c-instagram')?.value
+      }
+    });
+    showToast('success', 'Sauvegardé', 'Informations de contact mises à jour.');
+    updateSyncTime();
+  } catch (err) {
+    showToast('error', 'Erreur', err.message);
+  }
+}
+
+// ============================================================
+// MESSAGES
+// ============================================================
+let allMessages = [];
+
+async function loadMessages() {
+  const section = document.getElementById('section-messages');
+  if (!section) return;
+  section.innerHTML = `<div style="text-align:center;padding:2rem"><i class="fas fa-circle-notch fa-spin" style="color:var(--accent-blue);font-size:1.5rem"></i></div>`;
+
+  try {
+    allMessages = await apiGet('/contact/messages') || [];
+    const unread = allMessages.filter(m => !m.read).length;
+
+    // Update badge
+    const badge = document.getElementById('badge-messages');
+    if (badge) badge.textContent = unread;
+
+    section.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+        <h2 style="font-size:1.25rem;font-weight:700;color:var(--text-primary)">
+          Messages Reçus
+          ${unread > 0 ? `<span style="background:var(--accent-blue);color:white;border-radius:999px;padding:0.1rem 0.5rem;font-size:0.75rem;font-weight:600;margin-left:0.5rem">${unread} non lu${unread>1?'s':''}</span>` : ''}
+        </h2>
+      </div>
+      ${allMessages.length === 0
+        ? `<div style="text-align:center;padding:3rem;color:var(--text-muted);border:1px dashed var(--border-color);border-radius:1rem">
+            <i class="fas fa-inbox" style="font-size:2rem;margin-bottom:1rem;display:block"></i>
+            Aucun message reçu pour l'instant.
+           </div>`
+        : allMessages.map(m => `
+          <div id="msg-${m._id}" style="background:${m.read ? 'var(--bg-card)' : 'rgba(0,102,255,0.05)'};border:1px solid ${m.read ? 'var(--border-color)' : 'rgba(0,102,255,0.3)'};border-radius:0.75rem;padding:1.25rem;margin-bottom:0.75rem">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+              <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem">
+                  <div style="width:38px;height:38px;background:var(--gradient-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.9rem;flex-shrink:0">${m.name ? m.name[0].toUpperCase() : '?'}</div>
+                  <div>
+                    <div style="font-weight:600;color:var(--text-primary);font-size:0.9rem">${escapeHtml(m.name || 'Anonyme')}</div>
+                    <div style="font-size:0.78rem;color:var(--text-muted)">${escapeHtml(m.email || '')} ${m.phone ? '· ' + escapeHtml(m.phone) : ''}</div>
+                  </div>
+                  ${!m.read ? '<span style="background:var(--accent-blue);color:white;border-radius:999px;padding:0.1rem 0.5rem;font-size:0.68rem;font-weight:700">NOUVEAU</span>' : ''}
+                </div>
+                ${m.subject ? `<div style="font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.5rem">Sujet: ${escapeHtml(m.subject)}</div>` : ''}
+                <div style="font-size:0.85rem;color:var(--text-muted);line-height:1.6;background:rgba(0,0,0,0.2);border-radius:0.5rem;padding:0.75rem">${escapeHtml(m.message || '')}</div>
+                <div style="font-size:0.73rem;color:var(--text-dim);margin-top:0.5rem">${new Date(m.createdAt).toLocaleString('fr-FR')}</div>
+              </div>
+              <div style="display:flex;gap:0.5rem;flex-shrink:0">
+                ${!m.read ? `<button onclick="markMessageRead('${m._id}')" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#4ade80;border-radius:0.375rem;padding:0.4rem 0.7rem;cursor:pointer;font-size:0.78rem;font-family:inherit" title="Marquer comme lu">
+                  <i class="fas fa-check"></i>
+                </button>` : ''}
+                <a href="mailto:${m.email}" style="background:rgba(0,102,255,0.1);border:1px solid rgba(0,102,255,0.2);color:var(--accent-light);border-radius:0.375rem;padding:0.4rem 0.7rem;cursor:pointer;font-size:0.78rem;text-decoration:none;display:inline-flex;align-items:center" title="Répondre par email">
+                  <i class="fas fa-reply"></i>
+                </a>
+                <button onclick="deleteMessage('${m._id}')" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;border-radius:0.375rem;padding:0.4rem 0.7rem;cursor:pointer;font-size:0.78rem;font-family:inherit" title="Supprimer">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+    `;
+  } catch (err) {
+    section.innerHTML = `<p style="color:var(--text-muted)">Erreur: ${err.message}</p>`;
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function markMessageRead(id) {
+  try {
+    await apiPut('/contact/messages/' + id + '/read', {});
+    await loadMessages();
+  } catch (err) {
+    showToast('error', 'Erreur', err.message);
+  }
+}
+
+async function deleteMessage(id) {
+  if (!confirm('Supprimer ce message ?')) return;
+  try {
+    await apiDelete('/contact/messages/' + id);
+    await loadMessages();
+    showToast('success', 'Supprimé', 'Message supprimé.');
+  } catch (err) {
+    showToast('error', 'Erreur', err.message);
+  }
+}

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - JUDDEV CORPORATION</title>
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+</head>
+<body>
+
+<div class="dashboard-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div>
+        <div class="sidebar-logo-text">JUDDEV</div>
+        <div style="font-size:0.6rem;color:var(--text-dim);letter-spacing:0.1em">CORPORATION</div>
+      </div>
+      <span class="sidebar-logo-badge">ADMIN</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-title">Principal</div>
+      <div class="sidebar-link active" data-section="dashboard">
+        <span class="nav-icon"><i class="fas fa-gauge-high"></i></span>
+        Tableau de Bord
+      </div>
+
+      <div class="sidebar-section-title">Contenu</div>
+      <div class="sidebar-link" data-section="services">
+        <span class="nav-icon"><i class="fas fa-gears"></i></span>
+        Services
+        <span class="nav-badge" id="badge-services">—</span>
+      </div>
+      <div class="sidebar-link" data-section="realisations">
+        <span class="nav-icon"><i class="fas fa-trophy"></i></span>
+        Réalisations
+        <span class="nav-badge" id="badge-realisations">—</span>
+      </div>
+      <div class="sidebar-link" data-section="articles">
+        <span class="nav-icon"><i class="fas fa-newspaper"></i></span>
+        Articles de Blog
+        <span class="nav-badge" id="badge-articles">—</span>
+      </div>
+      <div class="sidebar-link" data-section="formations">
+        <span class="nav-icon"><i class="fas fa-graduation-cap"></i></span>
+        Formations
+      </div>
+
+      <div class="sidebar-section-title">Communication</div>
+      <div class="sidebar-link" data-section="messages">
+        <span class="nav-icon"><i class="fas fa-envelope"></i></span>
+        Messages
+        <span class="nav-badge" id="badge-messages">—</span>
+      </div>
+
+      <div class="sidebar-section-title">Paramètres</div>
+      <div class="sidebar-link" data-section="contacts">
+        <span class="nav-icon"><i class="fas fa-address-book"></i></span>
+        Contacts & Infos
+      </div>
+
+      <div class="sidebar-section-title">Vitrine</div>
+      <a href="http://localhost:5000" target="_blank" class="sidebar-link">
+        <span class="nav-icon"><i class="fas fa-arrow-up-right-from-square"></i></span>
+        Voir le Site
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-user">
+        <div class="sidebar-footer-avatar">JD</div>
+        <div>
+          <div style="font-size:0.8rem;font-weight:600;color:var(--text-primary)">JUDDEV Admin</div>
+          <div style="font-size:0.7rem;color:var(--text-dim)">Dernière synchro: <span id="sync-time">--:--</span></div>
+        </div>
+      </div>
+      <button onclick="logout()" title="Se déconnecter" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;border-radius:0.5rem;padding:0.45rem 0.75rem;cursor:pointer;font-size:0.78rem;font-family:inherit;margin-top:0.75rem;width:100%;display:flex;align-items:center;justify-content:center;gap:0.4rem;transition:all 0.2s"
+        onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='rgba(239,68,68,0.1)'">
+        <i class="fas fa-right-from-bracket"></i> Déconnexion
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button id="sidebar-hamburger" class="topbar-btn" style="display:none">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div>
+          <div class="topbar-title" id="topbar-title">Tableau de Bord</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <a href="http://localhost:5000" target="_blank" class="topbar-btn" title="Voir le site vitrine" style="display:flex;align-items:center;gap:0.4rem;padding:0 0.75rem;width:auto;text-decoration:none">
+          <i class="fas fa-eye"></i>
+          <span style="font-size:0.8rem;font-weight:600">Voir le site</span>
+        </a>
+        <button onclick="logout()" class="topbar-btn" title="Se déconnecter" style="color:#f87171">
+          <i class="fas fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT AREA -->
+    <div class="content-area">
+
+      <!-- DASHBOARD SECTION -->
+      <div class="section-view active" id="section-dashboard">
+        <div style="display:flex;align-items:center;justify-content:center;min-height:400px">
+          <div style="text-align:center">
+            <i class="fas fa-circle-notch fa-spin" style="font-size:2rem;color:var(--accent-blue)"></i>
+            <p style="color:var(--text-muted);margin-top:1rem">Chargement du dashboard...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SERVICES SECTION -->
+      <div class="section-view" id="section-services"></div>
+
+      <!-- REALISATIONS SECTION -->
+      <div class="section-view" id="section-realisations"></div>
+
+      <!-- ARTICLES SECTION -->
+      <div class="section-view" id="section-articles"></div>
+
+      <!-- FORMATIONS SECTION -->
+      <div class="section-view" id="section-formations"></div>
+
+      <!-- CONTACTS SECTION -->
+      <div class="section-view" id="section-contacts"></div>
+
+      <!-- MESSAGES SECTION -->
+      <div class="section-view" id="section-messages"></div>
+
+    </div>
+  </main>
+
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/dashboard.js"></script>
+<script>
+// Auth check
+if (!checkAuth()) {
+  window.location.href = 'login.html';
+}
+
+// Show hamburger on mobile
+function updateHamburger() {
+  const hb = document.getElementById('sidebar-hamburger');
+  if (hb) hb.style.display = window.innerWidth <= 900 ? 'flex' : 'none';
+}
+updateHamburger();
+window.addEventListener('resize', updateHamburger);
+</script>
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formations Digitales - JUDDEV CORPORATION</title>
+  <meta name="description" content="Formations digitales JUDDEV CORPORATION : développement web, mobile, UI/UX, cloud et intelligence artificielle." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+</head>
+<body>
+
+<div id="loader"><div class="loader-content"><div class="loader-logo">JUDDEV<span>CORPORATION</span></div><div class="loader-ring"></div></div></div>
+
+<nav id="navbar">
+  <div class="navbar-container">
+    <a href="index.html" class="navbar-logo">JUDDEV<span> CORPORATION</span></a>
+    <div class="navbar-links">
+      <a href="index.html">Accueil</a><a href="a-propos.html">À Propos</a>
+      <a href="services.html">Services</a><a href="realisations.html">Réalisations</a>
+      <a href="blog.html">Blog</a><a href="formations.html" class="active">Formations</a><a href="contact.html">Contact</a>
+    </div>
+    <div class="navbar-cta"><a href="#devis" class="btn-devis-nav">Demander un Devis</a></div>
+    <button class="navbar-hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="navbar-mobile">
+  <a href="index.html">Accueil</a><a href="a-propos.html">À Propos</a>
+  <a href="services.html">Services</a><a href="realisations.html">Réalisations</a>
+  <a href="blog.html">Blog</a><a href="formations.html" class="active">Formations</a><a href="contact.html">Contact</a>
+  <a href="#devis" class="btn-devis-nav">Demander un Devis</a>
+</div>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="page-hero-bg">
+    <img src="images/blogd1.PNG" alt="Formations" onerror="this.src='images/dev1.jpg'" />
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-grid"></div>
+    <div style="position:absolute;top:-50px;right:-50px;width:500px;height:500px;border-radius:50%;background:rgba(0,102,255,0.1);filter:blur(100px)"></div>
+  </div>
+  <div class="page-hero-content">
+    <nav class="breadcrumb">
+      <a href="index.html">Accueil</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Formations</span>
+    </nav>
+    <h1 class="page-hero-title">NOS <span>FORMATIONS</span> DIGITALES</h1>
+    <p class="page-hero-subtitle">Développez vos compétences avec des formations pratiques dispensées par des experts du terrain.</p>
+  </div>
+</section>
+
+<!-- INTRO -->
+<section style="padding:5rem 0;background:var(--bg-secondary);border-bottom:1px solid var(--border-color)">
+  <div class="container">
+    <div class="section-header reveal-left">
+      <span class="section-badge">POURQUOI SE FORMER AVEC NOUS</span>
+      <h2 class="section-title">Développez vos <span>compétences</span> avec JUDDEV</h2>
+      <p class="section-subtitle">Des formations pratiques et orientées terrain pour vous rendre opérationnel rapidement.</p>
+    </div>
+    <div class="grid-4">
+      <div class="value-card reveal stagger-1">
+        <span class="value-icon">👨‍💻</span>
+        <h3 class="value-title">Formateurs Experts</h3>
+        <p class="value-desc">Formés par des développeurs actifs qui travaillent quotidiennement sur des projets réels.</p>
+      </div>
+      <div class="value-card reveal stagger-2">
+        <span class="value-icon">🛠️</span>
+        <h3 class="value-title">Pratique Avant Tout</h3>
+        <p class="value-desc">70% de pratique, 30% de théorie. Vous apprenez en construisant de vrais projets.</p>
+      </div>
+      <div class="value-card reveal stagger-3">
+        <span class="value-icon">📜</span>
+        <h3 class="value-title">Certificat JUDDEV</h3>
+        <p class="value-desc">Un certificat de compétence reconnu à l'issue de chaque formation pour valoriser votre parcours.</p>
+      </div>
+      <div class="value-card reveal stagger-4">
+        <span class="value-icon">🤝</span>
+        <h3 class="value-title">Suivi Personnalisé</h3>
+        <p class="value-desc">Accompagnement individuel et accès à notre communauté d'anciens apprenants.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORMATIONS GRID -->
+<section class="section">
+  <div class="container">
+    <div class="section-header reveal-left">
+      <span class="section-badge">NOS PROGRAMMES</span>
+      <h2 class="section-title">Choisissez votre <span>Formation</span></h2>
+      <p class="section-subtitle">5 programmes complets pour maîtriser les technologies digitales les plus demandées.</p>
+    </div>
+    <div class="grid-3" id="formations-grid">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section style="padding:5rem 0;background:var(--bg-secondary);border-top:1px solid var(--border-color)">
+  <div class="container">
+    <div class="section-header reveal-left">
+      <span class="section-badge">COMMENT ÇA MARCHE</span>
+      <h2 class="section-title">Le processus <span>d'inscription</span></h2>
+    </div>
+    <div class="process-steps">
+      <div class="process-step reveal stagger-1">
+        <div class="process-step-number">01</div>
+        <h3 class="process-step-title">Choisissez votre formation</h3>
+        <p class="process-step-desc">Sélectionnez le programme qui correspond à vos objectifs et votre niveau actuel.</p>
+      </div>
+      <div class="process-step reveal stagger-2">
+        <div class="process-step-number">02</div>
+        <h3 class="process-step-title">Demandez un devis</h3>
+        <p class="process-step-desc">Contactez-nous pour obtenir une offre personnalisée selon votre profil et vos besoins.</p>
+      </div>
+      <div class="process-step reveal stagger-3">
+        <div class="process-step-number">03</div>
+        <h3 class="process-step-title">Entretien d'admission</h3>
+        <p class="process-step-desc">Un entretien rapide pour confirmer votre niveau et adapter le programme si nécessaire.</p>
+      </div>
+      <div class="process-step reveal stagger-4">
+        <div class="process-step-number">04</div>
+        <h3 class="process-step-title">Démarrez votre formation</h3>
+        <p class="process-step-desc">Accédez aux cours, projets pratiques et au support de votre formateur dédié.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORMATION SUR MESURE CTA -->
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-title reveal">Besoin d'une formation <span style="background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">sur mesure</span> ?</h2>
+    <p class="cta-subtitle reveal stagger-2">Nous concevons des programmes de formation personnalisés pour vos équipes, adaptés à vos technologies et objectifs métier.</p>
+    <div class="cta-buttons reveal stagger-3">
+      <button class="btn btn-primary btn-lg" onclick="window.openDevisModal && window.openDevisModal()">
+        <i class="fas fa-graduation-cap"></i> S'inscrire à une Formation
+      </button>
+      <a href="contact.html" class="btn btn-outline btn-lg">
+        <i class="fas fa-phone"></i> Parler à un Conseiller
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="index.html" class="footer-logo">JUDDEV<span>CORPORATION</span></a>
+        <p class="footer-desc">Votre partenaire technologique d'excellence pour la formation et le développement digital.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        </div>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Navigation</h4>
+        <div class="footer-links">
+          <a href="index.html">Accueil</a><a href="a-propos.html">À Propos</a>
+          <a href="services.html">Services</a><a href="realisations.html">Réalisations</a>
+          <a href="blog.html">Blog</a><a href="formations.html">Formations</a><a href="contact.html">Contact</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Formations</h4>
+        <div class="footer-links">
+          <a href="#formations-grid">Développement Web Full Stack</a>
+          <a href="#formations-grid">Développement Mobile</a>
+          <a href="#formations-grid">UI/UX Design</a>
+          <a href="#formations-grid">Cloud & DevOps</a>
+          <a href="#formations-grid">IA & Machine Learning</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Contact</h4>
+        <div class="footer-contact-item"><i class="fas fa-envelope"></i><span>contact@juddev.com</span></div>
+        <div class="footer-contact-item"><i class="fas fa-phone"></i><span>+237 6XX XXX XXX</span></div>
+        <div class="footer-contact-item"><i class="fas fa-map-marker-alt"></i><span>Yaoundé, Cameroun</span></div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copyright">© 2025 JUDDEV CORPORATION. Tous droits réservés.</span>
+      <div class="footer-bottom-links"><a href="#">Mentions légales</a><a href="#">Confidentialité</a></div>
+    </div>
+  </div>
+</footer>
+
+<!-- DEVIS MODAL -->
+<div id="devis-modal" class="modal">
+  <div class="modal-backdrop"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h2 class="modal-title">S'inscrire à une Formation</h2><button class="modal-close">✕</button></div>
+    <form id="devis-form">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Nom complet *</label><input type="text" class="form-input" placeholder="Jean Dupont" required /></div>
+        <div class="form-group"><label class="form-label">Email *</label><input type="email" class="form-input" placeholder="jean@exemple.com" required /></div>
+        <div class="form-group"><label class="form-label">Téléphone</label><input type="tel" class="form-input" placeholder="+237 6XX XXX XXX" /></div>
+        <div class="form-group"><label class="form-label">Niveau actuel</label>
+          <select class="form-input"><option>Débutant</option><option>Intermédiaire</option><option>Avancé</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Formation souhaitée *</label>
+          <select class="form-input" required><option value="">Sélectionnez</option>
+            <option>Développement Web Full Stack</option><option>Développement Mobile</option>
+            <option>UI/UX Design</option><option>Cloud & DevOps</option>
+            <option>IA & Machine Learning</option><option>Formation sur mesure</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Délai souhaité</label>
+          <select class="form-input"><option>Dès que possible</option><option>Dans 1 mois</option>
+            <option>Dans 2-3 mois</option><option>Flexible</option>
+          </select>
+        </div>
+        <div class="form-group full-width"><label class="form-label">Objectifs de formation</label><textarea class="form-input" rows="3" placeholder="Quels sont vos objectifs avec cette formation ?"></textarea></div>
+      </div>
+      <button type="submit" class="modal-submit"><i class="fas fa-graduation-cap"></i> Envoyer ma demande</button>
+    </form>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const grid = document.getElementById('formations-grid');
+  if (!grid || typeof JUDDEV_DATA === 'undefined') return;
+
+  grid.innerHTML = JUDDEV_DATA.formations.map((f, i) => `
+    <div class="formation-card reveal stagger-${(i % 3) + 1}">
+      <span class="formation-icon">${f.icon}</span>
+      <h3 class="formation-title">${f.title}</h3>
+      <div class="formation-badges">
+        <span class="formation-badge badge-duration"><i class="fas fa-clock" style="margin-right:0.3rem"></i> ${f.duration}</span>
+        <span class="formation-badge badge-level"><i class="fas fa-signal" style="margin-right:0.3rem"></i> ${f.level}</span>
+      </div>
+      <p class="formation-desc">${f.description}</p>
+      <h4 style="font-size:0.875rem;font-weight:700;color:var(--text-primary);margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.08em">Programme</h4>
+      <div class="formation-program">
+        ${f.program.map(p => `<div class="formation-program-item">${p}</div>`).join('')}
+      </div>
+      <div class="formation-price">
+        ${f.price} <span>/ participant</span>
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="window.openDevisModal && window.openDevisModal()">
+        <i class="fas fa-graduation-cap"></i> S'inscrire
+      </button>
+    </div>
+  `).join('');
+
+  setTimeout(() => {
+    document.querySelectorAll('.reveal, .reveal-left').forEach(el => {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+      }, { threshold: 0.05 });
+      obs.observe(el);
+    });
+  }, 100);
+});
+</script>
+</body>
+</html>

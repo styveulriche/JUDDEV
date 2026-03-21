@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>À Propos - JUDDEV CORPORATION</title>
+  <meta name="description" content="Découvrez l'histoire, la mission et l'équipe de JUDDEV CORPORATION, votre partenaire technologique d'excellence." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-content">
+    <div class="loader-logo">JUDDEV<span>CORPORATION</span></div>
+    <div class="loader-ring"></div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="navbar-container">
+    <a href="index.html" class="navbar-logo">JUDDEV<span> CORPORATION</span></a>
+    <div class="navbar-links">
+      <a href="index.html">Accueil</a>
+      <a href="a-propos.html" class="active">À Propos</a>
+      <a href="services.html">Services</a>
+      <a href="realisations.html">Réalisations</a>
+      <a href="blog.html">Blog</a>
+      <a href="formations.html">Formations</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div class="navbar-cta">
+      <a href="#devis" class="btn-devis-nav">Demander un Devis</a>
+    </div>
+    <button class="navbar-hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="navbar-mobile">
+  <a href="index.html">Accueil</a>
+  <a href="a-propos.html" class="active">À Propos</a>
+  <a href="services.html">Services</a>
+  <a href="realisations.html">Réalisations</a>
+  <a href="blog.html">Blog</a>
+  <a href="formations.html">Formations</a>
+  <a href="contact.html">Contact</a>
+  <a href="#devis" class="btn-devis-nav">Demander un Devis</a>
+</div>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="page-hero-bg">
+    <img src="images/background-dev.jpg" alt="À Propos" id="page-hero-img" />
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-grid"></div>
+  </div>
+  <div class="page-hero-content">
+    <nav class="breadcrumb">
+      <a href="index.html">Accueil</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>À Propos</span>
+    </nav>
+    <h1 class="page-hero-title">À <span>PROPOS</span> DE NOUS</h1>
+    <p class="page-hero-subtitle">Découvrez qui nous sommes, notre mission et les valeurs qui guident chacune de nos actions.</p>
+  </div>
+</section>
+
+<!-- QUI SOMMES-NOUS -->
+<section class="section">
+  <div class="container">
+    <div class="grid-2" style="gap:5rem;align-items:center">
+      <div class="reveal-left">
+        <span class="section-badge">NOTRE HISTOIRE</span>
+        <h2 class="section-title" style="text-align:left;margin-bottom:1.5rem">Qui sommes-nous <span>?</span></h2>
+        <p style="color:var(--text-muted);line-height:1.9;margin-bottom:1.5rem">
+          Chez <strong style="color:var(--text-primary)">JUDDEV CORPORATION</strong>, nous plaçons nos clients, partenaires et collaborateurs au cœur de notre démarche, afin d'apporter une attention personnalisée adaptée à chaque contexte.
+        </p>
+        <p style="color:var(--text-muted);line-height:1.9;margin-bottom:1.5rem">
+          Notre objectif est simple : vous fournir tous les outils nécessaires pour atteindre vos ambitions, et même aller au-delà. Grâce à notre expertise, nous créons des solutions qui placent l'humain au cœur du processus, en impliquant pleinement nos clients dans chaque étape de la réalisation.
+        </p>
+        <p style="color:var(--text-muted);line-height:1.9;margin-bottom:2rem">
+          Chez JUDDEV CORPORATION, l'intégration de notre savoir-faire dans vos projets est notre engagement premier. Nous combinons créativité, technologie et rigueur pour délivrer des solutions sur mesure qui <strong style="color:var(--accent-cyan)">dépassent vos attentes</strong>.
+        </p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+          <div style="text-align:center;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg)">
+            <div style="font-size:2rem;font-weight:900;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">50+</div>
+            <div style="font-size:0.875rem;color:var(--text-muted);margin-top:0.25rem">Projets livrés</div>
+          </div>
+          <div style="text-align:center;padding:1.5rem;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg)">
+            <div style="font-size:2rem;font-weight:900;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">100%</div>
+            <div style="font-size:0.875rem;color:var(--text-muted);margin-top:0.25rem">Satisfaction client</div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal-right">
+        <div style="position:relative">
+          <img src="images/Insight.jpg" alt="JUDDEV Team" style="width:100%;border-radius:var(--radius-2xl);aspect-ratio:4/3;object-fit:cover;border:1px solid var(--border-color);box-shadow:var(--shadow-xl),0 0 60px rgba(0,102,255,0.15)" onerror="this.src='images/dev1.jpg'" />
+          <div style="position:absolute;bottom:-20px;right:-20px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:1.25rem 1.5rem;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:1rem">
+            <div style="font-size:2rem">🏆</div>
+            <div>
+              <div style="font-weight:700;color:var(--text-primary);font-size:0.9rem">Agence de confiance</div>
+              <div style="font-size:0.75rem;color:var(--text-dim)">depuis 2022</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MISSION, VISION, OBJECTIFS -->
+<section class="section" style="background:var(--bg-secondary);border-top:1px solid var(--border-color);border-bottom:1px solid var(--border-color)">
+  <div class="container">
+    <div class="section-header reveal-left">
+      <span class="section-badge">NOS FONDATIONS</span>
+      <h2 class="section-title">Notre Mission & <span>Objectifs</span></h2>
+    </div>
+    <div class="grid-3">
+      <div class="info-card reveal stagger-1">
+        <div class="info-card-icon">🎯</div>
+        <div>
+          <h3 class="info-card-title">Notre Mission</h3>
+          <p class="info-card-text">Accompagner les entreprises et entrepreneurs africains dans leur transformation digitale en fournissant des solutions technologiques innovantes, accessibles et adaptées à leurs réalités spécifiques.</p>
+        </div>
+      </div>
+      <div class="info-card reveal stagger-2">
+        <div class="info-card-icon">🌟</div>
+        <div>
+          <h3 class="info-card-title">Notre Vision</h3>
+          <p class="info-card-text">Devenir la référence africaine en solutions numériques innovantes, en bâtissant des partenariats durables qui contribuent au développement économique du continent à travers la technologie.</p>
+        </div>
+      </div>
+      <div class="info-card reveal stagger-3">
+        <div class="info-card-icon">🚀</div>
+        <div>
+          <h3 class="info-card-title">Nos Objectifs</h3>
+          <p class="info-card-text">Livrer des projets de qualité supérieure dans les délais impartis, maintenir une satisfaction client de 100%, et innover continuellement pour anticiper les besoins du marché numérique africain.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NOS VALEURS -->
+<section class="section">
+  <div class="container">
+    <div class="section-header reveal-left">
+      <span class="section-badge">CE QUI NOUS GUIDE</span>
+      <h2 class="section-title">Nos <span>Valeurs</span></h2>
+      <p class="section-subtitle">Les principes fondamentaux qui orientent notre travail au quotidien.</p>
+    </div>
+    <div class="grid-4">
+      <div class="value-card reveal stagger-1">
+        <span class="value-icon">💡</span>
+        <h3 class="value-title">Innovation</h3>
+        <p class="value-desc">Nous explorons constamment les dernières technologies pour apporter des solutions avant-gardistes à nos clients.</p>
+      </div>
+      <div class="value-card reveal stagger-2">
+        <span class="value-icon">⭐</span>
+        <h3 class="value-title">Excellence</h3>
+        <p class="value-desc">Chaque ligne de code, chaque design, chaque livraison est réalisée avec le plus haut niveau de qualité.</p>
+      </div>
+      <div class="value-card reveal stagger-3">
+        <span class="value-icon">🤝</span>
+        <h3 class="value-title">Transparence</h3>
+        <p class="value-desc">Nous communiquons ouvertement avec nos clients à chaque étape du projet, sans surprises ni zones d'ombre.</p>
+      </div>
+      <div class="value-card reveal stagger-4">
+        <span class="value-icon">💪</span>
+        <h3 class="value-title">Engagement</h3>
+        <p class="value-desc">Nous nous engageons pleinement dans chaque projet et tenons nos promesses en termes de délais et de qualité.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NOTRE ÉQUIPE -->
+<section class="section" style="background:var(--bg-secondary);border-top:1px solid var(--border-color)">
+  <div class="container">
+    <div class="section-header reveal-left">
+      <span class="section-badge">LES EXPERTS</span>
+      <h2 class="section-title">Notre <span>Équipe</span></h2>
+      <p class="section-subtitle">Des experts passionnés et dédiés à la réussite de vos projets digitaux.</p>
+    </div>
+    <div class="grid-3">
+      <!-- NGUEYE DURAND -->
+      <div class="team-card reveal stagger-1">
+        <div class="team-card-inner">
+          <div class="team-avatar">ND</div>
+          <h3 class="team-name">NGUEYE NGUEYE DURAND YOURI</h3>
+          <p class="team-role">Directeur Général & CEO</p>
+          <div class="team-tags">
+            <span class="team-tag">Backend Development</span>
+            <span class="team-tag">Gestion de Projet</span>
+            <span class="team-tag">Architecture Système</span>
+            <span class="team-tag">Node.js</span>
+          </div>
+          <div class="team-socials">
+            <a href="#" class="team-social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="team-social-link" aria-label="GitHub"><i class="fab fa-github"></i></a>
+            <a href="#" class="team-social-link" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOKOUA STYVE -->
+      <div class="team-card reveal stagger-2">
+        <div class="team-card-inner">
+          <div class="team-avatar">FS</div>
+          <h3 class="team-name">FOKOUA WOWO U STYVE</h3>
+          <p class="team-role">Directeur des Opérations & COO</p>
+          <div class="team-tags">
+            <span class="team-tag">Java Development</span>
+            <span class="team-tag">OOP Architecture</span>
+            <span class="team-tag">Gestion Opérationnelle</span>
+            <span class="team-tag">Mobile Dev</span>
+          </div>
+          <div class="team-socials">
+            <a href="#" class="team-social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="team-social-link" aria-label="GitHub"><i class="fab fa-github"></i></a>
+            <a href="#" class="team-social-link" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- JAYSON STANLEY -->
+      <div class="team-card reveal stagger-3">
+        <div class="team-card-inner">
+          <div class="team-avatar">JS</div>
+          <h3 class="team-name">JAYSON STANLEY DJEMETIO NINZAGO</h3>
+          <p class="team-role">Directeur Technique & CTO</p>
+          <div class="team-tags">
+            <span class="team-tag">UI/UX Design</span>
+            <span class="team-tag">Web Design</span>
+            <span class="team-tag">Direction Technique</span>
+            <span class="team-tag">React</span>
+          </div>
+          <div class="team-socials">
+            <a href="#" class="team-social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="team-social-link" aria-label="GitHub"><i class="fab fa-github"></i></a>
+            <a href="#" class="team-social-link" aria-label="Behance"><i class="fab fa-behance"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-title reveal">Rejoignez l'aventure <span style="background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">JUDDEV</span></h2>
+    <p class="cta-subtitle reveal stagger-2">Vous avez un projet ambitieux ? Parlons-en ensemble et faisons-le devenir réalité.</p>
+    <div class="cta-buttons reveal stagger-3">
+      <button class="btn btn-primary btn-lg" onclick="window.openDevisModal && window.openDevisModal()">
+        <i class="fas fa-paper-plane"></i> Démarrer un Projet
+      </button>
+      <a href="contact.html" class="btn btn-outline btn-lg">
+        <i class="fas fa-envelope"></i> Contactez-nous
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="index.html" class="footer-logo">JUDDEV<span>CORPORATION</span></a>
+        <p class="footer-desc">Votre partenaire technologique d'excellence. Nous transformons vos idées en solutions digitales innovantes.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        </div>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Navigation</h4>
+        <div class="footer-links">
+          <a href="index.html">Accueil</a>
+          <a href="a-propos.html">À Propos</a>
+          <a href="services.html">Services</a>
+          <a href="realisations.html">Réalisations</a>
+          <a href="blog.html">Blog</a>
+          <a href="formations.html">Formations</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Services</h4>
+        <div class="footer-links">
+          <a href="service-detail.html?id=dev-web">Développement Web</a>
+          <a href="service-detail.html?id=dev-mobile">Applications Mobiles</a>
+          <a href="service-detail.html?id=saas">Produits SaaS</a>
+          <a href="service-detail.html?id=ux-design">UI/UX Design</a>
+          <a href="service-detail.html?id=cloud">Cloud Engineering</a>
+          <a href="service-detail.html?id=ia-solutions">IA & Automatisation</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="footer-col-title">Contact</h4>
+        <div class="footer-contact-item"><i class="fas fa-envelope"></i><span>contact@juddev.com</span></div>
+        <div class="footer-contact-item"><i class="fas fa-phone"></i><span>+237 6XX XXX XXX</span></div>
+        <div class="footer-contact-item"><i class="fas fa-map-marker-alt"></i><span>Yaoundé, Cameroun</span></div>
+        <div class="footer-contact-item"><i class="fas fa-clock"></i><span>Lun - Ven: 8h00 - 18h00</span></div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copyright">© 2025 JUDDEV CORPORATION. Tous droits réservés.</span>
+      <div class="footer-bottom-links">
+        <a href="#">Mentions légales</a>
+        <a href="#">Politique de confidentialité</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- DEVIS MODAL -->
+<div id="devis-modal" class="modal">
+  <div class="modal-backdrop"></div>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title">Demander un Devis</h2>
+      <button class="modal-close">✕</button>
+    </div>
+    <form id="devis-form">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Nom complet *</label><input type="text" class="form-input" placeholder="Jean Dupont" required /></div>
+        <div class="form-group"><label class="form-label">Email *</label><input type="email" class="form-input" placeholder="jean@exemple.com" required /></div>
+        <div class="form-group"><label class="form-label">Téléphone</label><input type="tel" class="form-input" placeholder="+237 6XX XXX XXX" /></div>
+        <div class="form-group"><label class="form-label">Entreprise</label><input type="text" class="form-input" placeholder="Votre entreprise" /></div>
+        <div class="form-group"><label class="form-label">Service souhaité *</label>
+          <select class="form-input" required>
+            <option value="">Sélectionnez un service</option>
+            <option>Développement Web</option><option>Applications Mobiles</option><option>Produits SaaS</option>
+            <option>UI/UX Design</option><option>Cloud Engineering</option><option>Développement MVP</option>
+            <option>Marketing Digital & SEO</option><option>IA & Automatisation</option><option>Formation</option><option>Autre</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Budget estimé</label>
+          <select class="form-input">
+            <option value="">Sélectionnez un budget</option>
+            <option>Moins de 500 000 FCFA</option><option>500 000 - 1 000 000 FCFA</option>
+            <option>1 000 000 - 5 000 000 FCFA</option><option>Plus de 5 000 000 FCFA</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Délai souhaité</label>
+          <select class="form-input">
+            <option value="">Sélectionnez un délai</option>
+            <option>Le plus tôt possible (ASAP)</option><option>1 à 3 mois</option><option>3 à 6 mois</option><option>Plus de 6 mois</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Cible visée</label><input type="text" class="form-input" placeholder="Ex: Entreprises B2B..." /></div>
+        <div class="form-group full-width"><label class="form-label">Description du projet *</label><textarea class="form-input" rows="3" placeholder="Décrivez votre projet..." required></textarea></div>
+        <div class="form-group full-width"><label class="form-label">Contexte du projet</label><textarea class="form-input" rows="2" placeholder="Contexte, objectifs..."></textarea></div>
+      </div>
+      <button type="submit" class="modal-submit"><i class="fas fa-paper-plane"></i> Envoyer ma demande</button>
+    </form>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

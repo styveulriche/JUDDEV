@@ -1,0 +1,23 @@
+# Environnement - NE JAMAIS PUSHER
+JUDDEV-backend/.env
+.env
+
+# Dépendances Node
+JUDDEV-backend/node_modules/
+node_modules/
+
+# Logs
+*.log
+/tmp/
+
+# Uploads utilisateurs
+JUDDEV-backend/uploads/images/*
+JUDDEV-backend/uploads/pdfs/*
+!JUDDEV-backend/uploads/images/.gitkeep
+!JUDDEV-backend/uploads/pdfs/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+.claude/
+**/.claude/
