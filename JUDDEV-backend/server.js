@@ -83,26 +83,33 @@ app.use((err, req, res, next) => {
 // ============================================================
 // DATABASE CONNECTION & START
 // ============================================================
+async function getInMemoryURI() {
+  console.log('⚠️  Démarrage du serveur MongoDB embarqué...');
+  const { MongoMemoryServer } = require('mongodb-memory-server');
+  const mongod = await MongoMemoryServer.create();
+  const uri = mongod.getUri() + 'juddev';
+  console.log('✅ MongoDB embarqué démarré (données non persistantes)');
+  return uri;
+}
+
 async function getMongoURI() {
-  // Try Atlas (or any non-localhost URI) first, with a connection test
+  // Try Atlas URI with a short connection timeout
   if (process.env.MONGODB_URI && !process.env.MONGODB_URI.includes('localhost')) {
     try {
-      // Quick DNS/network test before handing URI to mongoose
-      const { Resolver } = require('dns').promises;
-      const resolver = new Resolver();
-      const host = process.env.MONGODB_URI.replace(/^mongodb(\+srv)?:\/\/[^@]+@/, '').split('/')[0].split(':')[0];
-      await Promise.race([
-        resolver.resolve(host),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('DNS timeout')), 3000))
-      ]);
+      const testConn = mongoose.createConnection(process.env.MONGODB_URI, {
+        serverSelectionTimeoutMS: 5000,
+        connectTimeoutMS: 5000
+      });
+      await testConn.asPromise();
+      await testConn.close();
       console.log('✅ MongoDB Atlas accessible');
       return process.env.MONGODB_URI;
-    } catch (dnsErr) {
-      console.warn('⚠️  MongoDB Atlas inaccessible (' + dnsErr.message + '). Tentative locale...');
+    } catch (atlasErr) {
+      console.warn('⚠️  MongoDB Atlas inaccessible: ' + atlasErr.message.split('\n')[0]);
     }
   }
 
-  // Try to connect to local MongoDB
+  // Try local MongoDB
   try {
     const net = require('net');
     await new Promise((resolve, reject) => {
@@ -114,14 +121,8 @@ async function getMongoURI() {
     console.log('✅ MongoDB local disponible');
     return 'mongodb://localhost:27017/juddev';
   } catch {
-    // Local MongoDB not available – fallback to mongodb-memory-server
-    console.log('⚠️  MongoDB local non disponible. Démarrage du serveur embarqué...');
     try {
-      const { MongoMemoryServer } = require('mongodb-memory-server');
-      const mongod = await MongoMemoryServer.create();
-      const uri = mongod.getUri() + 'juddev';
-      console.log('✅ MongoDB embarqué démarré (données non persistantes)');
-      return uri;
+      return await getInMemoryURI();
     } catch (memErr) {
       console.error('❌ MongoDB non disponible. Installez MongoDB: https://www.mongodb.com/try/download/community');
       process.exit(1);
@@ -161,6 +162,28 @@ async function seedTeam() {
   }
 }
 
+async function seedPartners() {
+  try {
+    const ContactInfo = require('./models/ContactInfo');
+    let info = await ContactInfo.findOne();
+    if (!info) info = new ContactInfo({});
+    if (!info.partners || info.partners.length === 0) {
+      info.partners = [
+        { name: 'Partenaire 1', image: 'images/partenaire1.png', url: '#' },
+        { name: 'Partenaire 2', image: 'images/partenaire2.png', url: '#' },
+        { name: 'Partenaire 3', image: 'images/partenaire3.png', url: '#' },
+        { name: 'Partenaire 4', image: 'images/partenaire4.png', url: '#' },
+        { name: 'Partenaire 5', image: 'images/partenaire5.png', url: '#' },
+        { name: 'Partenaire 6', image: 'images/partenaire6.png', url: '#' },
+      ];
+      await info.save();
+      console.log('✅ Partenaires initialisés');
+    }
+  } catch (e) {
+    console.warn('⚠️  Auto-seed partners:', e.message);
+  }
+}
+
 async function start() {
   try {
     const mongoURI = await getMongoURI();
@@ -170,6 +193,7 @@ async function start() {
     // Auto-create admin user if not exists
     await seedAdmin();
     await seedTeam();
+    await seedPartners();
 
     app.listen(PORT, () => {
       console.log(`\n🚀 JUDDEV Backend running on http://localhost:${PORT}`);
