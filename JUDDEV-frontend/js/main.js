@@ -229,19 +229,13 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
   // Form submission
   if (form) {
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
 
       const submitBtn = form.querySelector('.modal-submit');
       const originalHTML = submitBtn.innerHTML;
-      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
-      submitBtn.disabled = true;
 
-      // Collect all form fields
-      const inputs = [...form.querySelectorAll('input, select, textarea')];
-      const getValue = (placeholder) => inputs.find(i => i.placeholder === placeholder || i.name === placeholder)?.value || '';
-
-      // Build message body from all fields
+      // Collect all form fields BEFORE closing
       const allInputs = [...form.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], select, textarea')];
       const name     = allInputs[0]?.value || '';
       const email    = allInputs[1]?.value || '';
@@ -258,35 +252,21 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         `\nDescription du projet:\n${desc}`
       ].filter(Boolean).join('\n');
 
-      try {
-        const API = typeof JUDDEV_CONFIG !== 'undefined' ? JUDDEV_CONFIG.API_URL : 'http://localhost:5000/api';
-        const formTypeField = form.querySelector('input[name="form-type"]');
-        const formType = formTypeField ? formTypeField.value : 'DEVIS';
-        const ctrl = new AbortController();
-        const t = setTimeout(() => ctrl.abort(), 10000);
-        try {
-          await fetch(API + '/contact/message', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name,
-              email,
-              phone,
-              subject: `[${formType}] ${service || 'Demande'}`,
-              message: msgBody
-            }),
-            signal: ctrl.signal
-          });
-        } finally {
-          clearTimeout(t);
-        }
-      } catch (_) {}
+      const API = typeof JUDDEV_CONFIG !== 'undefined' ? JUDDEV_CONFIG.API_URL : 'http://localhost:5000/api';
+      const formTypeField = form.querySelector('input[name="form-type"]');
+      const formType = formTypeField ? formTypeField.value : 'DEVIS';
 
+      // Close immediately — don't wait for server
       closeModal();
       form.reset();
-      submitBtn.innerHTML = originalHTML;
-      submitBtn.disabled = false;
-      showNotification('success', 'Devis envoyé !', 'Votre demande a été reçue. Nous vous contacterons dans les 24h.');
+      showNotification('success', 'Demande envoyée !', 'Votre demande a été reçue. Nous vous contacterons dans les 24h.');
+
+      // Send in background
+      fetch(API + '/contact/message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, subject: `[${formType}] ${service || 'Demande'}`, message: msgBody })
+      }).catch(() => {});
     });
   }
 
@@ -647,20 +627,14 @@ async function loadRealisationDetail() {
                 ${project.technologies.map(t => `<span class="tech-badge">${t}</span>`).join('')}
               </div>
 
-              ${project.showSiteBtn !== false || project.showYoutubeBtn ? `
-                <div style="margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap">
-                  ${project.showSiteBtn !== false ? `
-                    <a href="${project.url || '#'}" target="_blank" class="btn btn-primary">
-                      <i class="fas fa-external-link-alt"></i> Visiter le projet
-                    </a>
-                  ` : ''}
-                  ${project.showYoutubeBtn ? `
-                    <a href="${project.youtubeUrl || '#'}" target="_blank" class="btn btn-outline" style="border-color:#ff0000;color:#ff4444">
-                      <i class="fab fa-youtube"></i> Voir la démo YouTube
-                    </a>
-                  ` : ''}
-                </div>
-              ` : ''}
+              <div style="margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap">
+                <a href="${project.url && project.url !== '#' ? project.url : '#'}" ${project.url && project.url !== '#' ? 'target="_blank"' : ''} class="btn btn-primary" ${!project.url || project.url === '#' ? 'style="opacity:0.5;cursor:default"' : ''}>
+                  <i class="fas fa-external-link-alt"></i> Visiter le projet
+                </a>
+                <a href="${project.youtubeUrl || '#'}" ${project.youtubeUrl ? 'target="_blank"' : ''} class="btn btn-outline" style="border-color:#ff0000;color:#ff4444${!project.youtubeUrl ? ';opacity:0.5;cursor:default' : ''}">
+                  <i class="fab fa-youtube"></i> Voir la démo YouTube
+                </a>
+              </div>
             </div>
           </div>
 

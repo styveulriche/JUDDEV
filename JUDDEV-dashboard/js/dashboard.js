@@ -294,7 +294,7 @@ function confirmDelete(itemLabel, onConfirm) {
   if (!modal) {
     modal = document.createElement('div');
     modal.id = 'confirm-modal';
-    modal.style.cssText = 'position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;padding:1rem';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:1rem';
     document.body.appendChild(modal);
   }
   modal.innerHTML = `
@@ -428,14 +428,7 @@ function getServiceForm(s = {}) {
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
       ${formField('Icône (emoji)', `<input id="s-icon" style="${inputStyle}" value="${s.icon||'⚙️'}" placeholder="💻" />`)}
-      ${formField('Catégorie', `<select id="s-category" style="${inputStyle}">
-        <option value="web" ${s.category==='web'?'selected':''}>Web</option>
-        <option value="mobile" ${s.category==='mobile'?'selected':''}>Mobile</option>
-        <option value="cloud" ${s.category==='cloud'?'selected':''}>Cloud/SaaS</option>
-        <option value="design" ${s.category==='design'?'selected':''}>Design</option>
-        <option value="marketing" ${s.category==='marketing'?'selected':''}>Marketing</option>
-        <option value="ia" ${s.category==='ia'?'selected':''}>IA</option>
-      </select>`)}
+      ${formField('Catégorie', `<input id="s-category" list="s-category-list" style="${inputStyle}" value="${s.category||'web'}" placeholder="web, mobile, cloud, design, desktop, ia, marketing..." /><datalist id="s-category-list"><option value="web">Web</option><option value="mobile">Mobile</option><option value="cloud">Cloud/SaaS</option><option value="design">Design</option><option value="ia">IA & Automatisation</option><option value="marketing">Marketing Digital</option><option value="desktop">Application Desktop</option><option value="autre">Autre</option></datalist>`)}
     </div>
     ${formField('Image', `<input type="file" id="s-image" accept="image/*" style="${inputStyle};padding:0.5rem" />${s.image ? `<div style="margin-top:0.5rem"><img src="${resolveImageUrl(s.image)}" style="height:60px;border-radius:0.375rem;object-fit:cover" onerror="this.style.display='none'" /></div>` : ''}`, 'Laissez vide pour garder l\'image actuelle')}
     ${formField('Description courte *', `<textarea id="s-shortdesc" style="${textareaStyle};min-height:60px" placeholder="Description courte...">${s.shortDesc||''}</textarea>`)}
@@ -449,32 +442,23 @@ function showAddService() {
   openModal('➕ Nouveau Service', getServiceForm(), 'saveNewService');
 }
 
-async function saveNewService() {
-  const btn = document.getElementById('modal-submit-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
-
-  try {
-    const fd = new FormData();
-    fd.append('title', document.getElementById('s-title').value);
-    fd.append('subtitle', document.getElementById('s-subtitle').value);
-    fd.append('icon', document.getElementById('s-icon').value);
-    fd.append('category', document.getElementById('s-category').value);
-    fd.append('shortDesc', document.getElementById('s-shortdesc').value);
-    fd.append('longDesc', document.getElementById('s-longdesc').value);
-    fd.append('features', document.getElementById('s-features').value);
-    fd.append('technologies', document.getElementById('s-techs').value);
-    const imgFile = document.getElementById('s-image').files[0];
-    if (imgFile) fd.append('image', imgFile);
-
-    await apiPostForm('/services', fd);
-    closeModal();
+function saveNewService() {
+  const fd = new FormData();
+  fd.append('title', document.getElementById('s-title').value);
+  fd.append('subtitle', document.getElementById('s-subtitle').value);
+  fd.append('icon', document.getElementById('s-icon').value);
+  fd.append('category', document.getElementById('s-category').value);
+  fd.append('shortDesc', document.getElementById('s-shortdesc').value);
+  fd.append('longDesc', document.getElementById('s-longdesc').value);
+  fd.append('features', document.getElementById('s-features').value);
+  fd.append('technologies', document.getElementById('s-techs').value);
+  const imgFile = document.getElementById('s-image').files[0];
+  if (imgFile) fd.append('image', imgFile);
+  closeModal();
+  apiPostForm('/services', fd).then(async () => {
     showToast('success', 'Service créé', 'Le service a été ajouté avec succès.');
-    await loadServices();
-    updateSyncTime();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
-  }
+    await loadServices(); updateSyncTime();
+  }).catch(err => showToast('error', 'Erreur', err.message));
 }
 
 function editService(id) {
@@ -485,32 +469,23 @@ function editService(id) {
   document.getElementById('modal-submit-btn').onclick = () => saveEditService(id);
 }
 
-async function saveEditService(id) {
-  const btn = document.getElementById('modal-submit-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
-
-  try {
-    const fd = new FormData();
-    fd.append('title', document.getElementById('s-title').value);
-    fd.append('subtitle', document.getElementById('s-subtitle').value);
-    fd.append('icon', document.getElementById('s-icon').value);
-    fd.append('category', document.getElementById('s-category').value);
-    fd.append('shortDesc', document.getElementById('s-shortdesc').value);
-    fd.append('longDesc', document.getElementById('s-longdesc').value);
-    fd.append('features', document.getElementById('s-features').value);
-    fd.append('technologies', document.getElementById('s-techs').value);
-    const imgFile = document.getElementById('s-image').files[0];
-    if (imgFile) fd.append('image', imgFile);
-
-    await apiPutForm('/services/' + id, fd);
-    closeModal();
+function saveEditService(id) {
+  const fd = new FormData();
+  fd.append('title', document.getElementById('s-title').value);
+  fd.append('subtitle', document.getElementById('s-subtitle').value);
+  fd.append('icon', document.getElementById('s-icon').value);
+  fd.append('category', document.getElementById('s-category').value);
+  fd.append('shortDesc', document.getElementById('s-shortdesc').value);
+  fd.append('longDesc', document.getElementById('s-longdesc').value);
+  fd.append('features', document.getElementById('s-features').value);
+  fd.append('technologies', document.getElementById('s-techs').value);
+  const imgFile = document.getElementById('s-image').files[0];
+  if (imgFile) fd.append('image', imgFile);
+  closeModal();
+  apiPutForm('/services/' + id, fd).then(async () => {
     showToast('success', 'Service mis à jour', 'Les modifications ont été sauvegardées.');
-    await loadServices();
-    updateSyncTime();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
-  }
+    await loadServices(); updateSyncTime();
+  }).catch(err => showToast('error', 'Erreur', err.message));
 }
 
 function deleteService(id) {
@@ -555,7 +530,7 @@ function getRealisationForm(r = {}) {
   return `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
       ${formField('Titre *', `<input id="r-title" style="${inputStyle}" value="${r.title||''}" required />`)}
-      ${formField('Catégorie', `<select id="r-category" style="${inputStyle}"><option value="">-- Choisir --</option><option value="E-commerce" ${r.category==='E-commerce'?'selected':''}>E-commerce</option><option value="Mobile" ${r.category==='Mobile'?'selected':''}>Mobile</option><option value="SaaS" ${r.category==='SaaS'?'selected':''}>SaaS</option><option value="Web App" ${r.category==='Web App'?'selected':''}>Web App</option><option value="Site Vitrine" ${r.category==='Site Vitrine'?'selected':''}>Site Vitrine</option><option value="UI/UX Design" ${r.category==='UI/UX Design'?'selected':''}>UI/UX Design</option><option value="IA / ML" ${r.category==='IA / ML'?'selected':''}>IA / ML</option><option value="Cloud" ${r.category==='Cloud'?'selected':''}>Cloud</option><option value="Autre" ${r.category==='Autre'?'selected':''}>Autre</option></select>`)}
+      ${formField('Catégorie', `<input id="r-category" list="r-category-list" style="${inputStyle}" value="${r.category||''}" placeholder="E-commerce, Mobile, Desktop..." /><datalist id="r-category-list"><option value="E-commerce"></option><option value="Mobile"></option><option value="SaaS"></option><option value="Web App"></option><option value="Site Vitrine"></option><option value="UI/UX Design"></option><option value="IA / ML"></option><option value="Cloud"></option><option value="Application Desktop"></option><option value="MVP"></option><option value="Autre"></option></datalist>`)}
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
       ${formField('Client', `<input id="r-client" style="${inputStyle}" value="${r.client||''}" />`)}
@@ -582,39 +557,28 @@ function showAddRealisation() {
   openModal('➕ Nouvelle Réalisation', getRealisationForm(), 'saveNewRealisation');
 }
 
-async function saveNewRealisation() {
-  const btn = document.getElementById('modal-submit-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
-  try {
-    const fd = new FormData();
-    ['title','category','client','year','sector','shortDesc','longDesc','highlights','technologies','url'].forEach(k => {
-      const el = document.getElementById('r-' + k.toLowerCase().replace('shortdesc','shortdesc').replace('longdesc','longdesc'));
-      if (el) fd.append(k, el.value);
-    });
-    fd.set('title', document.getElementById('r-title').value);
-    fd.set('category', document.getElementById('r-category').value);
-    fd.set('client', document.getElementById('r-client').value);
-    fd.set('year', document.getElementById('r-year').value);
-    fd.set('sector', document.getElementById('r-sector').value);
-    fd.set('shortDesc', document.getElementById('r-shortdesc').value);
-    fd.set('longDesc', document.getElementById('r-longdesc').value);
-    fd.set('highlights', document.getElementById('r-highlights').value);
-    fd.set('technologies', document.getElementById('r-techs').value);
-    fd.set('url', document.getElementById('r-url').value);
-    fd.set('youtubeUrl', document.getElementById('r-youtube').value);
-    fd.set('showSiteBtn', document.getElementById('r-showsite').value);
-    fd.set('showYoutubeBtn', document.getElementById('r-showyoutube').value);
-    const imgFile = document.getElementById('r-image').files[0];
-    if (imgFile) fd.append('image', imgFile);
-
-    await apiPostForm('/realisations', fd);
-    closeModal();
+function saveNewRealisation() {
+  const fd = new FormData();
+  fd.append('title', document.getElementById('r-title').value);
+  fd.append('category', document.getElementById('r-category').value);
+  fd.append('client', document.getElementById('r-client').value);
+  fd.append('year', document.getElementById('r-year').value);
+  fd.append('sector', document.getElementById('r-sector').value);
+  fd.append('shortDesc', document.getElementById('r-shortdesc').value);
+  fd.append('longDesc', document.getElementById('r-longdesc').value);
+  fd.append('highlights', document.getElementById('r-highlights').value);
+  fd.append('technologies', document.getElementById('r-techs').value);
+  fd.append('url', document.getElementById('r-url').value);
+  fd.append('youtubeUrl', document.getElementById('r-youtube').value);
+  fd.append('showSiteBtn', document.getElementById('r-showsite').value);
+  fd.append('showYoutubeBtn', document.getElementById('r-showyoutube').value);
+  const imgFile = document.getElementById('r-image').files[0];
+  if (imgFile) fd.append('image', imgFile);
+  closeModal();
+  apiPostForm('/realisations', fd).then(async () => {
     showToast('success', 'Réalisation créée', 'La réalisation a été ajoutée.');
     await loadRealisations();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
-  }
+  }).catch(err => showToast('error', 'Erreur', err.message));
 }
 
 function editRealisation(id) {
@@ -624,35 +588,28 @@ function editRealisation(id) {
   document.getElementById('modal-submit-btn').onclick = () => saveEditRealisation(id);
 }
 
-async function saveEditRealisation(id) {
-  const btn = document.getElementById('modal-submit-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
-  try {
-    const fd = new FormData();
-    fd.append('title', document.getElementById('r-title').value);
-    fd.append('category', document.getElementById('r-category').value);
-    fd.append('client', document.getElementById('r-client').value);
-    fd.append('year', document.getElementById('r-year').value);
-    fd.append('sector', document.getElementById('r-sector').value);
-    fd.append('shortDesc', document.getElementById('r-shortdesc').value);
-    fd.append('longDesc', document.getElementById('r-longdesc').value);
-    fd.append('highlights', document.getElementById('r-highlights').value);
-    fd.append('technologies', document.getElementById('r-techs').value);
-    fd.append('url', document.getElementById('r-url').value);
-    fd.append('youtubeUrl', document.getElementById('r-youtube').value);
-    fd.append('showSiteBtn', document.getElementById('r-showsite').value);
-    fd.append('showYoutubeBtn', document.getElementById('r-showyoutube').value);
-    const imgFile = document.getElementById('r-image').files[0];
-    if (imgFile) fd.append('image', imgFile);
-
-    await apiPutForm('/realisations/' + id, fd);
-    closeModal();
+function saveEditRealisation(id) {
+  const fd = new FormData();
+  fd.append('title', document.getElementById('r-title').value);
+  fd.append('category', document.getElementById('r-category').value);
+  fd.append('client', document.getElementById('r-client').value);
+  fd.append('year', document.getElementById('r-year').value);
+  fd.append('sector', document.getElementById('r-sector').value);
+  fd.append('shortDesc', document.getElementById('r-shortdesc').value);
+  fd.append('longDesc', document.getElementById('r-longdesc').value);
+  fd.append('highlights', document.getElementById('r-highlights').value);
+  fd.append('technologies', document.getElementById('r-techs').value);
+  fd.append('url', document.getElementById('r-url').value);
+  fd.append('youtubeUrl', document.getElementById('r-youtube').value);
+  fd.append('showSiteBtn', document.getElementById('r-showsite').value);
+  fd.append('showYoutubeBtn', document.getElementById('r-showyoutube').value);
+  const imgFile = document.getElementById('r-image').files[0];
+  if (imgFile) fd.append('image', imgFile);
+  closeModal();
+  apiPutForm('/realisations/' + id, fd).then(async () => {
     showToast('success', 'Réalisation mise à jour', 'Modifications sauvegardées.');
     await loadRealisations();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
-  }
+  }).catch(err => showToast('error', 'Erreur', err.message));
 }
 
 function deleteRealisation(id) {
@@ -664,7 +621,6 @@ function deleteRealisation(id) {
       await loadRealisations();
     } catch (err) { showToast('error', 'Erreur', err.message); }
   });
-}
 }
 
 // ============================================================
@@ -768,46 +724,30 @@ function switchArticleMode(mode) {
   }
 }
 
-async function saveNewArticle() {
-  const btn = document.getElementById('modal-submit-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Création...';
-
-  try {
-    const fd = new FormData();
-    fd.append('title', document.getElementById('a-title').value);
-    fd.append('category', document.getElementById('a-category').value);
-    fd.append('author', document.getElementById('a-author').value);
-    fd.append('tags', [...document.getElementById('a-tags').selectedOptions].map(o => o.value).join(', '));
-    fd.append('shortDesc', document.getElementById('a-shortdesc').value);
-
-    const imgFile = document.getElementById('a-image')?.files[0];
-    if (imgFile) fd.append('image', imgFile);
-
-    let endpoint = '/articles';
-
-    if (articleMode === 'pdf') {
-      const pdfFile = document.getElementById('a-pdf')?.files[0];
-      if (!pdfFile) {
-        showToast('error', 'Fichier manquant', 'Veuillez sélectionner un fichier PDF.');
-        btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Créer l\'article';
-        return;
-      }
-      fd.append('pdfFile', pdfFile);
-      endpoint = '/articles/from-pdf';
-    } else {
-      fd.append('content', document.getElementById('a-content')?.value || '');
-      fd.append('sourceType', 'manual');
-    }
-
-    await apiPostForm(endpoint, fd);
-    closeModal();
-    showToast('success', 'Article créé', articleMode === 'pdf' ? 'Article créé depuis le PDF avec succès.' : 'Article créé avec succès.');
-    await loadArticles();
-    updateSyncTime();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Créer l\'article';
+function saveNewArticle() {
+  const fd = new FormData();
+  fd.append('title', document.getElementById('a-title').value);
+  fd.append('category', document.getElementById('a-category').value);
+  fd.append('author', document.getElementById('a-author').value);
+  fd.append('tags', [...document.getElementById('a-tags').selectedOptions].map(o => o.value).join(', '));
+  fd.append('shortDesc', document.getElementById('a-shortdesc').value);
+  const imgFile = document.getElementById('a-image')?.files[0];
+  if (imgFile) fd.append('image', imgFile);
+  let endpoint = '/articles';
+  if (articleMode === 'pdf') {
+    const pdfFile = document.getElementById('a-pdf')?.files[0];
+    if (!pdfFile) { showToast('error', 'Fichier manquant', 'Veuillez sélectionner un fichier PDF.'); return; }
+    fd.append('pdfFile', pdfFile);
+    endpoint = '/articles/from-pdf';
+  } else {
+    fd.append('content', document.getElementById('a-content')?.value || '');
+    fd.append('sourceType', 'manual');
   }
+  closeModal();
+  apiPostForm(endpoint, fd).then(async () => {
+    showToast('success', 'Article créé', articleMode === 'pdf' ? 'Article créé depuis le PDF.' : 'Article créé avec succès.');
+    await loadArticles(); updateSyncTime();
+  }).catch(err => showToast('error', 'Erreur', err.message));
 }
 
 function editArticle(id) {
@@ -818,29 +758,21 @@ function editArticle(id) {
   document.getElementById('modal-submit-btn').onclick = () => saveEditArticle(id);
 }
 
-async function saveEditArticle(id) {
-  const btn = document.getElementById('modal-submit-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
-
-  try {
-    const fd = new FormData();
-    fd.append('title', document.getElementById('a-title').value);
-    fd.append('category', document.getElementById('a-category').value);
-    fd.append('author', document.getElementById('a-author').value);
-    fd.append('tags', [...document.getElementById('a-tags').selectedOptions].map(o => o.value).join(', '));
-    fd.append('shortDesc', document.getElementById('a-shortdesc').value);
-    fd.append('content', document.getElementById('a-content')?.value || '');
-    const imgFile = document.getElementById('a-image')?.files[0];
-    if (imgFile) fd.append('image', imgFile);
-
-    await apiPutForm('/articles/' + id, fd);
-    closeModal();
+function saveEditArticle(id) {
+  const fd = new FormData();
+  fd.append('title', document.getElementById('a-title').value);
+  fd.append('category', document.getElementById('a-category').value);
+  fd.append('author', document.getElementById('a-author').value);
+  fd.append('tags', [...document.getElementById('a-tags').selectedOptions].map(o => o.value).join(', '));
+  fd.append('shortDesc', document.getElementById('a-shortdesc').value);
+  fd.append('content', document.getElementById('a-content')?.value || '');
+  const imgFile = document.getElementById('a-image')?.files[0];
+  if (imgFile) fd.append('image', imgFile);
+  closeModal();
+  apiPutForm('/articles/' + id, fd).then(async () => {
     showToast('success', 'Article mis à jour', 'Modifications sauvegardées.');
     await loadArticles();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
-  }
+  }).catch(err => showToast('error', 'Erreur', err.message));
 }
 
 function deleteArticle(id) {
@@ -903,26 +835,21 @@ function showAddFormation() {
   document.getElementById('modal-submit-btn').onclick = saveNewFormation;
 }
 
-async function saveNewFormation() {
-  const btn = document.getElementById('modal-submit-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
-  try {
-    await apiPost('/formations', {
-      title: document.getElementById('f-title').value,
-      icon: document.getElementById('f-icon').value,
-      duration: document.getElementById('f-duration').value,
-      level: document.getElementById('f-level').value,
-      price: document.getElementById('f-price').value,
-      description: document.getElementById('f-description').value,
-      program: document.getElementById('f-program').value.split('\n').filter(Boolean)
-    });
-    closeModal();
+function saveNewFormation() {
+  const data = {
+    title: document.getElementById('f-title').value,
+    icon: document.getElementById('f-icon').value,
+    duration: document.getElementById('f-duration').value,
+    level: document.getElementById('f-level').value,
+    price: document.getElementById('f-price').value,
+    description: document.getElementById('f-description').value,
+    program: document.getElementById('f-program').value.split('\n').filter(Boolean)
+  };
+  closeModal();
+  apiPost('/formations', data).then(async () => {
     showToast('success', 'Formation créée', 'La formation a été ajoutée.');
     await loadFormations();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
-  }
+  }).catch(err => showToast('error', 'Erreur', err.message));
 }
 
 function editFormation(id) {
@@ -932,26 +859,21 @@ function editFormation(id) {
   document.getElementById('modal-submit-btn').onclick = () => saveEditFormation(id);
 }
 
-async function saveEditFormation(id) {
-  const btn = document.getElementById('modal-submit-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
-  try {
-    await apiPut('/formations/' + id, {
-      title: document.getElementById('f-title').value,
-      icon: document.getElementById('f-icon').value,
-      duration: document.getElementById('f-duration').value,
-      level: document.getElementById('f-level').value,
-      price: document.getElementById('f-price').value,
-      description: document.getElementById('f-description').value,
-      program: document.getElementById('f-program').value.split('\n').filter(Boolean)
-    });
-    closeModal();
+function saveEditFormation(id) {
+  const data = {
+    title: document.getElementById('f-title').value,
+    icon: document.getElementById('f-icon').value,
+    duration: document.getElementById('f-duration').value,
+    level: document.getElementById('f-level').value,
+    price: document.getElementById('f-price').value,
+    description: document.getElementById('f-description').value,
+    program: document.getElementById('f-program').value.split('\n').filter(Boolean)
+  };
+  closeModal();
+  apiPut('/formations/' + id, data).then(async () => {
     showToast('success', 'Formation mise à jour', 'Modifications sauvegardées.');
     await loadFormations();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
-  }
+  }).catch(err => showToast('error', 'Erreur', err.message));
 }
 
 function deleteFormation(id) {
@@ -1101,23 +1023,17 @@ function showAddPartner() {
   document.getElementById('modal-submit-btn').onclick = saveNewPartner;
 }
 
-async function saveNewPartner() {
-  const btn = document.getElementById('modal-submit-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Ajout...';
-  try {
-    const fd = new FormData();
-    fd.append('name', document.getElementById('p-name').value);
-    fd.append('url', document.getElementById('p-url').value || '#');
-    const imgFile = document.getElementById('p-image').files[0];
-    if (imgFile) fd.append('image', imgFile);
-    await apiPostForm('/contact/partner', fd);
-    closeModal();
+function saveNewPartner() {
+  const fd = new FormData();
+  fd.append('name', document.getElementById('p-name').value);
+  fd.append('url', document.getElementById('p-url').value || '#');
+  const imgFile = document.getElementById('p-image').files[0];
+  if (imgFile) fd.append('image', imgFile);
+  closeModal();
+  apiPostForm('/contact/partner', fd).then(async () => {
     showToast('success', 'Partenaire ajouté', 'Le logo a été ajouté.');
     await loadPartenaires();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Ajouter';
-  }
+  }).catch(err => showToast('error', 'Erreur', err.message));
 }
 
 function editPartner(idx) {
@@ -1127,23 +1043,17 @@ function editPartner(idx) {
   document.getElementById('modal-submit-btn').onclick = () => saveEditPartner(idx);
 }
 
-async function saveEditPartner(idx) {
-  const btn = document.getElementById('modal-submit-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
-  try {
-    const fd = new FormData();
-    fd.append('name', document.getElementById('p-name').value);
-    fd.append('url', document.getElementById('p-url').value || '#');
-    const imgFile = document.getElementById('p-image').files[0];
-    if (imgFile) fd.append('image', imgFile);
-    await apiPutForm('/contact/partner/' + idx, fd);
-    closeModal();
+function saveEditPartner(idx) {
+  const fd = new FormData();
+  fd.append('name', document.getElementById('p-name').value);
+  fd.append('url', document.getElementById('p-url').value || '#');
+  const imgFile = document.getElementById('p-image').files[0];
+  if (imgFile) fd.append('image', imgFile);
+  closeModal();
+  apiPutForm('/contact/partner/' + idx, fd).then(async () => {
     showToast('success', 'Partenaire modifié', 'Modifications sauvegardées.');
     await loadPartenaires();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
-  }
+  }).catch(err => showToast('error', 'Erreur', err.message));
 }
 
 function deletePartner(idx) {
@@ -1304,30 +1214,24 @@ function showAddTeamMember() {
   document.getElementById('modal-submit-btn').onclick = saveNewTeamMember;
 }
 
-async function saveNewTeamMember() {
-  const btn = document.getElementById('modal-submit-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
-  try {
-    const fd = new FormData();
-    fd.append('name', document.getElementById('t-name').value);
-    fd.append('initials', document.getElementById('t-initials').value);
-    fd.append('role', document.getElementById('t-role').value);
-    fd.append('tags', document.getElementById('t-tags').value);
-    fd.append('linkedin', document.getElementById('t-linkedin').value);
-    fd.append('github', document.getElementById('t-github').value);
-    fd.append('twitter', document.getElementById('t-twitter').value);
-    fd.append('behance', document.getElementById('t-behance').value);
-    fd.append('order', document.getElementById('t-order').value);
-    const photo = document.getElementById('t-photo').files[0];
-    if (photo) fd.append('photo', photo);
-    await apiPostForm('/team', fd);
-    closeModal();
+function saveNewTeamMember() {
+  const fd = new FormData();
+  fd.append('name', document.getElementById('t-name').value);
+  fd.append('initials', document.getElementById('t-initials').value);
+  fd.append('role', document.getElementById('t-role').value);
+  fd.append('tags', document.getElementById('t-tags').value);
+  fd.append('linkedin', document.getElementById('t-linkedin').value);
+  fd.append('github', document.getElementById('t-github').value);
+  fd.append('twitter', document.getElementById('t-twitter').value);
+  fd.append('behance', document.getElementById('t-behance').value);
+  fd.append('order', document.getElementById('t-order').value);
+  const photo = document.getElementById('t-photo').files[0];
+  if (photo) fd.append('photo', photo);
+  closeModal();
+  apiPostForm('/team', fd).then(async () => {
     showToast('success', 'Membre ajouté', 'Le membre a été ajouté à l\'équipe.');
     await loadTeam();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
-  }
+  }).catch(err => showToast('error', 'Erreur', err.message));
 }
 
 function editTeamMember(id) {
@@ -1337,30 +1241,24 @@ function editTeamMember(id) {
   document.getElementById('modal-submit-btn').onclick = () => saveEditTeamMember(id);
 }
 
-async function saveEditTeamMember(id) {
-  const btn = document.getElementById('modal-submit-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
-  try {
-    const fd = new FormData();
-    fd.append('name', document.getElementById('t-name').value);
-    fd.append('initials', document.getElementById('t-initials').value);
-    fd.append('role', document.getElementById('t-role').value);
-    fd.append('tags', document.getElementById('t-tags').value);
-    fd.append('linkedin', document.getElementById('t-linkedin').value);
-    fd.append('github', document.getElementById('t-github').value);
-    fd.append('twitter', document.getElementById('t-twitter').value);
-    fd.append('behance', document.getElementById('t-behance').value);
-    fd.append('order', document.getElementById('t-order').value);
-    const photo = document.getElementById('t-photo').files[0];
-    if (photo) fd.append('photo', photo);
-    await apiPutForm('/team/' + id, fd);
-    closeModal();
+function saveEditTeamMember(id) {
+  const fd = new FormData();
+  fd.append('name', document.getElementById('t-name').value);
+  fd.append('initials', document.getElementById('t-initials').value);
+  fd.append('role', document.getElementById('t-role').value);
+  fd.append('tags', document.getElementById('t-tags').value);
+  fd.append('linkedin', document.getElementById('t-linkedin').value);
+  fd.append('github', document.getElementById('t-github').value);
+  fd.append('twitter', document.getElementById('t-twitter').value);
+  fd.append('behance', document.getElementById('t-behance').value);
+  fd.append('order', document.getElementById('t-order').value);
+  const photo = document.getElementById('t-photo').files[0];
+  if (photo) fd.append('photo', photo);
+  closeModal();
+  apiPutForm('/team/' + id, fd).then(async () => {
     showToast('success', 'Membre mis à jour', 'Les modifications ont été sauvegardées.');
     await loadTeam();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
-  }
+  }).catch(err => showToast('error', 'Erreur', err.message));
 }
 
 function deleteTeamMember(id) {
@@ -1450,40 +1348,30 @@ function openFAQModal(id) {
   `);
 }
 
-async function saveFAQNew() {
-  const btn = document.getElementById('faq-save-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
-  try {
-    await apiPost('/faq', {
-      question: document.getElementById('faq-q').value,
-      answer: document.getElementById('faq-a').value,
-      order: parseInt(document.getElementById('faq-order').value) || 0
-    });
-    closeModal();
+function saveFAQNew() {
+  const data = {
+    question: document.getElementById('faq-q').value,
+    answer: document.getElementById('faq-a').value,
+    order: parseInt(document.getElementById('faq-order').value) || 0
+  };
+  closeModal();
+  apiPost('/faq', data).then(async () => {
     showToast('success', 'FAQ créée', 'La question a été ajoutée.');
     await loadFAQ();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
-  }
+  }).catch(err => showToast('error', 'Erreur', err.message));
 }
 
-async function saveFAQEdit(id) {
-  const btn = document.getElementById('faq-save-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sauvegarde...';
-  try {
-    await apiPut('/faq/' + id, {
-      question: document.getElementById('faq-q').value,
-      answer: document.getElementById('faq-a').value,
-      order: parseInt(document.getElementById('faq-order').value) || 0
-    });
-    closeModal();
+function saveFAQEdit(id) {
+  const data = {
+    question: document.getElementById('faq-q').value,
+    answer: document.getElementById('faq-a').value,
+    order: parseInt(document.getElementById('faq-order').value) || 0
+  };
+  closeModal();
+  apiPut('/faq/' + id, data).then(async () => {
     showToast('success', 'FAQ mise à jour', 'Les modifications ont été sauvegardées.');
     await loadFAQ();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Sauvegarder';
-  }
+  }).catch(err => showToast('error', 'Erreur', err.message));
 }
 
 function deleteFAQ(id) {

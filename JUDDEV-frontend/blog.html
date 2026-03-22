@@ -255,34 +255,20 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
     btn.disabled = true;
 
-    try {
-      const API = typeof JUDDEV_CONFIG !== 'undefined' ? JUDDEV_CONFIG.API_URL : 'http://localhost:5000/api';
-      const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), 10000);
-      let res, data;
-      try {
-        res = await fetch(API + '/newsletter/subscribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: emailInput.value }),
-          signal: ctrl.signal
-        });
-        data = await res.json();
-      } finally {
-        clearTimeout(t);
-      }
-      if (res.ok || res.status === 200) {
-        emailInput.value = '';
-        showNotification('success', 'Abonnement réussi !', data.message || 'Vous recevrez nos prochains articles par email.');
-      } else {
-        showNotification('error', 'Erreur', data.message || 'Une erreur est survenue.');
-      }
-    } catch (err) {
-      showNotification('error', 'Erreur', 'Impossible de traiter votre demande. Réessayez plus tard.');
-    }
-
+    const email = emailInput.value;
+    // Close immediately
+    emailInput.value = '';
     btn.innerHTML = orig;
     btn.disabled = false;
+    showNotification('success', 'Abonnement réussi !', 'Vous recevrez nos prochains articles par email.');
+
+    // Send in background
+    const API = typeof JUDDEV_CONFIG !== 'undefined' ? JUDDEV_CONFIG.API_URL : 'http://localhost:5000/api';
+    fetch(API + '/newsletter/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    }).catch(() => {});
   };
 
   // Blog category filters
