@@ -3,38 +3,46 @@ const Subscriber = require('../models/Subscriber');
 
 const router = express.Router();
 
-// Helper to send email
-async function sendEmail(to, subject, html) {
-  if (!process.env.SMTP_PASS || process.env.SMTP_PASS === 'your_gmail_app_password_here') {
-    console.log('[Email] SMTP non configuré — variable SMTP_PASS manquante ou par défaut');
+// Helper to send email via Brevo HTTP API (works on Render - no SMTP port blocking)
+async function sendEmail(toAddresses, subject, html) {
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!apiKey) {
+    console.log('[Email] BREVO_API_KEY non configurée — emails désactivés');
     return;
   }
-  const port = parseInt(process.env.SMTP_PORT) || 587;
-  console.log('[Email] Tentative envoi vers:', to, '| Port:', port, '| Sujet:', subject);
+
+  // Build recipients array
+  const recipients = Array.isArray(toAddresses)
+    ? toAddresses.map(e => ({ email: e }))
+    : toAddresses.split(',').map(e => ({ email: e.trim() })).filter(e => e.email);
+
+  const senderEmail = process.env.SMTP_USER || 'juddevcorporation03@gmail.com';
+  console.log('[Email] Tentative envoi Brevo API vers:', recipients.map(r => r.email).join(', '));
+
   try {
-    const nodemailer = require('nodemailer');
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port,
-      secure: port === 465,
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-      connectionTimeout: 15000,
-      greetingTimeout: 10000,
-      socketTimeout: 20000,
-      tls: { rejectUnauthorized: false }
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': apiKey,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        sender: { name: 'JUDDEV CORPORATION', email: senderEmail },
+        to: recipients,
+        subject,
+        htmlContent: html
+      })
     });
-    await transporter.verify();
-    console.log('[Email] ✅ Connexion SMTP OK');
-    await transporter.sendMail({
-      from: `"JUDDEV CORPORATION" <${process.env.SMTP_USER}>`,
-      to,
-      subject,
-      html
-    });
-    console.log('[Email] ✅ Envoyé avec succès vers:', to);
+
+    if (res.ok) {
+      console.log('[Email] ✅ Envoyé avec succès via Brevo API');
+    } else {
+      const errBody = await res.json().catch(() => ({}));
+      console.error('[Email] ❌ Brevo API erreur', res.status, ':', JSON.stringify(errBody));
+    }
   } catch (err) {
-    console.error('[Email] ❌ Erreur:', err.message);
-    console.error('[Email] ❌ Code:', err.code, '| Response:', err.response || 'N/A');
+    console.error('[Email] ❌ Erreur réseau:', err.message);
   }
 }
 

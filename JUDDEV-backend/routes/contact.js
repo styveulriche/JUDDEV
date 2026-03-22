@@ -99,25 +99,27 @@ router.post('/message', async (req, res) => {
     const msg = new ContactMessage({ name, email, phone, subject, message });
     await msg.save();
 
-    // Optional: send email notification
-    if (process.env.SMTP_PASS && process.env.SMTP_PASS !== 'your_gmail_app_password_here') {
-      try {
-        const nodemailer = require('nodemailer');
-        const transporter = nodemailer.createTransport({
-          host: process.env.SMTP_HOST,
-          port: parseInt(process.env.SMTP_PORT),
-          secure: false,
-          auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-        });
-        await transporter.sendMail({
-          from: `"JUDDEV Site" <${process.env.SMTP_USER}>`,
-          to: process.env.ADMIN_EMAIL,
+    // Send email notification via Brevo HTTP API
+    if (process.env.BREVO_API_KEY) {
+      const adminEmail = process.env.ADMIN_EMAIL || 'juddevcorporation03@gmail.com';
+      const senderEmail = process.env.SMTP_USER || 'juddevcorporation03@gmail.com';
+      fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': process.env.BREVO_API_KEY,
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          sender: { name: 'JUDDEV Site', email: senderEmail },
+          to: [{ email: adminEmail }],
           subject: `Nouveau message: ${subject || 'Contact Site'}`,
-          html: `<h2>Nouveau message de ${name}</h2><p><strong>Email:</strong> ${email}</p><p><strong>Téléphone:</strong> ${phone || 'N/A'}</p><p><strong>Sujet:</strong> ${subject || 'N/A'}</p><p><strong>Message:</strong></p><p>${message}</p>`
-        });
-      } catch (emailErr) {
-        console.error('Email error:', emailErr.message);
-      }
+          htmlContent: `<h2>Nouveau message de ${name}</h2><p><strong>Email:</strong> ${email}</p><p><strong>Téléphone:</strong> ${phone || 'N/A'}</p><p><strong>Sujet:</strong> ${subject || 'N/A'}</p><p><strong>Message:</strong></p><p style="white-space:pre-wrap">${message}</p>`
+        })
+      }).then(r => {
+        if (r.ok) console.log('[Contact] Email admin envoyé via Brevo');
+        else r.json().then(e => console.error('[Contact] Brevo erreur:', JSON.stringify(e))).catch(() => {});
+      }).catch(e => console.error('[Contact] Erreur envoi email admin:', e.message));
     }
 
     res.status(201).json({ message: 'Message envoyé avec succès.' });

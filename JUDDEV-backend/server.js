@@ -323,7 +323,7 @@ async function start() {
       console.log(`🔧 Dashboard: http://localhost:${PORT}/admin/login.html`);
       console.log(`📡 API: http://localhost:${PORT}/api`);
       console.log(`❤️  Health: http://localhost:${PORT}/api/health`);
-      console.log(`📧 SMTP configuré: ${process.env.SMTP_PASS && process.env.SMTP_PASS !== 'your_gmail_app_password_here' ? '✅ OUI (' + (process.env.SMTP_USER || '?') + ')' : '❌ NON (emails désactivés)'}\n`);
+      console.log(`📧 Brevo API: ${process.env.BREVO_API_KEY ? '✅ configurée (emails actifs)' : '❌ BREVO_API_KEY manquante (emails désactivés)'}\n`);
 
       // Keep-alive: ping toutes les 14 min pour éviter le sleep sur Render free tier
       if (process.env.NODE_ENV === 'production') {
