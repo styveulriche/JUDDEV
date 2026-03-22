@@ -6,6 +6,17 @@ const { notifySubscribers } = require('./newsletter');
 
 const router = express.Router();
 
+// Upload vers Cloudinary sans bloquer si les credentials manquent
+async function safeUpload(file, folder) {
+  if (!file) return '';
+  try {
+    return await uploadToCloudinary(file, folder);
+  } catch (e) {
+    console.error('[Cloudinary] Upload échoué:', e.message);
+    return '';
+  }
+}
+
 // GET /api/articles
 router.get('/', async (req, res) => {
   try {
@@ -57,7 +68,7 @@ router.post('/', auth, uploadMixed.fields([{ name: 'image', maxCount: 1 }]), asy
   try {
     const { title, category, author, shortDesc, content } = req.body;
     const tags = req.body.tags ? (Array.isArray(req.body.tags) ? req.body.tags : req.body.tags.split(',').map(t => t.trim()).filter(Boolean)) : [];
-    const image = req.files?.image?.[0] ? await uploadToCloudinary(req.files.image[0], 'juddev/articles') : (req.body.image || '');
+    const image = req.files?.image?.[0] ? await safeUpload(req.files.image[0], 'juddev/articles') : (req.body.image || '');
 
     const id = `article-${Date.now()}`;
     const article = new Article({
@@ -85,7 +96,7 @@ router.post('/from-pdf', auth, uploadMixed.fields([
   try {
     const { title, category, author, shortDesc } = req.body;
     const tags = req.body.tags ? (Array.isArray(req.body.tags) ? req.body.tags : req.body.tags.split(',').map(t => t.trim()).filter(Boolean)) : [];
-    const image = req.files?.image?.[0] ? await uploadToCloudinary(req.files.image[0], 'juddev/articles') : (req.body.image || '');
+    const image = req.files?.image?.[0] ? await safeUpload(req.files.image[0], 'juddev/articles') : (req.body.image || '');
 
     if (!req.files?.pdfFile?.[0]) {
       return res.status(400).json({ message: 'Fichier PDF requis.' });
@@ -156,7 +167,7 @@ router.put('/:id', auth, uploadMixed.fields([{ name: 'image', maxCount: 1 }]), a
 
     const updateData = { title, category, author, shortDesc, content, tags };
     if (published !== undefined) updateData.published = published === 'true' || published === true;
-    if (req.files?.image?.[0]) updateData.image = await uploadToCloudinary(req.files.image[0], 'juddev/articles');
+    if (req.files?.image?.[0]) updateData.image = await safeUpload(req.files.image[0], 'juddev/articles');
     else if (req.body.image) updateData.image = req.body.image;
 
     const article = await Article.findOneAndUpdate({ id: req.params.id }, updateData, { new: true });
