@@ -5,13 +5,17 @@ const router = express.Router();
 
 // Helper to send email
 async function sendEmail(to, subject, html) {
-  if (!process.env.SMTP_PASS || process.env.SMTP_PASS === 'your_gmail_app_password_here') return;
+  if (!process.env.SMTP_PASS || process.env.SMTP_PASS === 'your_gmail_app_password_here') {
+    console.log('[Email] SMTP non configuré — variable SMTP_PASS manquante ou par défaut');
+    return;
+  }
+  console.log('[Email] Tentative envoi vers:', to, '| Sujet:', subject);
   try {
     const nodemailer = require('nodemailer');
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT),
-      secure: false,
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: parseInt(process.env.SMTP_PORT) || 587,
+      secure: parseInt(process.env.SMTP_PORT) === 465,
       auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
     });
     await transporter.sendMail({
@@ -20,8 +24,9 @@ async function sendEmail(to, subject, html) {
       subject,
       html
     });
+    console.log('[Email] ✅ Envoyé avec succès vers:', to);
   } catch (err) {
-    console.error('Newsletter email error:', err.message);
+    console.error('[Email] ❌ Erreur:', err.message);
   }
 }
 
@@ -29,16 +34,19 @@ async function sendEmail(to, subject, html) {
 router.post('/subscribe', async (req, res) => {
   try {
     const { email } = req.body;
+    console.log('[Newsletter] Abonnement demandé:', email);
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ message: 'Adresse email invalide.' });
     }
 
     const existing = await Subscriber.findOne({ email: email.toLowerCase() });
     if (existing) {
+      console.log('[Newsletter] Email déjà abonné:', email);
       return res.status(200).json({ message: 'Vous êtes déjà abonné(e).' });
     }
 
     await Subscriber.create({ email: email.toLowerCase() });
+    console.log('[Newsletter] Nouvel abonné créé:', email);
 
     // Send welcome email
     await sendEmail(

@@ -1065,3 +1065,59 @@ document.querySelectorAll('.counter').forEach(el => {
     inject();
   }
 })();
+
+// ============================================================
+// SOCIAL LINKS — apply from API data to footer + contact page
+// ============================================================
+(function initSocialLinks() {
+  const PLATFORM_MAP = {
+    linkedin:  { ariaLabel: 'LinkedIn',   iconClass: 'fa-linkedin-in' },
+    youtube:   { ariaLabel: 'YouTube',    iconClass: 'fa-youtube' },
+    whatsapp:  { ariaLabel: 'WhatsApp',   iconClass: 'fa-whatsapp' },
+    facebook:  { ariaLabel: 'Facebook',   iconClass: 'fa-facebook-f' },
+    twitter:   { ariaLabel: 'Twitter',    iconClass: 'fa-twitter' },
+    github:    { ariaLabel: 'GitHub',     iconClass: 'fa-github' },
+    instagram: { ariaLabel: 'Instagram',  iconClass: 'fa-instagram' }
+  };
+
+  function applyLinks(social) {
+    if (!social) return;
+    Object.entries(PLATFORM_MAP).forEach(([key, meta]) => {
+      const url = social[key];
+      if (!url || url === '#' || url === '') return;
+
+      // Footer social links (aria-label)
+      document.querySelectorAll(`.footer-social a[aria-label="${meta.ariaLabel}"]`).forEach(a => {
+        a.href = url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+      });
+
+      // Contact page social-link-card (find by icon class)
+      document.querySelectorAll('.social-link-card').forEach(card => {
+        if (card.querySelector(`.${meta.iconClass}`)) {
+          card.href = url;
+          card.target = '_blank';
+          card.rel = 'noopener noreferrer';
+        }
+      });
+    });
+  }
+
+  function init() {
+    // Apply immediately from cached/default data if available
+    if (typeof JUDDEV_DATA !== 'undefined' && JUDDEV_DATA.contacts?.social) {
+      applyLinks(JUDDEV_DATA.contacts.social);
+    }
+    // Re-apply when API data arrives
+    document.addEventListener('juddev:dataUpdated', (e) => {
+      if (e.detail?.contacts?.social) applyLinks(e.detail.contacts.social);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
