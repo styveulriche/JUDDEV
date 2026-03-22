@@ -113,7 +113,7 @@
           <p style="color:var(--text-muted);font-size:0.875rem;margin-bottom:2rem">Nous vous répondrons dans les plus brefs délais.</p>
 
           <form id="contact-form" onsubmit="handleContactSubmit(event)">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+            <div class="contact-form-grid">
               <div class="form-group">
                 <label class="form-label">Prénom *</label>
                 <input type="text" name="firstname" class="form-input" placeholder="Jean" required />
@@ -288,13 +288,10 @@
 <script src="js/i18n.js"></script>
 <script src="js/main.js"></script>
 <script>
-async function handleContactSubmit(e) {
+function handleContactSubmit(e) {
   e.preventDefault();
   const form = e.target;
   const btn = form.querySelector('button[type="submit"]');
-  const orig = btn.innerHTML;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
-  btn.disabled = true;
 
   const firstname = form.querySelector('[name="firstname"]')?.value || '';
   const lastname = form.querySelector('[name="lastname"]')?.value || '';
@@ -306,28 +303,19 @@ async function handleContactSubmit(e) {
     message: form.querySelector('[name="message"]')?.value || ''
   };
 
-  try {
-    const API = typeof JUDDEV_CONFIG !== 'undefined' ? JUDDEV_CONFIG.API_URL : 'http://localhost:5000/api';
-    const res = await fetch(API + '/contact/message', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    form.reset();
-    if (typeof showNotification === 'function') {
-      showNotification('success', 'Message envoyé !', 'Merci pour votre message. Nous vous répondrons dans les 24 heures.');
-    } else {
-      alert('Message envoyé ! Nous vous répondrons dans les 24 heures.');
-    }
-  } catch (err) {
-    form.reset();
-    if (typeof showNotification === 'function') {
-      showNotification('success', 'Message envoyé !', 'Merci pour votre message. Nous vous répondrons dans les 24 heures.');
-    }
+  // Close immediately
+  form.reset();
+  if (typeof showNotification === 'function') {
+    showNotification('success', 'Message envoyé !', 'Merci pour votre message. Nous vous répondrons dans les 24 heures.');
   }
 
-  btn.innerHTML = orig;
-  btn.disabled = false;
+  // Send in background
+  const API = typeof JUDDEV_CONFIG !== 'undefined' ? JUDDEV_CONFIG.API_URL : 'http://localhost:5000/api';
+  fetch(API + '/contact/message', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).catch(() => {});
 }
 
 // FAQ

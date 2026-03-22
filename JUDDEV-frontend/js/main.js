@@ -988,26 +988,63 @@ document.querySelectorAll('.counter').forEach(el => {
       footerLogoLink.parentElement.insertBefore(img, footerLogoLink);
     }
 
+    // --- Mobile Nav Controls ---
+    const mobileNav = document.querySelector('.navbar-mobile');
+    if (mobileNav && !document.getElementById('theme-toggle-m')) {
+      const mobileCtrl = document.createElement('div');
+      mobileCtrl.className = 'mobile-nav-controls';
+      mobileCtrl.innerHTML = `
+        <button class="theme-toggle-btn" id="theme-toggle-m" title="Changer le thème">
+          <i class="fas fa-sun"></i>
+        </button>
+        <div class="lang-switcher">
+          <button class="lang-btn lang-active" id="lang-fr-m">FR</button>
+          <button class="lang-btn" id="lang-en-m">EN</button>
+        </div>
+      `;
+      mobileNav.appendChild(mobileCtrl);
+    }
+
     // --- Wire up controls ---
+    function applyTheme(next) {
+      if (next === 'light') {
+        document.documentElement.classList.add('light-mode');
+      } else {
+        document.documentElement.classList.remove('light-mode');
+      }
+      localStorage.setItem('juddev_theme', next);
+      const cls = next === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+      const ic1 = document.getElementById('theme-toggle')?.querySelector('i');
+      const ic2 = document.getElementById('theme-toggle-m')?.querySelector('i');
+      if (ic1) ic1.className = cls;
+      if (ic2) ic2.className = cls;
+      const t1 = document.getElementById('theme-toggle');
+      const t2 = document.getElementById('theme-toggle-m');
+      const title = next === 'light' ? 'Mode sombre' : 'Mode clair';
+      if (t1) t1.title = title;
+      if (t2) t2.title = title;
+    }
+
     const themeBtn = document.getElementById('theme-toggle');
     if (themeBtn) {
       const current = localStorage.getItem('juddev_theme') || 'dark';
       const icon = themeBtn.querySelector('i');
       if (icon) icon.className = current === 'light' ? 'fas fa-moon' : 'fas fa-sun';
       themeBtn.title = current === 'light' ? 'Mode sombre' : 'Mode clair';
-
       themeBtn.addEventListener('click', () => {
-        const cur = localStorage.getItem('juddev_theme') || 'dark';
-        const next = cur === 'dark' ? 'light' : 'dark';
-        if (next === 'light') {
-          document.documentElement.classList.add('light-mode');
-        } else {
-          document.documentElement.classList.remove('light-mode');
-        }
-        localStorage.setItem('juddev_theme', next);
-        const ic = themeBtn.querySelector('i');
-        if (ic) ic.className = next === 'light' ? 'fas fa-moon' : 'fas fa-sun';
-        themeBtn.title = next === 'light' ? 'Mode sombre' : 'Mode clair';
+        const next = (localStorage.getItem('juddev_theme') || 'dark') === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
+      });
+    }
+
+    const themeBtnM = document.getElementById('theme-toggle-m');
+    if (themeBtnM) {
+      const curM = localStorage.getItem('juddev_theme') || 'dark';
+      const iconM = themeBtnM.querySelector('i');
+      if (iconM) iconM.className = curM === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+      themeBtnM.addEventListener('click', () => {
+        const next = (localStorage.getItem('juddev_theme') || 'dark') === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
       });
     }
 
@@ -1015,6 +1052,11 @@ document.querySelectorAll('.counter').forEach(el => {
     const enBtn = document.getElementById('lang-en');
     if (frBtn) frBtn.addEventListener('click', () => { if (typeof JUDDEV_I18N !== 'undefined') JUDDEV_I18N.setLang('fr'); });
     if (enBtn) enBtn.addEventListener('click', () => { if (typeof JUDDEV_I18N !== 'undefined') JUDDEV_I18N.setLang('en'); });
+
+    const frBtnM = document.getElementById('lang-fr-m');
+    const enBtnM = document.getElementById('lang-en-m');
+    if (frBtnM) frBtnM.addEventListener('click', () => { if (typeof JUDDEV_I18N !== 'undefined') JUDDEV_I18N.setLang('fr'); });
+    if (enBtnM) enBtnM.addEventListener('click', () => { if (typeof JUDDEV_I18N !== 'undefined') JUDDEV_I18N.setLang('en'); });
   }
 
   if (document.readyState === 'loading') {

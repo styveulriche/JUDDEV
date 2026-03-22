@@ -393,6 +393,16 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 0.5rem;
 }
 
+.mobile-nav-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border-color);
+  margin-top: 0.5rem;
+}
+
 /* ============================================================
    BUTTONS
    ============================================================ */
@@ -3579,8 +3589,8 @@ html.light-mode .cta-section .cta-subtitle {
     z-index: 1010;
     position: relative;
     margin-left: auto;
-    background: rgba(0, 102, 255, 0.1);
-    border: 1px solid rgba(0, 102, 255, 0.25);
+    background: rgba(10, 14, 26, 0.85);
+    border: 1px solid rgba(0, 102, 255, 0.5);
     border-radius: 0.5rem;
     padding: 0.5rem 0.6rem;
   }
@@ -3589,7 +3599,7 @@ html.light-mode .cta-section .cta-subtitle {
     display: block;
     width: 22px;
     height: 2px;
-    background: var(--text-primary);
+    background: #ffffff;
     border-radius: 2px;
   }
 }
@@ -3640,6 +3650,32 @@ html.light-mode .cta-section .cta-subtitle {
     width: 100%;
     height: 100px;
   }
+}
+
+/* Services intro characteristics: 2 per row on tablet, 1 on mobile */
+.services-intro-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .services-intro-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .services-intro-grid { grid-template-columns: 1fr; }
+}
+
+/* Contact form fields grid: responsive */
+.contact-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .contact-form-grid { grid-template-columns: 1fr; }
 }
 
 /* Prevent horizontal overflow site-wide */

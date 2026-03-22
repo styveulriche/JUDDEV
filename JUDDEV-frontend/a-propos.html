@@ -192,7 +192,7 @@
       <h2 class="section-title">Notre <span>Équipe</span></h2>
       <p class="section-subtitle">Des experts passionnés et dédiés à la réussite de vos projets digitaux.</p>
     </div>
-    <div class="grid-3">
+    <div class="grid-3" id="team-grid">
       <!-- NGUEYE DURAND -->
       <div class="team-card reveal stagger-1">
         <div class="team-card-inner">
@@ -378,7 +378,7 @@
 <script>
 // Load team from API and render
 document.addEventListener('DOMContentLoaded', async () => {
-  const grid = document.querySelector('.grid-3');
+  const grid = document.getElementById('team-grid');
   if (!grid) return;
 
   const API = typeof JUDDEV_CONFIG !== 'undefined' ? JUDDEV_CONFIG.API_URL : 'http://localhost:5000/api';
