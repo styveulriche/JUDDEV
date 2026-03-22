@@ -294,6 +294,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       renderRealisations(filtered);
     });
   });
+
+  // Auto-refresh: re-render when API data updates (every 30s via data.js polling)
+  document.addEventListener('juddev:dataUpdated', async () => {
+    try {
+      const res = await fetch(API + '/realisations');
+      if (res.ok) {
+        allRealisations = await res.json();
+        const activeFilter = document.querySelector('.filter-btn.active')?.dataset?.filter || 'all';
+        const filtered = activeFilter === 'all' ? allRealisations : allRealisations.filter(r => r.category === activeFilter);
+        renderRealisations(filtered);
+      }
+    } catch (_) {}
+  });
 });
 </script>
 </body>

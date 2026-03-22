@@ -289,6 +289,15 @@ document.addEventListener('DOMContentLoaded', () => {
       renderArticles(filtered);
     });
   });
+
+  // Auto-refresh: re-render when API data updates (every 30s via data.js polling)
+  document.addEventListener('juddev:dataUpdated', (e) => {
+    const articles = e.detail.articles;
+    if (!articles || !articles.length) return;
+    const activeFilter = document.querySelector('#blog-filters .filter-btn.active')?.dataset?.filter || 'all';
+    const filtered = activeFilter === 'all' ? articles : articles.filter(a => a.category === activeFilter);
+    renderArticles(filtered);
+  });
 });
 </script>
 </body>

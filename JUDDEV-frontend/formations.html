@@ -235,36 +235,46 @@ document.addEventListener('DOMContentLoaded', () => {
   const grid = document.getElementById('formations-grid');
   if (!grid || typeof JUDDEV_DATA === 'undefined') return;
 
-  grid.innerHTML = JUDDEV_DATA.formations.map((f, i) => `
-    <div class="formation-card reveal stagger-${(i % 3) + 1}">
-      <span class="formation-icon">${f.icon}</span>
-      <h3 class="formation-title">${f.title}</h3>
-      <div class="formation-badges">
-        <span class="formation-badge badge-duration"><i class="fas fa-clock" style="margin-right:0.3rem"></i> ${f.duration}</span>
-        <span class="formation-badge badge-level"><i class="fas fa-signal" style="margin-right:0.3rem"></i> ${f.level}</span>
+  function renderFormations(formations) {
+    grid.innerHTML = formations.map((f, i) => `
+      <div class="formation-card reveal stagger-${(i % 3) + 1}">
+        <span class="formation-icon">${f.icon}</span>
+        <h3 class="formation-title">${f.title}</h3>
+        <div class="formation-badges">
+          <span class="formation-badge badge-duration"><i class="fas fa-clock" style="margin-right:0.3rem"></i> ${f.duration}</span>
+          <span class="formation-badge badge-level"><i class="fas fa-signal" style="margin-right:0.3rem"></i> ${f.level}</span>
+        </div>
+        <p class="formation-desc">${f.description}</p>
+        <h4 style="font-size:0.875rem;font-weight:700;color:var(--text-primary);margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.08em">Programme</h4>
+        <div class="formation-program">
+          ${(f.program || []).map(p => `<div class="formation-program-item">${p}</div>`).join('')}
+        </div>
+        <div class="formation-price">
+          ${f.price} <span>/ participant</span>
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="window.openDevisModal && window.openDevisModal()">
+          <i class="fas fa-graduation-cap"></i> S'inscrire
+        </button>
       </div>
-      <p class="formation-desc">${f.description}</p>
-      <h4 style="font-size:0.875rem;font-weight:700;color:var(--text-primary);margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.08em">Programme</h4>
-      <div class="formation-program">
-        ${f.program.map(p => `<div class="formation-program-item">${p}</div>`).join('')}
-      </div>
-      <div class="formation-price">
-        ${f.price} <span>/ participant</span>
-      </div>
-      <button class="btn btn-primary" style="width:100%" onclick="window.openDevisModal && window.openDevisModal()">
-        <i class="fas fa-graduation-cap"></i> S'inscrire
-      </button>
-    </div>
-  `).join('');
+    `).join('');
 
-  setTimeout(() => {
-    document.querySelectorAll('.reveal, .reveal-left').forEach(el => {
-      const obs = new IntersectionObserver((entries) => {
-        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-      }, { threshold: 0.05 });
-      obs.observe(el);
-    });
-  }, 100);
+    setTimeout(() => {
+      grid.querySelectorAll('.reveal, .reveal-left').forEach(el => {
+        const obs = new IntersectionObserver((entries) => {
+          entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+        }, { threshold: 0.05 });
+        obs.observe(el);
+      });
+    }, 100);
+  }
+
+  renderFormations(JUDDEV_DATA.formations);
+
+  // Auto-refresh: re-render when API data updates (every 30s via data.js polling)
+  document.addEventListener('juddev:dataUpdated', (e) => {
+    const formations = e.detail.formations;
+    if (formations && formations.length) renderFormations(formations);
+  });
 });
 </script>
 </body>

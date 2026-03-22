@@ -713,6 +713,9 @@ if (document.readyState === 'loading') {
   setTimeout(syncFromAPI, 500);
 }
 
+// Auto-refresh every 30 seconds — vitrine reflects dashboard changes automatically
+setInterval(syncFromAPI, 30000);
+
 // Helper functions
 function getServiceById(id) {
   return JUDDEV_DATA.services.find(s => s.id === id) || null;

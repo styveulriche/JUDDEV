@@ -590,6 +590,73 @@ document.addEventListener('DOMContentLoaded', () => {
     // Init slider
     initRealisationsSlider();
   }, 200);
+
+  // Auto-refresh: re-render when API data updates (every 30s via data.js polling)
+  document.addEventListener('juddev:dataUpdated', (e) => {
+    const data = e.detail;
+    const API = typeof JUDDEV_CONFIG !== 'undefined' ? JUDDEV_CONFIG.API_URL : 'http://localhost:5000/api';
+
+    if (servicesGrid && data.services && data.services.length) {
+      servicesGrid.innerHTML = data.services.map((s, i) => `
+        <a href="service-detail.html?id=${s.id}" class="service-card reveal stagger-${(i % 8) + 1}" style="text-decoration:none">
+          <span class="service-card-icon">${s.icon}</span>
+          <div>
+            <div class="service-card-title">${s.title}</div>
+            <div class="service-card-subtitle">${s.subtitle}</div>
+          </div>
+          <p class="service-card-desc">${s.shortDesc}</p>
+          <span class="service-card-link">Voir les détails <i class="fas fa-arrow-right"></i></span>
+        </a>
+      `).join('');
+    }
+
+    if (realisationsGrid && data.realisations && data.realisations.length) {
+      realisationsGrid.innerHTML = data.realisations.slice(0, 3).map((r, i) => `
+        <a href="realisation-detail.html?id=${r.id}" class="realisation-card reveal stagger-${i + 1}" style="text-decoration:none">
+          <div class="realisation-card-img">
+            <img src="${r.image}" alt="${r.title}" loading="lazy" onerror="this.style.background='linear-gradient(135deg,#0066ff22,#00d4ff22)'" />
+            <div class="realisation-card-overlay"><span class="overlay-btn">Voir la Réalisation</span></div>
+          </div>
+          <div class="realisation-card-body">
+            <span class="category-tag">${r.category}</span>
+            <h3 class="realisation-card-title">${r.title}</h3>
+            <p class="realisation-card-desc">${r.shortDesc}</p>
+          </div>
+        </a>
+      `).join('');
+      setTimeout(() => initRealisationsSlider(), 100);
+    }
+
+    if (articlesGrid && data.articles && data.articles.length) {
+      articlesGrid.innerHTML = data.articles.slice(0, 3).map((a, i) => `
+        <a href="article-detail.html?id=${a.id}" class="blog-card reveal stagger-${i + 1}" style="text-decoration:none">
+          <div class="blog-card-img">
+            <img src="${a.image}" alt="${a.title}" loading="lazy" onerror="this.style.background='var(--bg-secondary)'" />
+          </div>
+          <div class="blog-card-body">
+            <div class="blog-card-meta">
+              <span class="blog-card-category">${a.category}</span>
+              <span class="blog-card-date">${typeof formatDate === 'function' ? formatDate(a.date) : a.date}</span>
+            </div>
+            <h3 class="blog-card-title">${a.title}</h3>
+            <p class="blog-card-excerpt">${a.shortDesc}</p>
+            <div style="margin-top:1rem"><span class="blog-card-link">Lire <i class="fas fa-arrow-right"></i></span></div>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    if (partnersGrid && data.contacts && data.contacts.partners && data.contacts.partners.length) {
+      partnersGrid.innerHTML = data.contacts.partners.map((p, i) => `
+        <div class="partner-logo">
+          ${p.url && p.url !== '#'
+            ? `<a href="${p.url}" target="_blank" rel="noopener"><img src="${p.image}" alt="${p.name || 'Partenaire ' + (i+1)}" onerror="this.parentElement.innerHTML='<span>${p.name || 'PARTNER'}</span>'" /></a>`
+            : `<img src="${p.image}" alt="${p.name || 'Partenaire ' + (i+1)}" onerror="this.parentElement.innerHTML='<span>${p.name || 'PARTNER'}</span>'" />`
+          }
+        </div>
+      `).join('');
+    }
+  });
 });
 
 function initRealisationsSlider() {
