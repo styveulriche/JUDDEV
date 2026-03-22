@@ -656,6 +656,13 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `).join('');
     }
+
+    // Rendre immédiatement visibles les éléments re-rendus (déjà dans le viewport)
+    setTimeout(() => {
+      [servicesGrid, realisationsGrid, articlesGrid].forEach(grid => {
+        if (grid) grid.querySelectorAll('.reveal, .reveal-scale').forEach(el => el.classList.add('visible'));
+      });
+    }, 50);
   });
 });
 

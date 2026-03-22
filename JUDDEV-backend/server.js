@@ -151,8 +151,8 @@ async function seedTeam() {
     const count = await Team.countDocuments();
     if (count === 0) {
       await Team.insertMany([
-        { id: 'member-1', name: 'NGUEYE NGUEYE DURAND YOURI', role: 'Directeur Général & CEO', initials: 'ND', photo: '', tags: ['Backend Development', 'Gestion de Projet', 'Architecture Système', 'Node.js'], socials: { linkedin: '#', github: '#', twitter: '#' }, order: 1 },
-        { id: 'member-2', name: 'FOKOUA WOWO U STYVE', role: 'Directeur des Opérations & COO', initials: 'FS', photo: '', tags: ['Java Development', 'OOP Architecture', 'Gestion Opérationnelle', 'Mobile Dev'], socials: { linkedin: '#', github: '#', twitter: '#' }, order: 2 },
+        { id: 'member-1', name: 'NGUEYE NGUEYE DURAND YOURI', role: 'Directeur Général & CEO', initials: 'ND', photo: '', tags: ['Backend Development', 'Gestion de Projet', 'Architecture Système', 'Python'], socials: { linkedin: '#', github: '#', twitter: '#' }, order: 1 },
+        { id: 'member-2', name: 'FOKOUA WOWO U STYVE', role: 'Directeur des Opérations & COO', initials: 'FS', photo: '', tags: ['Java Development', 'OOP Architecture', 'Gestion Opérationnelle', 'Java'], socials: { linkedin: '#', github: '#', twitter: '#' }, order: 2 },
         { id: 'member-3', name: 'JAYSON STANLEY DJEMETIO NINZAGO', role: 'Directeur Technique & CTO', initials: 'JS', photo: '', tags: ['UI/UX Design', 'Web Design', 'Direction Technique', 'React'], socials: { linkedin: '#', github: '#', behance: '#' }, order: 3 }
       ]);
       console.log('✅ Équipe initialisée');
