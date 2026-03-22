@@ -278,6 +278,20 @@ async function start() {
       console.log(`🔧 Dashboard: http://localhost:${PORT}/admin/login.html`);
       console.log(`📡 API: http://localhost:${PORT}/api`);
       console.log(`❤️  Health: http://localhost:${PORT}/api/health\n`);
+
+      // Keep-alive: ping toutes les 14 min pour éviter le sleep sur Render free tier
+      if (process.env.NODE_ENV === 'production') {
+        const siteUrl = process.env.FRONTEND_URL || `https://juddev-backend.onrender.com`;
+        setInterval(async () => {
+          try {
+            await fetch(siteUrl + '/api/health');
+            console.log('💓 Keep-alive ping OK');
+          } catch (e) {
+            console.warn('💓 Keep-alive ping failed:', e.message);
+          }
+        }, 14 * 60 * 1000);
+        console.log('💓 Keep-alive activé (ping toutes les 14 min)');
+      }
     });
   } catch (err) {
     console.error('❌ Erreur de démarrage:', err.message);

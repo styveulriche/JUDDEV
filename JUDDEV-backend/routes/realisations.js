@@ -1,7 +1,7 @@
 const express = require('express');
 const Realisation = require('../models/Realisation');
 const auth = require('../middleware/auth');
-const { uploadImage } = require('../middleware/upload');
+const { uploadImage, uploadToCloudinary } = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -42,7 +42,7 @@ router.post('/', auth, uploadImage.single('image'), async (req, res) => {
     const images = req.body.images ? (Array.isArray(req.body.images) ? req.body.images : [req.body.images]) : [];
 
     const id = `realisation-${Date.now()}`;
-    const image = req.file ? `/uploads/images/${req.file.filename}` : (req.body.image || '');
+    const image = req.file ? await uploadToCloudinary(req.file, 'juddev/realisations') : (req.body.image || '');
     if (image && !images.includes(image)) images.unshift(image);
 
     const youtubeUrl = req.body.youtubeUrl || '';
@@ -67,7 +67,7 @@ router.put('/:id', auth, uploadImage.single('image'), async (req, res) => {
     const showYoutubeBtn = req.body.showYoutubeBtn === 'true' || req.body.showYoutubeBtn === true;
 
     const updateData = { title, category, service, sector, shortDesc, longDesc, client, year, technologies, highlights, url: url || '#', youtubeUrl, showSiteBtn, showYoutubeBtn, order: order || 0 };
-    if (req.file) updateData.image = `/uploads/images/${req.file.filename}`;
+    if (req.file) updateData.image = await uploadToCloudinary(req.file, 'juddev/realisations');
     else if (req.body.image) updateData.image = req.body.image;
 
     const realisation = await Realisation.findOneAndUpdate({ id: req.params.id }, updateData, { new: true });

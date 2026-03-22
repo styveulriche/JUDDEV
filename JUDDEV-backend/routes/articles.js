@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const Article = require('../models/Article');
 const auth = require('../middleware/auth');
-const { uploadMixed } = require('../middleware/upload');
+const { uploadMixed, uploadToCloudinary } = require('../middleware/upload');
 const { notifySubscribers } = require('./newsletter');
 
 const router = express.Router();

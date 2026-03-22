@@ -1,21 +1,16 @@
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
 
-// Ensure upload directories exist
-const imgDir = path.join(__dirname, '../uploads/images');
-const pdfDir = path.join(__dirname, '../uploads/pdfs');
-if (!fs.existsSync(imgDir)) fs.mkdirSync(imgDir, { recursive: true });
-if (!fs.existsSync(pdfDir)) fs.mkdirSync(pdfDir, { recursive: true });
-
-// Image storage
-const imageStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, imgDir),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, unique + path.extname(file.originalname));
-  }
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
+
+// Memory storage — aucun fichier écrit sur le disque
+const memoryStorage = multer.memoryStorage();
 
 const imageFilter = (req, file, cb) => {
   const allowed = /jpeg|jpg|png|webp|gif/;
@@ -25,15 +20,6 @@ const imageFilter = (req, file, cb) => {
   cb(new Error('Seuls les fichiers image sont acceptés (jpg, png, webp, gif)'));
 };
 
-// PDF storage
-const pdfStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, pdfDir),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, unique + '.pdf');
-  }
-});
-
 const pdfFilter = (req, file, cb) => {
   if (file.mimetype === 'application/pdf' || path.extname(file.originalname).toLowerCase() === '.pdf') {
     return cb(null, true);
@@ -42,31 +28,33 @@ const pdfFilter = (req, file, cb) => {
 };
 
 exports.uploadImage = multer({
-  storage: imageStorage,
+  storage: memoryStorage,
   fileFilter: imageFilter,
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB
 });
 
 exports.uploadPDF = multer({
-  storage: pdfStorage,
+  storage: memoryStorage,
   fileFilter: pdfFilter,
   limits: { fileSize: 50 * 1024 * 1024 } // 50MB
 });
 
-// Mixed upload for articles (image + pdf)
-const mixedStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    if (file.fieldname === 'image') cb(null, imgDir);
-    else if (file.fieldname === 'pdfFile') cb(null, pdfDir);
-    else cb(null, imgDir);
-  },
-  filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, unique + path.extname(file.originalname));
-  }
-});
-
 exports.uploadMixed = multer({
-  storage: mixedStorage,
+  storage: memoryStorage,
   limits: { fileSize: 50 * 1024 * 1024 }
 });
+
+// Upload un buffer vers Cloudinary — retourne l'URL sécurisée
+exports.uploadToCloudinary = (file, folder = 'juddev') => {
+  return new Promise((resolve, reject) => {
+    const resourceType = file.mimetype === 'application/pdf' ? 'raw' : 'image';
+    const stream = cloudinary.uploader.upload_stream(
+      { folder, resource_type: resourceType },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result.secure_url);
+      }
+    );
+    stream.end(file.buffer);
+  });
+};

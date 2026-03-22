@@ -285,6 +285,49 @@ function itemCard(opts) {
 }
 
 // ============================================================
+// CONFIRMATION MODAL
+// ============================================================
+function confirmDelete(itemLabel, onConfirm) {
+  let modal = document.getElementById('confirm-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'confirm-modal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;padding:1rem';
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML = `
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px)" onclick="closeConfirm()"></div>
+    <div style="position:relative;background:var(--bg-card);border:1px solid rgba(239,68,68,0.3);border-radius:1.25rem;width:100%;max-width:420px;padding:2rem;box-shadow:0 25px 80px rgba(0,0,0,0.6);text-align:center">
+      <div style="width:56px;height:56px;background:rgba(239,68,68,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem">
+        <i class="fas fa-triangle-exclamation" style="color:#f87171;font-size:1.5rem"></i>
+      </div>
+      <h3 style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:0.5rem">Confirmer la suppression</h3>
+      <p style="color:var(--text-muted);font-size:0.875rem;margin-bottom:1.5rem">
+        Vous êtes sur le point de supprimer <strong style="color:var(--text-primary)">${itemLabel}</strong>.<br/>
+        Cette action est <strong style="color:#f87171">irréversible</strong>.
+      </p>
+      <div style="display:flex;gap:0.75rem;justify-content:center">
+        <button onclick="closeConfirm()" style="background:rgba(255,255,255,0.05);border:1px solid var(--border-color);color:var(--text-muted);padding:0.65rem 1.5rem;border-radius:0.5rem;cursor:pointer;font-family:inherit;font-size:0.875rem">
+          Annuler
+        </button>
+        <button id="confirm-delete-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);border:none;color:white;padding:0.65rem 1.5rem;border-radius:0.5rem;cursor:pointer;font-weight:600;font-family:inherit;font-size:0.875rem;display:flex;align-items:center;gap:0.5rem">
+          <i class="fas fa-trash"></i> Supprimer
+        </button>
+      </div>
+    </div>
+  `;
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  document.getElementById('confirm-delete-btn').onclick = () => { closeConfirm(); onConfirm(); };
+}
+
+function closeConfirm() {
+  const modal = document.getElementById('confirm-modal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// ============================================================
 // MODAL SYSTEM
 // ============================================================
 function openModal(title, bodyHTML, onSubmit, submitLabel = 'Sauvegarder') {
@@ -468,15 +511,15 @@ async function saveEditService(id) {
   }
 }
 
-async function deleteService(id) {
-  if (!confirm('Supprimer ce service ? Cette action est irréversible.')) return;
-  try {
-    await apiDelete('/services/' + id);
-    showToast('success', 'Supprimé', 'Service supprimé.');
-    await loadServices();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-  }
+function deleteService(id) {
+  const s = allServices.find(x => x.id === id);
+  confirmDelete(s ? s.title : 'ce service', async () => {
+    try {
+      await apiDelete('/services/' + id);
+      showToast('success', 'Supprimé', 'Service supprimé.');
+      await loadServices();
+    } catch (err) { showToast('error', 'Erreur', err.message); }
+  });
 }
 
 // ============================================================
@@ -610,15 +653,16 @@ async function saveEditRealisation(id) {
   }
 }
 
-async function deleteRealisation(id) {
-  if (!confirm('Supprimer cette réalisation ?')) return;
-  try {
-    await apiDelete('/realisations/' + id);
-    showToast('success', 'Supprimé', 'Réalisation supprimée.');
-    await loadRealisations();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-  }
+function deleteRealisation(id) {
+  const r = allRealisations.find(x => x.id === id);
+  confirmDelete(r ? r.title : 'cette réalisation', async () => {
+    try {
+      await apiDelete('/realisations/' + id);
+      showToast('success', 'Supprimé', 'Réalisation supprimée.');
+      await loadRealisations();
+    } catch (err) { showToast('error', 'Erreur', err.message); }
+  });
+}
 }
 
 // ============================================================
@@ -797,15 +841,15 @@ async function saveEditArticle(id) {
   }
 }
 
-async function deleteArticle(id) {
-  if (!confirm('Supprimer cet article ?')) return;
-  try {
-    await apiDelete('/articles/' + id);
-    showToast('success', 'Supprimé', 'Article supprimé.');
-    await loadArticles();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-  }
+function deleteArticle(id) {
+  const a = allArticles.find(x => x.id === id);
+  confirmDelete(a ? a.title : 'cet article', async () => {
+    try {
+      await apiDelete('/articles/' + id);
+      showToast('success', 'Supprimé', 'Article supprimé.');
+      await loadArticles();
+    } catch (err) { showToast('error', 'Erreur', err.message); }
+  });
 }
 
 // ============================================================
@@ -908,15 +952,15 @@ async function saveEditFormation(id) {
   }
 }
 
-async function deleteFormation(id) {
-  if (!confirm('Supprimer cette formation ?')) return;
-  try {
-    await apiDelete('/formations/' + id);
-    showToast('success', 'Supprimé', 'Formation supprimée.');
-    await loadFormations();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-  }
+function deleteFormation(id) {
+  const f = allFormations.find(x => x.id === id);
+  confirmDelete(f ? f.title : 'cette formation', async () => {
+    try {
+      await apiDelete('/formations/' + id);
+      showToast('success', 'Supprimé', 'Formation supprimée.');
+      await loadFormations();
+    } catch (err) { showToast('error', 'Erreur', err.message); }
+  });
 }
 
 // ============================================================
@@ -1100,15 +1144,15 @@ async function saveEditPartner(idx) {
   }
 }
 
-async function deletePartner(idx) {
-  if (!confirm('Supprimer ce partenaire ?')) return;
-  try {
-    await apiDelete('/contact/partner/' + idx);
-    showToast('success', 'Supprimé', 'Partenaire supprimé.');
-    await loadPartenaires();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-  }
+function deletePartner(idx) {
+  const p = allPartners[idx];
+  confirmDelete(p ? (p.name || 'ce partenaire') : 'ce partenaire', async () => {
+    try {
+      await apiDelete('/contact/partner/' + idx);
+      showToast('success', 'Supprimé', 'Partenaire supprimé.');
+      await loadPartenaires();
+    } catch (err) { showToast('error', 'Erreur', err.message); }
+  });
 }
 
 // ============================================================
@@ -1191,15 +1235,14 @@ async function markMessageRead(id) {
   }
 }
 
-async function deleteMessage(id) {
-  if (!confirm('Supprimer ce message ?')) return;
-  try {
-    await apiDelete('/contact/messages/' + id);
-    await loadMessages();
-    showToast('success', 'Supprimé', 'Message supprimé.');
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-  }
+function deleteMessage(id) {
+  confirmDelete('ce message', async () => {
+    try {
+      await apiDelete('/contact/messages/' + id);
+      await loadMessages();
+      showToast('success', 'Supprimé', 'Message supprimé.');
+    } catch (err) { showToast('error', 'Erreur', err.message); }
+  });
 }
 
 // ============================================================
@@ -1318,13 +1361,13 @@ async function saveEditTeamMember(id) {
   }
 }
 
-async function deleteTeamMember(id) {
-  if (!confirm('Supprimer ce membre de l\'équipe ?')) return;
-  try {
-    await apiDelete('/team/' + id);
-    showToast('success', 'Supprimé', 'Membre supprimé.');
-    await loadTeam();
-  } catch (err) {
-    showToast('error', 'Erreur', err.message);
-  }
+function deleteTeamMember(id) {
+  const m = (typeof allTeam !== 'undefined' ? allTeam : []).find(x => x.id === id);
+  confirmDelete(m ? m.name : 'ce membre', async () => {
+    try {
+      await apiDelete('/team/' + id);
+      showToast('success', 'Supprimé', 'Membre supprimé.');
+      await loadTeam();
+    } catch (err) { showToast('error', 'Erreur', err.message); }
+  });
 }

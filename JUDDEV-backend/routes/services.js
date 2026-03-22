@@ -1,7 +1,7 @@
 const express = require('express');
 const Service = require('../models/Service');
 const auth = require('../middleware/auth');
-const { uploadImage } = require('../middleware/upload');
+const { uploadImage, uploadToCloudinary } = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -41,7 +41,7 @@ router.post('/', auth, uploadImage.single('image'), async (req, res) => {
     const technologies = req.body.technologies ? (Array.isArray(req.body.technologies) ? req.body.technologies : req.body.technologies.split(',').map(t => t.trim()).filter(Boolean)) : [];
 
     const id = slugify(title) || `service-${Date.now()}`;
-    const image = req.file ? `/uploads/images/${req.file.filename}` : (req.body.image || '');
+    const image = req.file ? await uploadToCloudinary(req.file, 'juddev/services') : (req.body.image || '');
 
     const service = new Service({ id, title, subtitle, icon, image, shortDesc, longDesc, features, technologies, category, order: order || 0 });
     await service.save();
@@ -60,7 +60,7 @@ router.put('/:id', auth, uploadImage.single('image'), async (req, res) => {
     const technologies = req.body.technologies ? (Array.isArray(req.body.technologies) ? req.body.technologies : req.body.technologies.split(',').map(t => t.trim()).filter(Boolean)) : [];
 
     const updateData = { title, subtitle, icon, shortDesc, longDesc, features, technologies, category, order: order || 0 };
-    if (req.file) updateData.image = `/uploads/images/${req.file.filename}`;
+    if (req.file) updateData.image = await uploadToCloudinary(req.file, 'juddev/services');
     else if (req.body.image) updateData.image = req.body.image;
 
     const service = await Service.findOneAndUpdate({ id: req.params.id }, updateData, { new: true });
