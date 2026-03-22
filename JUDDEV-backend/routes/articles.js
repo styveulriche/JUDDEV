@@ -1,5 +1,4 @@
 const express = require('express');
-const path = require('path');
 const Article = require('../models/Article');
 const auth = require('../middleware/auth');
 const { uploadMixed, uploadToCloudinary } = require('../middleware/upload');
@@ -33,7 +32,7 @@ router.post('/', auth, uploadMixed.fields([{ name: 'image', maxCount: 1 }]), asy
   try {
     const { title, category, author, shortDesc, content } = req.body;
     const tags = req.body.tags ? (Array.isArray(req.body.tags) ? req.body.tags : req.body.tags.split(',').map(t => t.trim()).filter(Boolean)) : [];
-    const image = req.files?.image?.[0] ? `/uploads/images/${req.files.image[0].filename}` : (req.body.image || '');
+    const image = req.files?.image?.[0] ? await uploadToCloudinary(req.files.image[0], 'juddev/articles') : (req.body.image || '');
 
     const id = `article-${Date.now()}`;
     const article = new Article({
@@ -61,21 +60,20 @@ router.post('/from-pdf', auth, uploadMixed.fields([
   try {
     const { title, category, author, shortDesc } = req.body;
     const tags = req.body.tags ? (Array.isArray(req.body.tags) ? req.body.tags : req.body.tags.split(',').map(t => t.trim()).filter(Boolean)) : [];
-    const image = req.files?.image?.[0] ? `/uploads/images/${req.files.image[0].filename}` : (req.body.image || '');
+    const image = req.files?.image?.[0] ? await uploadToCloudinary(req.files.image[0], 'juddev/articles') : (req.body.image || '');
 
     if (!req.files?.pdfFile?.[0]) {
       return res.status(400).json({ message: 'Fichier PDF requis.' });
     }
 
-    const pdfPath = req.files.pdfFile[0].path;
-    const pdfFilename = `/uploads/pdfs/${req.files.pdfFile[0].filename}`;
+    const pdfFile = req.files.pdfFile[0];
 
     // Extract text from PDF
     let content = '';
+    let pdfFilename = '';
     try {
       const pdfParse = require('pdf-parse');
-      const fs = require('fs');
-      const dataBuffer = fs.readFileSync(pdfPath);
+      const dataBuffer = pdfFile.buffer;
       const pdfData = await pdfParse(dataBuffer);
 
       // Convert plain text to HTML paragraphs
@@ -97,6 +95,13 @@ router.post('/from-pdf', auth, uploadMixed.fields([
     } catch (pdfErr) {
       console.error('PDF parse error:', pdfErr);
       content = `<p>Contenu extrait du PDF. Erreur de parsing: ${pdfErr.message}</p>`;
+    }
+
+    // Upload PDF to Cloudinary if parse succeeded (optional)
+    try {
+      pdfFilename = await uploadToCloudinary(pdfFile, 'juddev/pdfs');
+    } catch (e) {
+      console.error('PDF Cloudinary upload error:', e.message);
     }
 
     const id = `article-${Date.now()}`;
@@ -126,7 +131,7 @@ router.put('/:id', auth, uploadMixed.fields([{ name: 'image', maxCount: 1 }]), a
 
     const updateData = { title, category, author, shortDesc, content, tags };
     if (published !== undefined) updateData.published = published === 'true' || published === true;
-    if (req.files?.image?.[0]) updateData.image = `/uploads/images/${req.files.image[0].filename}`;
+    if (req.files?.image?.[0]) updateData.image = await uploadToCloudinary(req.files.image[0], 'juddev/articles');
     else if (req.body.image) updateData.image = req.body.image;
 
     const article = await Article.findOneAndUpdate({ id: req.params.id }, updateData, { new: true });
@@ -145,6 +150,36 @@ router.delete('/:id', auth, async (req, res) => {
     res.json({ message: 'Article supprimé.' });
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
+
+// POST /api/articles/:id/comments - Public
+router.post('/:id/comments', async (req, res) => {
+  try {
+    const { name, email, text } = req.body;
+    if (!name || !text) return res.status(400).json({ message: 'Nom et commentaire requis.' });
+    const article = await Article.findOne({ id: req.params.id });
+    if (!article) return res.status(404).json({ message: 'Article non trouvé.' });
+    article.comments.push({ name, email: email || '', text });
+    await article.save();
+    res.status(201).json(article.comments);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur: ' + err.message });
+  }
+});
+
+// DELETE /api/articles/:id/comments/:commentId - Protected
+router.delete('/:id/comments/:commentId', auth, async (req, res) => {
+  try {
+    const article = await Article.findOne({ id: req.params.id });
+    if (!article) return res.status(404).json({ message: 'Article non trouvé.' });
+    const comment = article.comments.id(req.params.commentId);
+    if (!comment) return res.status(404).json({ message: 'Commentaire non trouvé.' });
+    comment.deleteOne();
+    await article.save();
+    res.json({ message: 'Commentaire supprimé.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur: ' + err.message });
   }
 });
 

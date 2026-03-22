@@ -679,7 +679,12 @@ async function loadArticles() {
         image: a.image, title: a.title,
         subtitle: `${a.author || ''} · ${new Date(a.date).toLocaleDateString('fr-FR')}`,
         badge: a.category,
-        extra: a.sourceType === 'pdf' ? '<span style="font-size:0.7rem;color:#f59e0b;margin-top:0.3rem;display:block"><i class="fas fa-file-pdf"></i> PDF</span>' : '',
+        extra: `
+          ${a.sourceType === 'pdf' ? '<span style="font-size:0.7rem;color:#f59e0b;margin-top:0.3rem;display:block"><i class="fas fa-file-pdf"></i> PDF</span>' : ''}
+          <button onclick="viewArticleComments('${a.id}')" style="margin-top:0.5rem;background:rgba(0,102,255,0.1);border:1px solid rgba(0,102,255,0.2);color:var(--accent-light);border-radius:0.375rem;padding:0.25rem 0.6rem;cursor:pointer;font-size:0.72rem;font-family:inherit">
+            <i class="fas fa-comments"></i> Commentaires ${a.comments && a.comments.length ? `(${a.comments.length})` : ''}
+          </button>
+        `,
         onEdit: `editArticle('${a.id}')`, onDelete: `deleteArticle('${a.id}')`
       })
     });
@@ -818,6 +823,48 @@ function deleteArticle(id) {
       await loadArticles();
     } catch (err) { showToast('error', 'Erreur', err.message); }
   });
+}
+
+async function viewArticleComments(articleId) {
+  const a = allArticles.find(x => x.id === articleId);
+  let article;
+  try {
+    article = await apiGet('/articles/' + articleId);
+  } catch (e) {
+    showToast('error', 'Erreur', 'Impossible de charger les commentaires.');
+    return;
+  }
+  const comments = article.comments || [];
+  const content = comments.length === 0
+    ? '<p style="color:var(--text-muted);text-align:center;padding:1rem">Aucun commentaire pour cet article.</p>'
+    : comments.map((c, i) => `
+      <div style="padding:1rem;background:var(--bg-secondary);border-radius:0.5rem;margin-bottom:0.75rem;border:1px solid var(--border-color)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem">
+          <div>
+            <span style="font-weight:600;font-size:0.875rem;color:var(--text-primary)">${c.name}</span>
+            ${c.email ? `<span style="font-size:0.75rem;color:var(--text-dim);margin-left:0.5rem">${c.email}</span>` : ''}
+            <div style="font-size:0.75rem;color:var(--text-dim)">${new Date(c.date).toLocaleDateString('fr-FR')}</div>
+          </div>
+          <button onclick="deleteComment('${articleId}','${c._id}')" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;border-radius:0.375rem;padding:0.25rem 0.5rem;cursor:pointer;font-size:0.75rem">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+        <p style="color:var(--text-secondary);font-size:0.875rem;line-height:1.5;margin:0;white-space:pre-wrap">${c.text}</p>
+      </div>
+    `).join('');
+  openModal(`💬 Commentaires — ${a ? a.title : articleId}`, content, '');
+  document.getElementById('modal-submit-btn').style.display = 'none';
+}
+
+async function deleteComment(articleId, commentId) {
+  try {
+    await apiDelete(`/articles/${articleId}/comments/${commentId}`);
+    showToast('success', 'Supprimé', 'Commentaire supprimé.');
+    closeModal();
+    await loadArticles();
+  } catch (err) {
+    showToast('error', 'Erreur', err.message);
+  }
 }
 
 // ============================================================

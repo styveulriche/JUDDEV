@@ -773,16 +773,16 @@ function loadArticleDetail() {
               </div>
             </div>
 
-            <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:2rem;margin-top:2rem;reveal">
+            <div id="comments-section" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:2rem;margin-top:2rem">
               <h3 style="font-size:1.25rem;font-weight:700;color:var(--text-primary);margin-bottom:1.5rem">💬 Commentaires</h3>
-              <p style="color:var(--text-muted);font-size:0.875rem;margin-bottom:1.5rem">Partagez vos réflexions sur cet article.</p>
-              <form onsubmit="event.preventDefault();showNotification('success','Commentaire envoyé !','Votre commentaire a été soumis pour modération.')">
+              <div id="comments-list" style="margin-bottom:2rem"></div>
+              <form id="comment-form">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
-                  <input class="form-input" placeholder="Votre nom" required />
-                  <input class="form-input" type="email" placeholder="Votre email" required />
+                  <input id="comment-name" class="form-input" placeholder="Votre nom *" required />
+                  <input id="comment-email" class="form-input" type="email" placeholder="Votre email (optionnel)" />
                 </div>
-                <textarea class="form-input" rows="4" placeholder="Votre commentaire..." required style="width:100%;margin-bottom:1rem"></textarea>
-                <button type="submit" class="btn btn-primary">Envoyer le commentaire</button>
+                <textarea id="comment-text" class="form-input" rows="4" placeholder="Votre commentaire..." required style="width:100%;margin-bottom:1rem"></textarea>
+                <button type="submit" class="btn btn-primary" id="comment-submit-btn">Envoyer le commentaire</button>
               </form>
             </div>
           </div>
@@ -866,6 +866,77 @@ function loadArticleDetail() {
       observer.observe(el);
     });
   }, 100);
+
+  // Load comments for this article
+  loadArticleComments(id);
+
+  // Comment form submission
+  const commentForm = document.getElementById('comment-form');
+  if (commentForm) {
+    commentForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('comment-name').value.trim();
+      const email = document.getElementById('comment-email').value.trim();
+      const text = document.getElementById('comment-text').value.trim();
+      const btn = document.getElementById('comment-submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Envoi...';
+      try {
+        const res = await fetch(JUDDEV_CONFIG.API_URL + '/articles/' + id + '/comments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, text })
+        });
+        if (res.ok) {
+          commentForm.reset();
+          showNotification('success', 'Commentaire envoyé !', 'Votre commentaire a été publié.');
+          loadArticleComments(id);
+        } else {
+          const data = await res.json().catch(() => ({}));
+          showNotification('error', 'Erreur', data.message || 'Impossible d\'envoyer le commentaire.');
+        }
+      } catch (err) {
+        showNotification('error', 'Erreur réseau', 'Veuillez réessayer.');
+      }
+      btn.disabled = false;
+      btn.textContent = 'Envoyer le commentaire';
+    });
+  }
+}
+
+function renderComments(comments) {
+  const list = document.getElementById('comments-list');
+  if (!list) return;
+  if (!comments || !comments.length) {
+    list.innerHTML = '<p style="color:var(--text-muted);font-size:0.875rem">Aucun commentaire pour l\'instant. Soyez le premier !</p>';
+    return;
+  }
+  list.innerHTML = comments.map(c => `
+    <div style="padding:1rem;background:var(--bg-secondary);border-radius:var(--radius-lg);margin-bottom:1rem;border:1px solid var(--border-color)">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem">
+        <div style="width:2rem;height:2rem;border-radius:50%;background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.75rem;color:#fff;flex-shrink:0">${(c.name||'?')[0].toUpperCase()}</div>
+        <div>
+          <div style="font-weight:600;font-size:0.875rem;color:var(--text-primary)">${escapeHtml(c.name)}</div>
+          <div style="font-size:0.75rem;color:var(--text-dim)">${new Date(c.date).toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' })}</div>
+        </div>
+      </div>
+      <p style="color:var(--text-secondary);font-size:0.875rem;line-height:1.6;white-space:pre-wrap;margin:0">${escapeHtml(c.text)}</p>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function loadArticleComments(articleId) {
+  try {
+    const res = await fetch(JUDDEV_CONFIG.API_URL + '/articles/' + articleId);
+    if (res.ok) {
+      const data = await res.json();
+      renderComments(data.comments || []);
+    }
+  } catch (e) { /* silent */ }
 }
 
 // Auto-initialize detail pages
