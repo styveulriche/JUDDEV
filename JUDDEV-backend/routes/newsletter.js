@@ -79,11 +79,22 @@ router.post('/subscribe', async (req, res) => {
   }
 });
 
-// GET /api/newsletter/subscribers (admin only — no auth for simplicity, add auth if needed)
+// GET /api/newsletter/subscribers (admin only)
 router.get('/subscribers', async (req, res) => {
   try {
     const subscribers = await Subscriber.find().sort({ createdAt: -1 });
     res.json(subscribers);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
+
+// DELETE /api/newsletter/subscribers/:id (admin only)
+const auth = require('../middleware/auth');
+router.delete('/subscribers/:id', auth, async (req, res) => {
+  try {
+    await Subscriber.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Abonné supprimé.' });
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur.' });
   }

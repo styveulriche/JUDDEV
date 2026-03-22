@@ -1160,9 +1160,65 @@ async function loadMessages() {
           </div>
         `).join('')}
     `;
+    // Load subscribers below messages
+    loadSubscribers();
   } catch (err) {
     section.innerHTML = `<p style="color:var(--text-muted)">Erreur: ${err.message}</p>`;
   }
+}
+
+async function loadSubscribers() {
+  const section = document.getElementById('section-messages');
+  if (!section) return;
+  try {
+    const subscribers = await apiGet('/newsletter/subscribers') || [];
+    const existing = document.getElementById('subscribers-block');
+    if (existing) existing.remove();
+
+    const block = document.createElement('div');
+    block.id = 'subscribers-block';
+    block.style.marginTop = '2rem';
+    block.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.75rem">
+        <h2 style="font-size:1.1rem;font-weight:700;color:var(--text-primary)">
+          <i class="fas fa-envelope-open-text" style="color:var(--accent-blue);margin-right:0.5rem"></i>
+          Abonnés Newsletter
+          <span style="background:rgba(0,102,255,0.15);color:var(--accent-light);border-radius:999px;padding:0.1rem 0.5rem;font-size:0.75rem;font-weight:600;margin-left:0.5rem">${subscribers.length}</span>
+        </h2>
+      </div>
+      ${subscribers.length === 0
+        ? `<div style="text-align:center;padding:2rem;color:var(--text-muted);border:1px dashed var(--border-color);border-radius:0.75rem">Aucun abonné pour l'instant.</div>`
+        : `<div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:0.75rem;overflow:hidden">
+            ${subscribers.map((s, i) => `
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;${i < subscribers.length-1 ? 'border-bottom:1px solid var(--border-color)' : ''}">
+                <div>
+                  <div style="font-size:0.875rem;color:var(--text-primary);font-weight:500">${escapeHtml(s.email)}</div>
+                  <div style="font-size:0.73rem;color:var(--text-dim)">${new Date(s.createdAt).toLocaleDateString('fr-FR')}</div>
+                </div>
+                <button onclick="deleteSubscriber('${s._id}')" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;border-radius:0.375rem;padding:0.35rem 0.6rem;cursor:pointer;font-size:0.75rem;font-family:inherit" title="Supprimer">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            `).join('')}
+           </div>`
+      }
+    `;
+    section.appendChild(block);
+  } catch (err) {
+    // Silently ignore - subscribers endpoint may not exist yet
+  }
+}
+
+async function deleteSubscriber(id) {
+  confirmDelete('cet abonné', async () => {
+    try {
+      await apiDelete('/newsletter/subscribers/' + id);
+      await loadSubscribers();
+      showToast('success', 'Supprimé', 'Abonné supprimé.');
+    } catch (err) {
+      showToast('error', 'Erreur', err.message);
+    }
+  });
 }
 
 function escapeHtml(str) {
