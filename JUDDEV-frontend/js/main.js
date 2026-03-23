@@ -714,17 +714,26 @@ async function loadRealisationDetail() {
 }
 
 // Article Detail Page
-function loadArticleDetail() {
+async function loadArticleDetail() {
   const container = document.getElementById('article-detail-content');
   if (!container) return;
 
   const id = getURLParam('id');
-  if (!id || typeof JUDDEV_DATA === 'undefined') {
+  if (!id) {
     container.innerHTML = '<div class="empty-state"><p>Article introuvable.</p><a href="blog.html" class="btn btn-primary" style="margin-top:1rem">Voir tous les articles</a></div>';
     return;
   }
 
-  const article = getArticleById(id);
+  // Fetch article directly from API (always fresh, no cache issue)
+  let article = null;
+  try {
+    const res = await fetch(JUDDEV_CONFIG.API_URL + '/articles/' + id);
+    if (res.ok) article = await res.json();
+  } catch (e) {
+    // API unreachable — fall back to cached data
+    article = (typeof getArticleById === 'function') ? getArticleById(id) : null;
+  }
+
   if (!article) {
     container.innerHTML = '<div class="empty-state"><p>Article introuvable.</p><a href="blog.html" class="btn btn-primary" style="margin-top:1rem">Voir tous les articles</a></div>';
     return;

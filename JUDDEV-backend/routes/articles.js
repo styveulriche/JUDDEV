@@ -119,13 +119,14 @@ router.post('/from-pdf', auth, uploadMixed.fields([
         .map(p => p.trim())
         .filter(p => p.length > 10);
 
+      const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
       content = paragraphs.map(p => {
         // Detect headings (short lines, all caps, or ending with colon)
         const lines = p.split('\n').map(l => l.trim()).filter(Boolean);
         if (lines.length === 1 && (p.length < 80 || p === p.toUpperCase() || p.endsWith(':'))) {
-          return `<h2>${p}</h2>`;
+          return `<h2>${esc(p)}</h2>`;
         }
-        return `<p>${lines.join(' ')}</p>`;
+        return `<p>${lines.map(esc).join(' ')}</p>`;
       }).join('\n');
 
     } catch (pdfErr) {
