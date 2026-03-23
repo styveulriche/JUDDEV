@@ -81,11 +81,12 @@
     <div class="section-header reveal-left">
       <span class="section-badge">EXPERTISE</span>
       <h2 class="section-title">Tous nos <span>Services</span></h2>
-      <p class="section-subtitle">8 domaines d'expertise pour couvrir tous vos besoins digitaux.</p>
+      <p class="section-subtitle"><span id="services-count"></span></p>
     </div>
     <div class="grid-3" id="services-full-grid">
       <!-- Populated by JS -->
     </div>
+    <div class="pagination-bar" id="services-pagination"></div>
   </div>
 </section>
 
@@ -223,39 +224,157 @@
   </div>
 </div>
 
+<style>
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+}
+.page-btn {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color, rgba(255,255,255,0.1));
+  background: var(--bg-card, rgba(255,255,255,0.05));
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.page-btn:hover:not(:disabled) {
+  background: rgba(0,102,255,0.15);
+  border-color: rgba(0,102,255,0.4);
+  color: #60a5fa;
+}
+.page-btn.active {
+  background: linear-gradient(135deg, #0052cc, #0099cc);
+  border-color: #0066ff;
+  color: #ffffff;
+}
+.page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.page-ellipsis {
+  color: var(--text-dim, #475569);
+  font-size: 0.875rem;
+  padding: 0 0.2rem;
+  line-height: 36px;
+}
+html.light-mode .page-btn {
+  background: #ffffff;
+  border-color: rgba(0,82,204,0.2);
+  color: #475569;
+}
+html.light-mode .page-btn:hover:not(:disabled) {
+  background: rgba(0,82,204,0.1);
+  color: #0052cc;
+}
+</style>
+
 <script src="js/config.js"></script>
 <script src="js/data.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/main.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+const SERVICES_PER_PAGE = 6;
+let servicesPage = 1;
+let allServices = [];
+
+function renderServicesPage(page) {
+  servicesPage = page;
   const grid = document.getElementById('services-full-grid');
-  if (grid && typeof JUDDEV_DATA !== 'undefined') {
-    grid.innerHTML = JUDDEV_DATA.services.map((s, i) => `
-      <a href="service-detail.html?id=${s.id}" class="card reveal stagger-${(i % 4) + 1}" style="text-decoration:none;overflow:visible">
-        <div style="aspect-ratio:16/9;overflow:hidden;border-radius:var(--radius-xl) var(--radius-xl) 0 0">
-          <img src="${s.image}" alt="${s.title}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.5s ease" onerror="this.style.background='linear-gradient(135deg,#0066ff22,#00d4ff22)'" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'" loading="lazy" />
+  if (!grid) return;
+  const start = (page - 1) * SERVICES_PER_PAGE;
+  const slice = allServices.slice(start, start + SERVICES_PER_PAGE);
+
+  grid.innerHTML = slice.map((s, i) => `
+    <a href="service-detail.html?id=${s.id}" class="card reveal stagger-${(i % 4) + 1}" style="text-decoration:none;overflow:visible">
+      <div style="aspect-ratio:16/9;overflow:hidden;border-radius:var(--radius-xl) var(--radius-xl) 0 0">
+        <img src="${s.image}" alt="${s.title}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.5s ease" onerror="this.style.background='linear-gradient(135deg,#0066ff22,#00d4ff22)'" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'" loading="lazy" />
+      </div>
+      <div style="padding:1.75rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem">
+          <span class="category-tag">${s.category.toUpperCase()}</span>
+          <span style="font-size:1.5rem">${s.icon}</span>
         </div>
-        <div style="padding:1.75rem">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem">
-            <span class="category-tag">${s.category.toUpperCase()}</span>
-            <span style="font-size:1.5rem">${s.icon}</span>
-          </div>
-          <h3 style="font-size:1.2rem;font-weight:700;color:var(--text-primary);margin-bottom:0.4rem">${s.title}</h3>
-          <p style="font-size:0.85rem;color:var(--accent-cyan);font-weight:600;margin-bottom:0.75rem">${s.subtitle}</p>
-          <p style="font-size:0.875rem;color:var(--text-muted);line-height:1.7;margin-bottom:1.25rem">${s.shortDesc}</p>
-          <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.25rem">
-            ${s.technologies.slice(0, 4).map(t => `<span style="padding:0.2rem 0.6rem;background:rgba(0,102,255,0.08);border:1px solid rgba(0,102,255,0.2);border-radius:20px;font-size:0.7rem;color:var(--accent-light)">${t}</span>`).join('')}
-          </div>
-          <span style="display:inline-flex;align-items:center;gap:0.5rem;color:var(--accent-light);font-size:0.875rem;font-weight:600">
-            Voir les détails <i class="fas fa-arrow-right"></i>
-          </span>
+        <h3 style="font-size:1.2rem;font-weight:700;color:var(--text-primary);margin-bottom:0.4rem">${s.title}</h3>
+        <p style="font-size:0.85rem;color:var(--accent-cyan);font-weight:600;margin-bottom:0.75rem">${s.subtitle}</p>
+        <p style="font-size:0.875rem;color:var(--text-muted);line-height:1.7;margin-bottom:1.25rem">${s.shortDesc}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.25rem">
+          ${s.technologies.slice(0, 4).map(t => `<span style="padding:0.2rem 0.6rem;background:rgba(0,102,255,0.08);border:1px solid rgba(0,102,255,0.2);border-radius:20px;font-size:0.7rem;color:var(--accent-light)">${t}</span>`).join('')}
         </div>
-      </a>
-    `).join('');
+        <span style="display:inline-flex;align-items:center;gap:0.5rem;color:var(--accent-light);font-size:0.875rem;font-weight:600">
+          Voir les détails <i class="fas fa-arrow-right"></i>
+        </span>
+      </div>
+    </a>
+  `).join('');
+
+  setTimeout(() => {
+    grid.querySelectorAll('.reveal').forEach(el => {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+      }, { threshold: 0.05 });
+      obs.observe(el);
+    });
+  }, 100);
+
+  renderServicesPagination(allServices.length, page);
+
+  if (page > 1) {
+    grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function renderServicesPagination(total, current) {
+  const container = document.getElementById('services-pagination');
+  if (!container) return;
+  const totalPages = Math.ceil(total / SERVICES_PER_PAGE);
+  if (totalPages <= 1) { container.style.display = 'none'; return; }
+  container.style.display = 'flex';
+
+  let html = '';
+  html += `<button class="page-btn" onclick="renderServicesPage(${current - 1})" ${current === 1 ? 'disabled' : ''}>&#8249;</button>`;
+
+  let start = Math.max(1, current - 2);
+  let end = Math.min(totalPages, start + 4);
+  start = Math.max(1, end - 4);
+
+  if (start > 1) html += `<button class="page-btn" onclick="renderServicesPage(1)">1</button>`;
+  if (start > 2) html += `<span class="page-ellipsis">&hellip;</span>`;
+
+  for (let i = start; i <= end; i++) {
+    html += `<button class="page-btn ${i === current ? 'active' : ''}" onclick="renderServicesPage(${i})">${i}</button>`;
+  }
+
+  if (end < totalPages - 1) html += `<span class="page-ellipsis">&hellip;</span>`;
+  if (end < totalPages) html += `<button class="page-btn" onclick="renderServicesPage(${totalPages})">${totalPages}</button>`;
+
+  html += `<button class="page-btn" onclick="renderServicesPage(${current + 1})" ${current === totalPages ? 'disabled' : ''}>&#8250;</button>`;
+  container.innerHTML = html;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof JUDDEV_DATA !== 'undefined') {
+    allServices = JUDDEV_DATA.services;
+
+    const countEl = document.getElementById('services-count');
+    if (countEl) countEl.textContent = allServices.length + ' service' + (allServices.length > 1 ? 's' : '');
+
+    renderServicesPage(1);
 
     setTimeout(() => {
-      document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
+      document.querySelectorAll('.reveal-left, .reveal-right').forEach(el => {
         const obs = new IntersectionObserver((entries) => {
           entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
         }, { threshold: 0.05 });

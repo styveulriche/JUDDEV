@@ -72,6 +72,7 @@
     <div class="grid-3" id="articles-grid">
       <!-- Populated by JS -->
     </div>
+    <div class="pagination-bar" id="articles-pagination"></div>
   </div>
 </section>
 
@@ -169,11 +170,142 @@
   </div>
 </div>
 
+<style>
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+}
+.page-btn {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color, rgba(255,255,255,0.1));
+  background: var(--bg-card, rgba(255,255,255,0.05));
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.page-btn:hover:not(:disabled) {
+  background: rgba(0,102,255,0.15);
+  border-color: rgba(0,102,255,0.4);
+  color: #60a5fa;
+}
+.page-btn.active {
+  background: linear-gradient(135deg, #0052cc, #0099cc);
+  border-color: #0066ff;
+  color: #ffffff;
+}
+.page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.page-ellipsis {
+  color: var(--text-dim, #475569);
+  font-size: 0.875rem;
+  padding: 0 0.2rem;
+  line-height: 36px;
+}
+html.light-mode .page-btn {
+  background: #ffffff;
+  border-color: rgba(0,82,204,0.2);
+  color: #475569;
+}
+html.light-mode .page-btn:hover:not(:disabled) {
+  background: rgba(0,82,204,0.1);
+  color: #0052cc;
+}
+</style>
+
 <script src="js/config.js"></script>
 <script src="js/data.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/main.js"></script>
 <script>
+const ARTICLES_PER_PAGE = 9;
+let articlesPage = 1;
+let filteredArticles = [];
+
+function renderArticlesPage(page) {
+  articlesPage = page;
+  const grid = document.getElementById('articles-grid');
+  if (!grid) return;
+  const start = (page - 1) * ARTICLES_PER_PAGE;
+  const slice = filteredArticles.slice(start, start + ARTICLES_PER_PAGE);
+
+  grid.innerHTML = slice.map((a, i) => `
+    <a href="article-detail.html?id=${a.id}" class="blog-card reveal stagger-${(i % 3) + 1}" style="text-decoration:none" data-filter-cat="${a.category}">
+      <div class="blog-card-img">
+        <img src="${a.image}" alt="${a.title}" loading="lazy" onerror="this.style.background='var(--bg-secondary)'" />
+      </div>
+      <div class="blog-card-body">
+        <div class="blog-card-meta">
+          <span class="blog-card-category">${a.category}</span>
+          <span class="blog-card-date">${formatDate(a.date)}</span>
+        </div>
+        <h3 class="blog-card-title">${a.title}</h3>
+        <p class="blog-card-excerpt">${a.shortDesc}</p>
+        <div style="margin-top:1rem">
+          <span class="blog-card-link">Lire <i class="fas fa-arrow-right"></i></span>
+        </div>
+      </div>
+    </a>
+  `).join('');
+
+  setTimeout(() => {
+    grid.querySelectorAll('.reveal').forEach(el => {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+      }, { threshold: 0.05 });
+      obs.observe(el);
+    });
+  }, 50);
+
+  renderArticlesPagination(filteredArticles.length, page);
+
+  if (page > 1) {
+    grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function renderArticlesPagination(total, current) {
+  const container = document.getElementById('articles-pagination');
+  if (!container) return;
+  const totalPages = Math.ceil(total / ARTICLES_PER_PAGE);
+  if (totalPages <= 1) { container.style.display = 'none'; return; }
+  container.style.display = 'flex';
+
+  let html = '';
+  html += `<button class="page-btn" onclick="renderArticlesPage(${current - 1})" ${current === 1 ? 'disabled' : ''}>&#8249;</button>`;
+
+  let start = Math.max(1, current - 2);
+  let end = Math.min(totalPages, start + 4);
+  start = Math.max(1, end - 4);
+
+  if (start > 1) html += `<button class="page-btn" onclick="renderArticlesPage(1)">1</button>`;
+  if (start > 2) html += `<span class="page-ellipsis">&hellip;</span>`;
+
+  for (let i = start; i <= end; i++) {
+    html += `<button class="page-btn ${i === current ? 'active' : ''}" onclick="renderArticlesPage(${i})">${i}</button>`;
+  }
+
+  if (end < totalPages - 1) html += `<span class="page-ellipsis">&hellip;</span>`;
+  if (end < totalPages) html += `<button class="page-btn" onclick="renderArticlesPage(${totalPages})">${totalPages}</button>`;
+
+  html += `<button class="page-btn" onclick="renderArticlesPage(${current + 1})" ${current === totalPages ? 'disabled' : ''}>&#8250;</button>`;
+  container.innerHTML = html;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof JUDDEV_DATA === 'undefined') return;
 
@@ -212,41 +344,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const carousel = document.getElementById('blog-carousel');
   if (carousel) initCarousel(carousel);
 
-  // Build articles grid
-  const grid = document.getElementById('articles-grid');
-
-  function renderArticles(items) {
-    if (!grid) return;
-    grid.innerHTML = items.map((a, i) => `
-      <a href="article-detail.html?id=${a.id}" class="blog-card reveal stagger-${(i % 3) + 1}" style="text-decoration:none" data-filter-cat="${a.category}">
-        <div class="blog-card-img">
-          <img src="${a.image}" alt="${a.title}" loading="lazy" onerror="this.style.background='var(--bg-secondary)'" />
-        </div>
-        <div class="blog-card-body">
-          <div class="blog-card-meta">
-            <span class="blog-card-category">${a.category}</span>
-            <span class="blog-card-date">${formatDate(a.date)}</span>
-          </div>
-          <h3 class="blog-card-title">${a.title}</h3>
-          <p class="blog-card-excerpt">${a.shortDesc}</p>
-          <div style="margin-top:1rem">
-            <span class="blog-card-link">Lire <i class="fas fa-arrow-right"></i></span>
-          </div>
-        </div>
-      </a>
-    `).join('');
-
-    setTimeout(() => {
-      grid.querySelectorAll('.reveal').forEach(el => {
-        const obs = new IntersectionObserver((entries) => {
-          entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-        }, { threshold: 0.05 });
-        obs.observe(el);
-      });
-    }, 50);
-  }
-
-  renderArticles(JUDDEV_DATA.articles);
+  // Initial articles render
+  filteredArticles = JUDDEV_DATA.articles;
+  renderArticlesPage(1);
 
   // Newsletter form
   window.handleNewsletterSubmit = async function(e) {
@@ -258,13 +358,11 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.disabled = true;
 
     const email = emailInput.value;
-    // Close immediately
     emailInput.value = '';
     btn.innerHTML = orig;
     btn.disabled = false;
     showNotification('success', 'Abonnement réussi !', 'Vous recevrez nos prochains articles par email.');
 
-    // Send in background
     const API = typeof JUDDEV_CONFIG !== 'undefined' ? JUDDEV_CONFIG.API_URL : 'http://localhost:5000/api';
     fetch(API + '/newsletter/subscribe', {
       method: 'POST',
@@ -279,10 +377,11 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('#blog-filters .filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const filter = btn.dataset.filter;
-      const filtered = filter === 'all'
+      filteredArticles = filter === 'all'
         ? JUDDEV_DATA.articles
         : JUDDEV_DATA.articles.filter(a => a.category === filter);
-      renderArticles(filtered);
+      articlesPage = 1;
+      renderArticlesPage(1);
     });
   });
 
@@ -291,8 +390,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const articles = e.detail.articles;
     if (!articles || !articles.length) return;
     const activeFilter = document.querySelector('#blog-filters .filter-btn.active')?.dataset?.filter || 'all';
-    const filtered = activeFilter === 'all' ? articles : articles.filter(a => a.category === activeFilter);
-    renderArticles(filtered);
+    filteredArticles = activeFilter === 'all' ? articles : articles.filter(a => a.category === activeFilter);
+    articlesPage = 1;
+    renderArticlesPage(1);
   });
 });
 </script>

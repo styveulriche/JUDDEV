@@ -111,6 +111,7 @@
     <div class="grid-3" id="realisations-grid">
       <!-- Populated by JS -->
     </div>
+    <div class="pagination-bar" id="realisations-pagination"></div>
   </div>
 </section>
 
@@ -216,11 +217,170 @@
   </div>
 </div>
 
+<style>
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+}
+.page-btn {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color, rgba(255,255,255,0.1));
+  background: var(--bg-card, rgba(255,255,255,0.05));
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.page-btn:hover:not(:disabled) {
+  background: rgba(0,102,255,0.15);
+  border-color: rgba(0,102,255,0.4);
+  color: #60a5fa;
+}
+.page-btn.active {
+  background: linear-gradient(135deg, #0052cc, #0099cc);
+  border-color: #0066ff;
+  color: #ffffff;
+}
+.page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.page-ellipsis {
+  color: var(--text-dim, #475569);
+  font-size: 0.875rem;
+  padding: 0 0.2rem;
+  line-height: 36px;
+}
+html.light-mode .page-btn {
+  background: #ffffff;
+  border-color: rgba(0,82,204,0.2);
+  color: #475569;
+}
+html.light-mode .page-btn:hover:not(:disabled) {
+  background: rgba(0,82,204,0.1);
+  color: #0052cc;
+}
+</style>
+
 <script src="js/config.js"></script>
 <script src="js/data.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/main.js"></script>
 <script>
+const REALISATIONS_PER_PAGE = 6;
+let realisationsPage = 1;
+let filteredRealisations = [];
+
+function renderRealisationsPage(page) {
+  realisationsPage = page;
+  const grid = document.getElementById('realisations-grid');
+  if (!grid) return;
+  const start = (page - 1) * REALISATIONS_PER_PAGE;
+  const slice = filteredRealisations.slice(start, start + REALISATIONS_PER_PAGE);
+
+  grid.innerHTML = slice.map((r) => `
+    <div class="realisation-card" data-category="${r.category || ''}" data-service="${r.service || ''}">
+      <a href="realisation-detail.html?id=${r.id}" style="text-decoration:none;display:block">
+        <div class="realisation-card-img">
+          <img src="${resolveRealisationImg(r.image)}" alt="${r.title}" loading="lazy" onerror="this.style.background='linear-gradient(135deg,#0066ff22,#00d4ff22)'" />
+          <div class="realisation-card-overlay">
+            <span class="overlay-btn">Voir la Réalisation <i class="fas fa-arrow-right" style="margin-left:0.5rem"></i></span>
+          </div>
+        </div>
+        <div class="realisation-card-body">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem">
+            <span class="category-tag">${r.category || ''}</span>
+            <span style="font-size:0.8rem;color:var(--text-dim)">${r.year || ''}</span>
+          </div>
+          <h3 class="realisation-card-title">${r.title}</h3>
+          <p class="realisation-card-desc">${r.shortDesc || ''}</p>
+          <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:1rem">
+            ${(r.technologies || []).slice(0, 3).map(t => `<span style="padding:0.15rem 0.5rem;background:rgba(0,102,255,0.08);border:1px solid rgba(0,102,255,0.15);border-radius:20px;font-size:0.7rem;color:var(--accent-light)">${t}</span>`).join('')}
+          </div>
+        </div>
+      </a>
+      ${(r.showSiteBtn !== false && r.url && r.url !== '#') || (r.showYoutubeBtn && r.youtubeUrl) ? `
+        <div style="display:flex;gap:0.5rem;padding:0 1.25rem 1.25rem;flex-wrap:wrap">
+          ${r.showSiteBtn !== false && r.url && r.url !== '#' ? `
+            <a href="${r.url}" target="_blank" rel="noopener" style="flex:1;min-width:120px;display:flex;align-items:center;justify-content:center;gap:0.4rem;padding:0.5rem 0.75rem;background:rgba(0,102,255,0.12);border:1px solid rgba(0,102,255,0.3);border-radius:0.5rem;color:var(--accent-light);font-size:0.78rem;font-weight:600;text-decoration:none;transition:all 0.2s"
+              onmouseover="this.style.background='rgba(0,102,255,0.2)'" onmouseout="this.style.background='rgba(0,102,255,0.12)'">
+              <i class="fas fa-arrow-up-right-from-square"></i> Visiter le site
+            </a>` : ''}
+          ${r.showYoutubeBtn && r.youtubeUrl ? `
+            <a href="${r.youtubeUrl}" target="_blank" rel="noopener" style="flex:1;min-width:120px;display:flex;align-items:center;justify-content:center;gap:0.4rem;padding:0.5rem 0.75rem;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:0.5rem;color:#f87171;font-size:0.78rem;font-weight:600;text-decoration:none;transition:all 0.2s"
+              onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='rgba(239,68,68,0.1)'">
+              <i class="fab fa-youtube"></i> Voir la vidéo
+            </a>` : ''}
+        </div>` : ''}
+    </div>
+  `).join('');
+
+  setTimeout(() => {
+    grid.querySelectorAll('.realisation-card').forEach((el, i) => {
+      el.classList.add('reveal');
+      el.style.transitionDelay = (i * 0.1) + 's';
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+      }, { threshold: 0.05 });
+      obs.observe(el);
+    });
+  }, 50);
+
+  renderRealisationsPagination(filteredRealisations.length, page);
+
+  if (page > 1) {
+    grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function renderRealisationsPagination(total, current) {
+  const container = document.getElementById('realisations-pagination');
+  if (!container) return;
+  const totalPages = Math.ceil(total / REALISATIONS_PER_PAGE);
+  if (totalPages <= 1) { container.style.display = 'none'; return; }
+  container.style.display = 'flex';
+
+  let html = '';
+  html += `<button class="page-btn" onclick="renderRealisationsPage(${current - 1})" ${current === 1 ? 'disabled' : ''}>&#8249;</button>`;
+
+  let start = Math.max(1, current - 2);
+  let end = Math.min(totalPages, start + 4);
+  start = Math.max(1, end - 4);
+
+  if (start > 1) html += `<button class="page-btn" onclick="renderRealisationsPage(1)">1</button>`;
+  if (start > 2) html += `<span class="page-ellipsis">&hellip;</span>`;
+
+  for (let i = start; i <= end; i++) {
+    html += `<button class="page-btn ${i === current ? 'active' : ''}" onclick="renderRealisationsPage(${i})">${i}</button>`;
+  }
+
+  if (end < totalPages - 1) html += `<span class="page-ellipsis">&hellip;</span>`;
+  if (end < totalPages) html += `<button class="page-btn" onclick="renderRealisationsPage(${totalPages})">${totalPages}</button>`;
+
+  html += `<button class="page-btn" onclick="renderRealisationsPage(${current + 1})" ${current === totalPages ? 'disabled' : ''}>&#8250;</button>`;
+  container.innerHTML = html;
+}
+
+function resolveRealisationImg(path) {
+  const API = typeof JUDDEV_CONFIG !== 'undefined' ? JUDDEV_CONFIG.API_URL : 'http://localhost:5000/api';
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  if (path.startsWith('/uploads/')) return API.replace('/api', '') + path;
+  return path;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   const grid = document.getElementById('realisations-grid');
   if (!grid) return;
@@ -237,77 +397,77 @@ document.addEventListener('DOMContentLoaded', async () => {
     allRealisations = JUDDEV_DATA.realisations;
   }
 
-  function resolveImg(path) {
-    if (!path) return '';
-    if (path.startsWith('http://') || path.startsWith('https://')) return path;
-    if (path.startsWith('/uploads/')) return API.replace('/api', '') + path;
-    return path;
-  }
-
-  function renderRealisations(items) {
-    grid.innerHTML = items.map((r, i) => `
-      <div class="realisation-card" data-category="${r.category || ''}" data-service="${r.service || ''}">
-        <a href="realisation-detail.html?id=${r.id}" style="text-decoration:none;display:block">
-          <div class="realisation-card-img">
-            <img src="${resolveImg(r.image)}" alt="${r.title}" loading="lazy" onerror="this.style.background='linear-gradient(135deg,#0066ff22,#00d4ff22)'" />
-            <div class="realisation-card-overlay">
-              <span class="overlay-btn">Voir la Réalisation <i class="fas fa-arrow-right" style="margin-left:0.5rem"></i></span>
-            </div>
-          </div>
-          <div class="realisation-card-body">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem">
-              <span class="category-tag">${r.category || ''}</span>
-              <span style="font-size:0.8rem;color:var(--text-dim)">${r.year || ''}</span>
-            </div>
-            <h3 class="realisation-card-title">${r.title}</h3>
-            <p class="realisation-card-desc">${r.shortDesc || ''}</p>
-            <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:1rem">
-              ${(r.technologies || []).slice(0, 3).map(t => `<span style="padding:0.15rem 0.5rem;background:rgba(0,102,255,0.08);border:1px solid rgba(0,102,255,0.15);border-radius:20px;font-size:0.7rem;color:var(--accent-light)">${t}</span>`).join('')}
-            </div>
-          </div>
-        </a>
-        ${(r.showSiteBtn !== false && r.url && r.url !== '#') || (r.showYoutubeBtn && r.youtubeUrl) ? `
-          <div style="display:flex;gap:0.5rem;padding:0 1.25rem 1.25rem;flex-wrap:wrap">
-            ${r.showSiteBtn !== false && r.url && r.url !== '#' ? `
-              <a href="${r.url}" target="_blank" rel="noopener" style="flex:1;min-width:120px;display:flex;align-items:center;justify-content:center;gap:0.4rem;padding:0.5rem 0.75rem;background:rgba(0,102,255,0.12);border:1px solid rgba(0,102,255,0.3);border-radius:0.5rem;color:var(--accent-light);font-size:0.78rem;font-weight:600;text-decoration:none;transition:all 0.2s"
-                onmouseover="this.style.background='rgba(0,102,255,0.2)'" onmouseout="this.style.background='rgba(0,102,255,0.12)'">
-                <i class="fas fa-arrow-up-right-from-square"></i> Visiter le site
-              </a>` : ''}
-            ${r.showYoutubeBtn && r.youtubeUrl ? `
-              <a href="${r.youtubeUrl}" target="_blank" rel="noopener" style="flex:1;min-width:120px;display:flex;align-items:center;justify-content:center;gap:0.4rem;padding:0.5rem 0.75rem;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:0.5rem;color:#f87171;font-size:0.78rem;font-weight:600;text-decoration:none;transition:all 0.2s"
-                onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='rgba(239,68,68,0.1)'">
-                <i class="fab fa-youtube"></i> Voir la vidéo
-              </a>` : ''}
-          </div>` : ''}
-      </div>
-    `).join('');
-
-    setTimeout(() => {
-      grid.querySelectorAll('.realisation-card').forEach((el, i) => {
-        el.classList.add('reveal');
-        el.style.transitionDelay = (i * 0.1) + 's';
-        const obs = new IntersectionObserver((entries) => {
-          entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-        }, { threshold: 0.05 });
-        obs.observe(el);
-      });
-    }, 50);
-  }
-
-  renderRealisations(allRealisations);
-
-  // Category filter
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const filter = btn.dataset.filter;
-      const filtered = filter === 'all'
-        ? allRealisations
-        : allRealisations.filter(r => r.category === filter);
-      renderRealisations(filtered);
+  function getFiltered() {
+    const domainVal = (document.getElementById('filter-domain')?.value || '').trim();
+    const techVal = (document.getElementById('filter-tech')?.value || '').trim();
+    return allRealisations.filter(r => {
+      const domainMatch = !domainVal || (r.category || '') === domainVal;
+      const techMatch = !techVal || (r.technologies || []).includes(techVal);
+      return domainMatch && techMatch;
     });
-  });
+  }
+
+  function applyFilters() {
+    filteredRealisations = getFiltered();
+    realisationsPage = 1;
+    renderRealisationsPage(1);
+    updateFilterCount();
+    updateResetBtn();
+  }
+
+  function updateFilterCount() {
+    const countEl = document.getElementById('filter-count');
+    if (countEl) countEl.textContent = filteredRealisations.length + ' projet' + (filteredRealisations.length > 1 ? 's' : '');
+  }
+
+  function updateResetBtn() {
+    const resetBtn = document.getElementById('filter-reset');
+    if (!resetBtn) return;
+    const domainVal = document.getElementById('filter-domain')?.value || '';
+    const techVal = document.getElementById('filter-tech')?.value || '';
+    resetBtn.style.display = (domainVal || techVal) ? 'inline-flex' : 'none';
+  }
+
+  // Populate domain filter
+  const domainSelect = document.getElementById('filter-domain');
+  if (domainSelect) {
+    const domains = [...new Set(allRealisations.map(r => r.category).filter(Boolean))].sort();
+    domains.forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d;
+      opt.textContent = d;
+      domainSelect.appendChild(opt);
+    });
+    domainSelect.addEventListener('change', applyFilters);
+  }
+
+  // Populate tech filter
+  const techSelect = document.getElementById('filter-tech');
+  if (techSelect) {
+    const techs = [...new Set(allRealisations.flatMap(r => r.technologies || []))].sort();
+    techs.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t;
+      opt.textContent = t;
+      techSelect.appendChild(opt);
+    });
+    techSelect.addEventListener('change', applyFilters);
+  }
+
+  // Reset button
+  const resetBtn = document.getElementById('filter-reset');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      if (domainSelect) domainSelect.value = '';
+      if (techSelect) techSelect.value = '';
+      applyFilters();
+    });
+  }
+
+  // Initial render
+  filteredRealisations = allRealisations;
+  renderRealisationsPage(1);
+  updateFilterCount();
 
   // Auto-refresh: re-render when API data updates (every 30s via data.js polling)
   document.addEventListener('juddev:dataUpdated', async () => {
@@ -315,9 +475,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const res = await fetch(API + '/realisations');
       if (res.ok) {
         allRealisations = await res.json();
-        const activeFilter = document.querySelector('.filter-btn.active')?.dataset?.filter || 'all';
-        const filtered = activeFilter === 'all' ? allRealisations : allRealisations.filter(r => r.category === activeFilter);
-        renderRealisations(filtered);
+        filteredRealisations = getFiltered();
+        renderRealisationsPage(1);
+        updateFilterCount();
       }
     } catch (_) {}
   });
