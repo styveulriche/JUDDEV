@@ -726,6 +726,9 @@ async function syncFromAPI() {
   }
 }
 
+// Ping immédiat pour réveiller Render dès la première page (sans attendre les données)
+fetch(_API_BASE + '/health').catch(() => {});
+
 // Start API sync after page loads (non-blocking)
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => setTimeout(syncFromAPI, 500));

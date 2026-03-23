@@ -724,14 +724,13 @@ async function loadArticleDetail() {
     return;
   }
 
-  // Fetch article directly from API (always fresh, no cache issue)
-  let article = null;
-  try {
-    const res = await fetch(JUDDEV_CONFIG.API_URL + '/articles/' + id);
-    if (res.ok) article = await res.json();
-  } catch (e) {
-    // API unreachable — fall back to cached data
-    article = (typeof getArticleById === 'function') ? getArticleById(id) : null;
+  // Cache d'abord (affichage instantané), sinon fetch API (nouvel article)
+  let article = (typeof getArticleById === 'function') ? getArticleById(id) : null;
+  if (!article) {
+    try {
+      const res = await fetch(JUDDEV_CONFIG.API_URL + '/articles/' + id);
+      if (res.ok) article = await res.json();
+    } catch (e) {}
   }
 
   if (!article) {
