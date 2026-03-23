@@ -867,14 +867,10 @@ async function loadArticleDetail() {
     </section>
   `;
 
-  setTimeout(() => {
-    document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
-      }, { threshold: 0.1 });
-      observer.observe(el);
-    });
-  }, 100);
+  // Contenu chargé async — forcer visible directement (pas d'IntersectionObserver)
+  container.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
+    el.classList.add('visible');
+  });
 
   // Load comments for this article
   loadArticleComments(id);
