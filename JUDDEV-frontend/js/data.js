@@ -201,6 +201,28 @@ const JUDDEV_DATA_DEFAULT = {
       ],
       technologies: ['Electron', 'Python (PyQt, Tkinter)', 'C# (.NET / WPF)', 'Java (JavaFX)', 'Rust (Tauri)', 'C++'],
       category: 'desktop'
+    },
+    {
+      id: 'cybersecurite',
+      title: 'Cybersécurité',
+      subtitle: 'Protégez votre infrastructure numérique',
+      icon: '<i class="fas fa-shield-halved"></i>',
+      image: 'images/ia.jpg',
+      shortDesc: 'Audit, protection et surveillance de vos systèmes informatiques contre les cybermenaces pour garantir la sécurité de vos données.',
+      longDesc: 'JUDDEV CORPORATION vous accompagne dans la sécurisation de votre infrastructure numérique. Notre équipe d\'experts en cybersécurité effectue des audits complets, identifie les vulnérabilités et met en place des mesures de protection robustes. Nous proposons des solutions adaptées à chaque entreprise, de la PME aux grandes organisations, pour garantir la confidentialité, l\'intégrité et la disponibilité de vos données. Notre approche proactive inclut la surveillance continue, la réponse aux incidents et la formation de vos équipes.',
+      features: [
+        'Audit de sécurité et tests d\'intrusion (pentesting)',
+        'Analyse des vulnérabilités et gestion des risques',
+        'Mise en place de politiques de sécurité (RGPD, ISO 27001)',
+        'Sécurisation des applications web et mobiles',
+        'Protection contre les ransomwares et malwares',
+        'Authentification forte et gestion des accès (IAM)',
+        'Surveillance SOC et détection d\'intrusions (IDS/IPS)',
+        'Formation et sensibilisation des équipes',
+        'Réponse aux incidents et plan de reprise (PRA/PCA)'
+      ],
+      technologies: ['Kali Linux', 'Metasploit', 'Burp Suite', 'Wireshark', 'Nessus', 'OWASP', 'Splunk', 'CrowdStrike'],
+      category: 'securite'
     }
   ],
 
@@ -736,8 +758,7 @@ if (document.readyState === 'loading') {
   setTimeout(syncFromAPI, 500);
 }
 
-// Auto-refresh every 30 seconds — vitrine reflects dashboard changes automatically
-setInterval(syncFromAPI, 30000);
+// Auto-refresh disabled to prevent page reload annoyance (data synced on page load)
 
 // Helper functions
 function getServiceById(id) {

@@ -83,15 +83,28 @@
       <h2 class="section-title">Tous nos <span>Projets</span></h2>
     </div>
 
-    <!-- Category Filters -->
-    <div class="filter-bar reveal" id="category-filters">
-      <button class="filter-btn active" data-filter="all" data-filter-type="category">Tous</button>
-      <button class="filter-btn" data-filter="E-commerce" data-filter-type="category">E-commerce</button>
-      <button class="filter-btn" data-filter="Mobile" data-filter-type="category">Mobile</button>
-      <button class="filter-btn" data-filter="SaaS" data-filter-type="category">SaaS</button>
-      <button class="filter-btn" data-filter="Design" data-filter-type="category">Design</button>
-      <button class="filter-btn" data-filter="Cloud" data-filter-type="category">Cloud</button>
-      <button class="filter-btn" data-filter="MVP" data-filter-type="category">MVP</button>
+    <!-- Filter Dropdowns -->
+    <div class="filter-dropdowns reveal" id="filter-container">
+      <div class="filter-dropdown-group">
+        <label class="filter-dropdown-label" for="filter-domain">
+          <i class="fas fa-layer-group"></i> Domaine
+        </label>
+        <select class="filter-select" id="filter-domain">
+          <option value="">Tous les domaines</option>
+        </select>
+      </div>
+      <div class="filter-dropdown-group">
+        <label class="filter-dropdown-label" for="filter-tech">
+          <i class="fas fa-code"></i> Technologie
+        </label>
+        <select class="filter-select" id="filter-tech">
+          <option value="">Toutes les technologies</option>
+        </select>
+      </div>
+      <span class="filter-count-badge" id="filter-count"></span>
+      <button class="filter-reset-btn" id="filter-reset" style="display:none">
+        <i class="fas fa-rotate-left"></i> Réinitialiser
+      </button>
     </div>
 
     <!-- Realisations Grid -->
@@ -179,7 +192,8 @@
           <select class="form-input" required><option value="">Sélectionnez</option>
             <option>Développement Web</option><option>Applications Mobiles</option><option>Produits SaaS</option>
             <option>UI/UX Design</option><option>Cloud Engineering</option><option>Développement MVP</option>
-            <option>Marketing Digital</option><option>IA & Automatisation</option><option>Autre</option>
+            <option>Marketing Digital & SEO</option><option>IA & Automatisation</option><option>Cybersécurité</option>
+            <option>Application Desktop</option><option>Formation</option><option>Autre</option>
           </select>
         </div>
         <div class="form-group"><label class="form-label">Budget estimé</label>

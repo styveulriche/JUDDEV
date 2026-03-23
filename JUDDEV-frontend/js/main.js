@@ -235,7 +235,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       const submitBtn = form.querySelector('.modal-submit');
       const originalHTML = submitBtn.innerHTML;
 
-      // Collect all form fields BEFORE closing
+      // Collect all form fields BEFORE closing (document order)
       const allInputs = [...form.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], select, textarea')];
       const name     = allInputs[0]?.value || '';
       const email    = allInputs[1]?.value || '';
@@ -243,13 +243,19 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       const company  = allInputs[3]?.value || '';
       const service  = allInputs[4]?.value || '';
       const budget   = allInputs[5]?.value || '';
-      const desc     = allInputs[6]?.value || allInputs[7]?.value || '';
+      const delai    = allInputs[6]?.value || '';
+      const cible    = allInputs[7]?.value || '';
+      const desc     = allInputs[8]?.value || '';
+      const context  = allInputs[9]?.value || '';
 
       const msgBody = [
         company ? `Entreprise: ${company}` : '',
         service ? `Service souhaité: ${service}` : '',
         budget  ? `Budget: ${budget}` : '',
-        `\nDescription du projet:\n${desc}`
+        delai   ? `Délai souhaité: ${delai}` : '',
+        cible   ? `Cible visée: ${cible}` : '',
+        desc    ? `\nDescription du projet:\n${desc}` : '',
+        context ? `\nContexte du projet:\n${context}` : ''
       ].filter(Boolean).join('\n');
 
       const API = typeof JUDDEV_CONFIG !== 'undefined' ? JUDDEV_CONFIG.API_URL : 'http://localhost:5000/api';
@@ -1021,7 +1027,7 @@ document.querySelectorAll('.counter').forEach(el => {
 // DARK / LIGHT MODE - Apply saved theme immediately
 // ============================================================
 (function initTheme() {
-  const saved = localStorage.getItem('juddev_theme') || 'dark';
+  const saved = localStorage.getItem('juddev_theme') || 'light';
   if (saved === 'light') {
     document.documentElement.classList.add('light-mode');
   }
@@ -1049,6 +1055,17 @@ document.querySelectorAll('.counter').forEach(el => {
         `;
         navbarCta.insertAdjacentElement('afterend', controls);
       }
+    }
+
+    // --- Navbar Logo Image ---
+    const navbarLogoEl = document.querySelector('.navbar-logo');
+    if (navbarLogoEl && !navbarLogoEl.querySelector('.navbar-logo-img')) {
+      const logoImg = document.createElement('img');
+      logoImg.src = 'images/JUDDEVlogomenu.png';
+      logoImg.className = 'navbar-logo-img';
+      logoImg.alt = 'JUDDEV';
+      logoImg.onerror = function() { this.style.display = 'none'; };
+      navbarLogoEl.prepend(logoImg);
     }
 
     // --- Footer Logo ---

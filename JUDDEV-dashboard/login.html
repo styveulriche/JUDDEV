@@ -426,6 +426,19 @@
 <script>
   const API_URL = window.location.origin + '/api';
 
+  // Clear form when navigating back to this page (browser back button)
+  window.addEventListener('pageshow', function(e) {
+    if (e.persisted || (window.performance && window.performance.getEntriesByType('navigation')[0]?.type === 'back_forward')) {
+      document.getElementById('email').value = '';
+      document.getElementById('password').value = '';
+      document.getElementById('error-alert').classList.remove('show');
+      const btn = document.getElementById('login-btn');
+      btn.classList.remove('loading');
+      btn.disabled = false;
+      btn.innerHTML = '<div class="spinner"></div><span class="btn-text"><i class="fas fa-arrow-right-to-bracket"></i> Se Connecter</span>';
+    }
+  });
+
   // Check if already logged in
   (function checkAuth() {
     const token = localStorage.getItem('juddev_token');

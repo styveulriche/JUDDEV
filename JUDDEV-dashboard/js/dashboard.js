@@ -216,7 +216,7 @@ async function loadDashboardStats() {
         `).join('')}
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem">
         <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem">
           <h3 style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem">
             <i class="fas fa-bolt" style="color:var(--accent-blue)"></i> Actions Rapides
@@ -1168,6 +1168,42 @@ async function loadMessages() {
     const badge = document.getElementById('badge-messages');
     if (badge) badge.textContent = unread;
 
+    const unreadMsgs = allMessages.filter(m => !m.read);
+    const readMsgs = allMessages.filter(m => m.read);
+
+    function renderMessageCard(m) {
+      return `
+        <div id="msg-${m._id}" style="background:${m.read ? 'var(--bg-card)' : 'rgba(0,102,255,0.05)'};border:1px solid ${m.read ? 'var(--border-color)' : 'rgba(0,102,255,0.3)'};border-radius:0.75rem;padding:1.25rem;margin-bottom:0.75rem">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap">
+                <div style="width:38px;height:38px;background:var(--gradient-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.9rem;flex-shrink:0">${m.name ? m.name[0].toUpperCase() : '?'}</div>
+                <div>
+                  <div style="font-weight:600;color:var(--text-primary);font-size:0.9rem">${escapeHtml(m.name || 'Anonyme')}</div>
+                  <div style="font-size:0.78rem;color:var(--text-muted)">${escapeHtml(m.email || '')} ${m.phone ? '· ' + escapeHtml(m.phone) : ''}</div>
+                </div>
+                ${!m.read ? '<span style="background:var(--accent-blue);color:white;border-radius:999px;padding:0.1rem 0.5rem;font-size:0.68rem;font-weight:700">NOUVEAU</span>' : ''}
+              </div>
+              ${m.subject ? `<div style="font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.5rem">Sujet: ${escapeHtml(m.subject)}</div>` : ''}
+              <div style="font-size:0.85rem;color:var(--text-muted);line-height:1.8;background:rgba(0,0,0,0.2);border-radius:0.5rem;padding:0.75rem;word-break:break-word">${escapeHtml(m.message || '').replace(/\n/g, '<br>')}</div>
+              <div style="font-size:0.73rem;color:var(--text-dim);margin-top:0.5rem">${new Date(m.createdAt).toLocaleString('fr-FR')}</div>
+            </div>
+            <div style="display:flex;gap:0.5rem;flex-shrink:0">
+              ${!m.read ? `<button onclick="markMessageRead('${m._id}')" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#4ade80;border-radius:0.375rem;padding:0.4rem 0.7rem;cursor:pointer;font-size:0.78rem;font-family:inherit" title="Marquer comme lu">
+                <i class="fas fa-check"></i>
+              </button>` : ''}
+              <a href="mailto:${m.email}" style="background:rgba(0,102,255,0.1);border:1px solid rgba(0,102,255,0.2);color:var(--accent-light);border-radius:0.375rem;padding:0.4rem 0.7rem;cursor:pointer;font-size:0.78rem;text-decoration:none;display:inline-flex;align-items:center" title="Répondre par email">
+                <i class="fas fa-reply"></i>
+              </a>
+              <button onclick="deleteMessage('${m._id}')" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;border-radius:0.375rem;padding:0.4rem 0.7rem;cursor:pointer;font-size:0.78rem;font-family:inherit" title="Supprimer">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     section.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
         <h2 style="font-size:1.25rem;font-weight:700;color:var(--text-primary)">
@@ -1180,36 +1216,28 @@ async function loadMessages() {
             <i class="fas fa-inbox" style="font-size:2rem;margin-bottom:1rem;display:block"></i>
             Aucun message reçu pour l'instant.
            </div>`
-        : allMessages.map(m => `
-          <div id="msg-${m._id}" style="background:${m.read ? 'var(--bg-card)' : 'rgba(0,102,255,0.05)'};border:1px solid ${m.read ? 'var(--border-color)' : 'rgba(0,102,255,0.3)'};border-radius:0.75rem;padding:1.25rem;margin-bottom:0.75rem">
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap">
-              <div style="flex:1">
-                <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem">
-                  <div style="width:38px;height:38px;background:var(--gradient-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.9rem;flex-shrink:0">${m.name ? m.name[0].toUpperCase() : '?'}</div>
-                  <div>
-                    <div style="font-weight:600;color:var(--text-primary);font-size:0.9rem">${escapeHtml(m.name || 'Anonyme')}</div>
-                    <div style="font-size:0.78rem;color:var(--text-muted)">${escapeHtml(m.email || '')} ${m.phone ? '· ' + escapeHtml(m.phone) : ''}</div>
-                  </div>
-                  ${!m.read ? '<span style="background:var(--accent-blue);color:white;border-radius:999px;padding:0.1rem 0.5rem;font-size:0.68rem;font-weight:700">NOUVEAU</span>' : ''}
-                </div>
-                ${m.subject ? `<div style="font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.5rem">Sujet: ${escapeHtml(m.subject)}</div>` : ''}
-                <div style="font-size:0.85rem;color:var(--text-muted);line-height:1.8;background:rgba(0,0,0,0.2);border-radius:0.5rem;padding:0.75rem">${escapeHtml(m.message || '').replace(/\n/g, '<br>')}</div>
-                <div style="font-size:0.73rem;color:var(--text-dim);margin-top:0.5rem">${new Date(m.createdAt).toLocaleString('fr-FR')}</div>
-              </div>
-              <div style="display:flex;gap:0.5rem;flex-shrink:0">
-                ${!m.read ? `<button onclick="markMessageRead('${m._id}')" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#4ade80;border-radius:0.375rem;padding:0.4rem 0.7rem;cursor:pointer;font-size:0.78rem;font-family:inherit" title="Marquer comme lu">
-                  <i class="fas fa-check"></i>
-                </button>` : ''}
-                <a href="mailto:${m.email}" style="background:rgba(0,102,255,0.1);border:1px solid rgba(0,102,255,0.2);color:var(--accent-light);border-radius:0.375rem;padding:0.4rem 0.7rem;cursor:pointer;font-size:0.78rem;text-decoration:none;display:inline-flex;align-items:center" title="Répondre par email">
-                  <i class="fas fa-reply"></i>
-                </a>
-                <button onclick="deleteMessage('${m._id}')" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;border-radius:0.375rem;padding:0.4rem 0.7rem;cursor:pointer;font-size:0.78rem;font-family:inherit" title="Supprimer">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
+        : `
+          ${unreadMsgs.length > 0 ? `
+            <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem">
+              <div style="height:2px;flex:1;background:linear-gradient(to right,var(--accent-blue),transparent)"></div>
+              <span style="font-size:0.78rem;font-weight:700;color:var(--accent-blue);text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap">
+                <i class="fas fa-circle-dot" style="margin-right:0.35rem"></i>Non lus (${unreadMsgs.length})
+              </span>
+              <div style="height:2px;flex:1;background:linear-gradient(to left,var(--accent-blue),transparent)"></div>
             </div>
-          </div>
-        `).join('')}
+            ${unreadMsgs.map(renderMessageCard).join('')}
+          ` : ''}
+          ${readMsgs.length > 0 ? `
+            <div style="display:flex;align-items:center;gap:0.75rem;margin:${unreadMsgs.length > 0 ? '1.5rem' : '0'} 0 1rem">
+              <div style="height:1px;flex:1;background:var(--border-color)"></div>
+              <span style="font-size:0.78rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap">
+                <i class="fas fa-check-double" style="margin-right:0.35rem"></i>Lus (${readMsgs.length})
+              </span>
+              <div style="height:1px;flex:1;background:var(--border-color)"></div>
+            </div>
+            ${readMsgs.map(renderMessageCard).join('')}
+          ` : ''}
+        `}
     `;
   } catch (err) {
     section.innerHTML = `<p style="color:var(--text-muted)">Erreur: ${err.message}</p>`;
