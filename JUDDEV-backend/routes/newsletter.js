@@ -64,6 +64,7 @@ router.post('/subscribe', async (req, res) => {
     await Subscriber.create({ email: email.toLowerCase() });
     console.log('[Newsletter] Nouvel abonné créé:', email);
 
+    const welcomeSiteUrl = process.env.FRONTEND_URL || '';
     // Send welcome email
     await sendEmail(
       email,
@@ -71,6 +72,7 @@ router.post('/subscribe', async (req, res) => {
       `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0e1a;color:#e2e8f0;border-radius:12px;overflow:hidden">
         <div style="background:linear-gradient(135deg,#0066ff,#00d4ff);padding:2rem;text-align:center">
+          ${welcomeSiteUrl ? `<img src="${welcomeSiteUrl}/images/JUDDEVlogomenu.png" alt="JUDDEV" style="height:52px;margin-bottom:0.75rem;object-fit:contain;display:block;margin-left:auto;margin-right:auto" />` : ''}
           <h1 style="color:#fff;margin:0;font-size:1.5rem">JUDDEV CORPORATION</h1>
           <p style="color:rgba(255,255,255,0.85);margin:0.5rem 0 0">Votre partenaire technologique d'excellence</p>
         </div>
@@ -131,6 +133,7 @@ async function notifySubscribers(article) {
       `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0e1a;color:#e2e8f0;border-radius:12px;overflow:hidden">
         <div style="background:linear-gradient(135deg,#0066ff,#00d4ff);padding:2rem;text-align:center">
+          ${siteUrl ? `<img src="${siteUrl}/images/JUDDEVlogomenu.png" alt="JUDDEV" style="height:52px;margin-bottom:0.75rem;object-fit:contain;display:block;margin-left:auto;margin-right:auto" />` : ''}
           <h1 style="color:#fff;margin:0;font-size:1.5rem">JUDDEV CORPORATION</h1>
           <p style="color:rgba(255,255,255,0.85);margin:0.5rem 0 0">Nouvel article publié</p>
         </div>

@@ -1,7 +1,7 @@
 const express = require('express');
 const Team = require('../models/Team');
 const auth = require('../middleware/auth');
-const { uploadImage } = require('../middleware/upload');
+const { uploadImage, uploadToCloudinary } = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -28,7 +28,11 @@ router.post('/', auth, uploadImage.single('photo'), async (req, res) => {
       twitter: req.body.twitter || '#',
       behance: req.body.behance || ''
     };
-    const photo = req.file ? `/uploads/images/${req.file.filename}` : (req.body.photo || '');
+    let photo = req.body.photo || '';
+    if (req.file) {
+      const url = await uploadToCloudinary(req.file, 'juddev/team');
+      if (url) photo = url;
+    }
     const words = (name || '').split(' ').filter(Boolean);
     const initials = req.body.initials || words.map(w => w[0]).join('').substring(0, 2).toUpperCase();
     const id = `member-${Date.now()}`;
@@ -54,8 +58,12 @@ router.put('/:id', auth, uploadImage.single('photo'), async (req, res) => {
       behance: req.body.behance || ''
     };
     const updateData = { name, role, initials, tags, socials, order: parseInt(order) || 0 };
-    if (req.file) updateData.photo = `/uploads/images/${req.file.filename}`;
-    else if (req.body.photo !== undefined) updateData.photo = req.body.photo;
+    if (req.file) {
+      const url = await uploadToCloudinary(req.file, 'juddev/team');
+      if (url) updateData.photo = url;
+    } else if (req.body.photo !== undefined) {
+      updateData.photo = req.body.photo;
+    }
     const member = await Team.findOneAndUpdate({ id: req.params.id }, updateData, { new: true });
     if (!member) return res.status(404).json({ message: 'Membre non trouvé.' });
     res.json(member);

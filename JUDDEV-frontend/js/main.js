@@ -619,7 +619,7 @@ async function loadRealisationDetail() {
               <p>${project.longDesc}</p>
 
               <h3>Points forts</h3>
-              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin:1rem 0">
+              <div class="highlights-grid">
                 ${project.highlights.map(h => `
                   <div class="highlight-card">
                     <div class="highlight-icon"><i class="fas fa-star"></i></div>
@@ -791,7 +791,7 @@ async function loadArticleDetail() {
               <h3 style="font-size:1.25rem;font-weight:700;color:var(--text-primary);margin-bottom:1.5rem">💬 Commentaires</h3>
               <div id="comments-list" style="margin-bottom:2rem"></div>
               <form id="comment-form">
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+                <div class="comment-form-fields">
                   <input id="comment-name" class="form-input" placeholder="Votre nom *" required />
                   <input id="comment-email" class="form-input" type="email" placeholder="Votre email (optionnel)" />
                 </div>

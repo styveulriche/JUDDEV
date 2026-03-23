@@ -114,7 +114,11 @@ router.post('/message', async (req, res) => {
           sender: { name: 'JUDDEV Site', email: senderEmail },
           to: [{ email: adminEmail }],
           subject: `Nouveau message: ${subject || 'Contact Site'}`,
-          htmlContent: `<h2>Nouveau message de ${name}</h2><p><strong>Email:</strong> ${email}</p><p><strong>Téléphone:</strong> ${phone || 'N/A'}</p><p><strong>Sujet:</strong> ${subject || 'N/A'}</p><p><strong>Message:</strong></p><p style="white-space:pre-wrap">${message}</p>`
+          htmlContent: (() => {
+            const siteUrl = process.env.FRONTEND_URL || '';
+            const logoHtml = siteUrl ? `<img src="${siteUrl}/images/JUDDEVlogomenu.png" alt="JUDDEV" style="height:48px;margin-bottom:0.75rem;object-fit:contain;display:block;margin-left:auto;margin-right:auto" />` : '';
+            return `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0e1a;color:#e2e8f0;border-radius:12px;overflow:hidden"><div style="background:linear-gradient(135deg,#0066ff,#00d4ff);padding:2rem;text-align:center">${logoHtml}<h1 style="color:#fff;margin:0;font-size:1.4rem">JUDDEV CORPORATION</h1><p style="color:rgba(255,255,255,0.85);margin:0.5rem 0 0">Nouveau message de contact</p></div><div style="padding:2rem"><h2 style="color:#fff;margin-top:0">Message de ${name}</h2><p><strong style="color:#94a3b8">Email:</strong> <span style="color:#e2e8f0">${email}</span></p><p><strong style="color:#94a3b8">Téléphone:</strong> <span style="color:#e2e8f0">${phone || 'N/A'}</span></p><p><strong style="color:#94a3b8">Sujet:</strong> <span style="color:#e2e8f0">${subject || 'N/A'}</span></p><p><strong style="color:#94a3b8">Message:</strong></p><p style="white-space:pre-wrap;color:#e2e8f0;background:rgba(255,255,255,0.05);padding:1rem;border-radius:8px;border-left:3px solid #0066ff">${message}</p></div><div style="padding:1rem 2rem;background:rgba(0,0,0,0.2);text-align:center"><p style="color:#64748b;font-size:0.8rem;margin:0">© 2025 JUDDEV CORPORATION — Yaoundé, Cameroun</p></div></div>`;
+          })()
         })
       }).then(r => {
         if (r.ok) console.log('[Contact] Email admin envoyé via Brevo');
