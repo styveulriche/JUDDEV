@@ -44,8 +44,15 @@ exports.uploadMixed = multer({
   limits: { fileSize: 50 * 1024 * 1024 }
 });
 
-// Upload un buffer vers Cloudinary — retourne l'URL sécurisée
+// Upload un buffer vers Cloudinary — retourne l'URL sécurisée ou '' si non configuré
 exports.uploadToCloudinary = (file, folder = 'juddev') => {
+  // Si les credentials Cloudinary ne sont pas configurés, skip immédiatement (pas de timeout)
+  if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    console.log('[Cloudinary] Credentials non configurés — upload ignoré');
+    return Promise.resolve('');
+  }
+  if (!file || !file.buffer) return Promise.resolve('');
+
   return new Promise((resolve, reject) => {
     const resourceType = file.mimetype === 'application/pdf' ? 'raw' : 'image';
     const stream = cloudinary.uploader.upload_stream(

@@ -7,12 +7,8 @@ const router = express.Router();
 
 async function safeUpload(file, folder) {
   if (!file) return '';
-  try {
-    return await uploadToCloudinary(file, folder);
-  } catch (e) {
-    console.error('[Cloudinary] Upload échoué:', e.message);
-    return '';
-  }
+  try { return await uploadToCloudinary(file, folder); }
+  catch (e) { console.error('[Cloudinary]', e.message); return ''; }
 }
 
 function slugify(str) {

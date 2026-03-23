@@ -6,15 +6,10 @@ const { notifySubscribers } = require('./newsletter');
 
 const router = express.Router();
 
-// Upload vers Cloudinary sans bloquer si les credentials manquent
 async function safeUpload(file, folder) {
   if (!file) return '';
-  try {
-    return await uploadToCloudinary(file, folder);
-  } catch (e) {
-    console.error('[Cloudinary] Upload échoué:', e.message);
-    return '';
-  }
+  try { return await uploadToCloudinary(file, folder); }
+  catch (e) { console.error('[Cloudinary]', e.message); return ''; }
 }
 
 // GET /api/articles
@@ -108,7 +103,8 @@ router.post('/from-pdf', auth, uploadMixed.fields([
     let content = '';
     let pdfFilename = '';
     try {
-      const pdfParse = require('pdf-parse');
+      // Importer directement la lib (évite l'erreur de fichier test sur Render)
+      const pdfParse = require('pdf-parse/lib/pdf-parse.js');
       const dataBuffer = pdfFile.buffer;
       const pdfData = await pdfParse(dataBuffer);
 
