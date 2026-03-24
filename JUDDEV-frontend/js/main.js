@@ -914,14 +914,12 @@ async function loadArticleDetail() {
   }
 }
 
-function renderComments(comments) {
-  const list = document.getElementById('comments-list');
-  if (!list) return;
-  if (!comments || !comments.length) {
-    list.innerHTML = '<p style="color:var(--text-muted);font-size:0.875rem">Aucun commentaire pour l\'instant. Soyez le premier !</p>';
-    return;
-  }
-  list.innerHTML = comments.map(c => `
+const COMMENTS_PER_PAGE = 3;
+let _allComments = [];
+let _visibleComments = 0;
+
+function renderCommentItem(c) {
+  return `
     <div style="padding:1rem;background:var(--bg-secondary);border-radius:var(--radius-lg);margin-bottom:1rem;border:1px solid var(--border-color)">
       <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem">
         <div style="width:2rem;height:2rem;border-radius:50%;background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.75rem;color:#fff;flex-shrink:0">${(c.name||'?')[0].toUpperCase()}</div>
@@ -932,7 +930,37 @@ function renderComments(comments) {
       </div>
       <p style="color:var(--text-secondary);font-size:0.875rem;line-height:1.6;white-space:pre-wrap;margin:0">${escapeHtml(c.text)}</p>
     </div>
-  `).join('');
+  `;
+}
+
+function renderCommentsVisible() {
+  const list = document.getElementById('comments-list');
+  if (!list) return;
+  const items = _allComments.slice(0, _visibleComments);
+  const remaining = _allComments.length - _visibleComments;
+  const nextBatch = Math.min(remaining, COMMENTS_PER_PAGE);
+  list.innerHTML = items.map(renderCommentItem).join('') + (remaining > 0 ? `
+    <button id="comments-load-more" onclick="loadMoreComments()" style="display:flex;align-items:center;gap:0.5rem;margin:0.5rem auto 0;padding:0.65rem 1.4rem;background:transparent;border:1px solid var(--border-color);border-radius:var(--radius-xl);color:var(--text-secondary);font-size:0.875rem;cursor:pointer;transition:all 0.2s">
+      <i class="fas fa-chevron-down"></i> Voir ${nextBatch} commentaire${nextBatch > 1 ? 's' : ''} de plus <span style="opacity:0.55;font-size:0.8rem">(${remaining} restant${remaining > 1 ? 's' : ''})</span>
+    </button>
+  ` : '');
+}
+
+function loadMoreComments() {
+  _visibleComments = Math.min(_visibleComments + COMMENTS_PER_PAGE, _allComments.length);
+  renderCommentsVisible();
+}
+
+function renderComments(comments) {
+  const list = document.getElementById('comments-list');
+  if (!list) return;
+  if (!comments || !comments.length) {
+    list.innerHTML = '<p style="color:var(--text-muted);font-size:0.875rem">Aucun commentaire pour l\'instant. Soyez le premier !</p>';
+    return;
+  }
+  _allComments = comments;
+  _visibleComments = COMMENTS_PER_PAGE;
+  renderCommentsVisible();
 }
 
 function escapeHtml(str) {
