@@ -25,7 +25,7 @@ const JUDDEV_DATA_DEFAULT = {
         'Tests et assurance qualité',
         'Maintenance et évolutions'
       ],
-      technologies: ['React', 'Vue.js', 'Next.js', 'Node.js', 'PHP', 'Laravel', 'WordPress', 'PostgreSQL'],
+      technologies: ['React', 'Vue.js', 'Next.js', 'Node.js', 'Python', 'Java', 'WordPress', 'PostgreSQL'],
       category: 'web'
     },
     {
@@ -69,7 +69,7 @@ const JUDDEV_DATA_DEFAULT = {
         'Monitoring et alerting en temps réel',
         'RGPD et conformité sécurité'
       ],
-      technologies: ['Vue.js', 'React', 'Node.js', 'Laravel', 'PostgreSQL', 'Redis', 'Docker', 'Kubernetes'],
+      technologies: ['Vue.js', 'React', 'Node.js', 'Spring Boot', 'PostgreSQL', 'Redis', 'Docker', 'Kubernetes'],
       category: 'cloud'
     },
     {
@@ -271,7 +271,7 @@ const JUDDEV_DATA_DEFAULT = {
       longDesc: 'CorpRH nous a mandatés pour développer une plateforme SaaS RH complète destinée aux PME africaines. La solution couvre l\'ensemble du cycle de vie employé : recrutement, onboarding, gestion de la paie, suivi des congés, évaluations de performance et reporting RH. L\'architecture multi-tenant permet à des centaines d\'entreprises d\'utiliser la plateforme en toute isolation des données. Les tableaux de bord interactifs offrent des insights précieux sur la masse salariale et les performances. La plateforme gère aujourd\'hui plus de 200 entreprises clientes et 15,000 employés actifs.',
       client: 'CorpRH',
       year: '2024',
-      technologies: ['Vue.js', 'Laravel', 'MySQL', 'Redis', 'AWS S3', 'Stripe'],
+      technologies: ['Vue.js', 'Node.js', 'MySQL', 'Redis', 'AWS S3', 'Stripe'],
       url: '#',
       highlights: ['200+ entreprises clientes', 'Multi-tenant sécurisé', 'Paie automatisée', 'Rapports avancés']
     },

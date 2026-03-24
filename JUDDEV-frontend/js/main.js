@@ -755,7 +755,90 @@ async function loadArticleDetail() {
   if (heroBg) heroBg.src = article.image;
 
   const recent = JUDDEV_DATA.articles.filter(a => a.id !== id).slice(0, 4);
-  const related = JUDDEV_DATA.articles.filter(a => a.id !== id).slice(0, 3);
+
+  // Articles connexes : même catégorie ou tags communs (priorité catégorie)
+  const articleTags = new Set(article.tags || []);
+  const connexes = JUDDEV_DATA.articles
+    .filter(a => a.id !== id)
+    .map(a => {
+      let score = 0;
+      if (a.category === article.category) score += 3;
+      (a.tags || []).forEach(t => { if (articleTags.has(t)) score += 1; });
+      return { ...a, _score: score };
+    })
+    .filter(a => a._score > 0)
+    .sort((a, b) => b._score - a._score)
+    .slice(0, 3);
+
+  // Autres articles : ceux qui ne sont pas connexes
+  const connexesIds = new Set(connexes.map(a => a.id));
+  const autresArticles = JUDDEV_DATA.articles
+    .filter(a => a.id !== id && !connexesIds.has(a.id))
+    .slice(0, 3);
+
+  // Pagination pour longs articles (split sur <!-- page-break --> ou auto à 4000 chars)
+  function buildArticlePages(content) {
+    const manualPages = content.split(/<!--\s*page-break\s*-->/i);
+    if (manualPages.length > 1) return manualPages;
+    // Auto-split: couper à la limite de 4000 chars sur une balise de fermeture
+    const LIMIT = 4000;
+    if (content.length <= LIMIT) return [content];
+    const pages = [];
+    let remaining = content;
+    while (remaining.length > LIMIT) {
+      let cut = remaining.lastIndexOf('</p>', LIMIT);
+      if (cut < 0) cut = remaining.lastIndexOf('</h2>', LIMIT);
+      if (cut < 0) cut = remaining.lastIndexOf('</h3>', LIMIT);
+      if (cut < 0) cut = LIMIT;
+      else cut += cut === remaining.lastIndexOf('</p>', LIMIT) ? 4 :
+                  cut === remaining.lastIndexOf('</h2>', LIMIT) ? 5 : 5;
+      pages.push(remaining.slice(0, cut));
+      remaining = remaining.slice(cut);
+    }
+    if (remaining.trim()) pages.push(remaining);
+    return pages;
+  }
+
+  const articlePages = buildArticlePages(article.content || '');
+  const isMultiPage = articlePages.length > 1;
+  let currentPage = 0;
+
+  function renderPage(idx) {
+    const pg = document.getElementById('article-page-content');
+    const pgCounter = document.getElementById('article-page-counter');
+    const btnPrev = document.getElementById('article-page-prev');
+    const btnNext = document.getElementById('article-page-next');
+    const pgNav = document.getElementById('article-page-nav');
+    if (!pg) return;
+    pg.innerHTML = articlePages[idx];
+    if (pgCounter) pgCounter.textContent = `Page ${idx + 1} / ${articlePages.length}`;
+    if (btnPrev) btnPrev.disabled = idx === 0;
+    if (btnNext) btnNext.disabled = idx === articlePages.length - 1;
+    if (pgNav) pgNav.style.display = isMultiPage ? 'flex' : 'none';
+    currentPage = idx;
+    pg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  window._articleChangePage = function(delta) {
+    renderPage(currentPage + delta);
+  };
+
+  function blogCardHtml(a, i) {
+    return `
+      <a href="article-detail.html?id=${a.id}" class="blog-card reveal stagger-${i + 1}" style="text-decoration:none">
+        <div class="blog-card-img">
+          <img src="${a.image}" alt="${a.title}" onerror="this.style.background='var(--bg-secondary)'" />
+        </div>
+        <div class="blog-card-body">
+          <div class="blog-card-meta">
+            <span class="blog-card-category">${a.category}</span>
+            <span class="blog-card-date">${formatDate(a.date)}</span>
+          </div>
+          <h3 class="blog-card-title">${a.title}</h3>
+          <p class="blog-card-excerpt">${a.shortDesc}</p>
+        </div>
+      </a>`;
+  }
 
   container.innerHTML = `
     <section class="section">
@@ -778,11 +861,25 @@ async function loadArticleDetail() {
                 </div>
               </div>
               <img src="${article.image}" alt="${article.title}" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:var(--radius-lg);margin-bottom:2rem" onerror="this.style.display='none'" />
-              ${article.content}
+
+              <!-- Article content with pagination -->
+              <div id="article-page-content">${articlePages[0]}</div>
+
+              <!-- Page navigation (shown only for multi-page articles) -->
+              <div id="article-page-nav" style="display:${isMultiPage ? 'flex' : 'none'};align-items:center;justify-content:center;gap:1rem;margin:2rem 0;padding:1.25rem;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-xl)">
+                <button id="article-page-prev" onclick="_articleChangePage(-1)" class="btn btn-outline btn-sm" ${currentPage === 0 ? 'disabled' : ''} style="min-width:100px">
+                  <i class="fas fa-chevron-left"></i> Précédent
+                </button>
+                <span id="article-page-counter" style="color:var(--text-muted);font-size:0.875rem;font-weight:600">Page 1 / ${articlePages.length}</span>
+                <button id="article-page-next" onclick="_articleChangePage(1)" class="btn btn-primary btn-sm" ${articlePages.length <= 1 ? 'disabled' : ''} style="min-width:100px">
+                  Suivant <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+
               <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border-color)">
                 <strong style="font-size:0.875rem;color:var(--text-secondary)">Tags :</strong>
                 <div class="tags-cloud" style="margin-top:0.75rem">
-                  ${article.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+                  ${(article.tags || []).map(t => `<a href="blog.html?tag=${encodeURIComponent(t)}" class="tag" style="text-decoration:none">${t}</a>`).join('')}
                 </div>
               </div>
             </div>
@@ -822,7 +919,7 @@ async function loadArticleDetail() {
               <div style="display:flex;flex-direction:column;gap:0.5rem">
                 ${[...new Set(JUDDEV_DATA.articles.map(a => a.category))].map(cat => `
                   <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.04)">
-                    <span style="color:var(--text-muted);font-size:0.875rem">${cat}</span>
+                    <a href="blog.html?cat=${encodeURIComponent(cat)}" style="color:var(--text-muted);font-size:0.875rem;text-decoration:none">${cat}</a>
                     <span style="background:rgba(0,102,255,0.1);border:1px solid rgba(0,102,255,0.2);border-radius:20px;padding:0.15rem 0.6rem;font-size:0.75rem;color:var(--accent-light)">${JUDDEV_DATA.articles.filter(a => a.category === cat).length}</span>
                   </div>
                 `).join('')}
@@ -832,7 +929,7 @@ async function loadArticleDetail() {
             <div class="sidebar-widget reveal stagger-4">
               <h3 class="sidebar-widget-title">Tags</h3>
               <div class="tags-cloud">
-                ${[...new Set(JUDDEV_DATA.articles.flatMap(a => a.tags))].map(t => `<a href="#" class="tag">${t}</a>`).join('')}
+                ${[...new Set(JUDDEV_DATA.articles.flatMap(a => a.tags || []))].map(t => `<a href="blog.html?tag=${encodeURIComponent(t)}" class="tag" style="text-decoration:none">${t}</a>`).join('')}
               </div>
             </div>
 
@@ -846,30 +943,36 @@ async function loadArticleDetail() {
       </div>
     </section>
 
+    ${connexes.length > 0 ? `
     <section class="section" style="background:var(--bg-secondary);border-top:1px solid var(--border-color)">
       <div class="container">
-        <div class="section-header reveal-left">
+        <div class="section-header reveal-left" style="margin-bottom:2rem">
+          <span class="section-badge" style="background:rgba(0,102,255,0.1);border-color:rgba(0,102,255,0.3)"><i class="fas fa-link" style="margin-right:0.4rem"></i>DANS LA MÊME THÉMATIQUE</span>
           <h2 class="section-title">Articles <span>Connexes</span></h2>
+          <p class="section-subtitle" style="font-size:0.95rem">Ces articles traitent des mêmes sujets que l'article que vous venez de lire.</p>
         </div>
         <div class="grid-3">
-          ${related.map((a, i) => `
-            <a href="article-detail.html?id=${a.id}" class="blog-card reveal stagger-${i + 1}" style="text-decoration:none">
-              <div class="blog-card-img">
-                <img src="${a.image}" alt="${a.title}" onerror="this.style.background='var(--bg-secondary)'" />
-              </div>
-              <div class="blog-card-body">
-                <div class="blog-card-meta">
-                  <span class="blog-card-category">${a.category}</span>
-                  <span class="blog-card-date">${formatDate(a.date)}</span>
-                </div>
-                <h3 class="blog-card-title">${a.title}</h3>
-                <p class="blog-card-excerpt">${a.shortDesc}</p>
-              </div>
-            </a>
-          `).join('')}
+          ${connexes.map((a, i) => blogCardHtml(a, i)).join('')}
         </div>
       </div>
-    </section>
+    </section>` : ''}
+
+    ${autresArticles.length > 0 ? `
+    <section class="section" style="border-top:1px solid var(--border-color)">
+      <div class="container">
+        <div class="section-header reveal-left" style="margin-bottom:2rem">
+          <span class="section-badge" style="background:rgba(0,212,255,0.08);border-color:rgba(0,212,255,0.25)"><i class="fas fa-newspaper" style="margin-right:0.4rem"></i>EXPLOREZ AUSSI</span>
+          <h2 class="section-title">Autres <span>Articles</span></h2>
+          <p class="section-subtitle" style="font-size:0.95rem">D'autres sujets qui pourraient vous intéresser.</p>
+        </div>
+        <div class="grid-3">
+          ${autresArticles.map((a, i) => blogCardHtml(a, i)).join('')}
+        </div>
+        <div style="text-align:center;margin-top:2.5rem">
+          <a href="blog.html" class="btn btn-outline"><i class="fas fa-th-large"></i> Voir tous les articles</a>
+        </div>
+      </div>
+    </section>` : ''}
   `;
 
   // Contenu chargé async — forcer visible directement (pas d'IntersectionObserver)
@@ -1085,10 +1188,22 @@ document.querySelectorAll('.counter').forEach(el => {
       }
     }
 
+    // --- Logo helpers ---
+    function getLogoSrc() {
+      const t = localStorage.getItem('juddev_theme') || 'dark';
+      return t === 'light' ? 'images/logo-modeClair.png' : 'images/logo-modeSombre.png';
+    }
+    function updateAllLogos() {
+      const src = getLogoSrc();
+      const nav = document.getElementById('navbar-logo-img');
+      const foot = document.getElementById('footer-logo-img');
+      if (nav) nav.src = src;
+      if (foot) foot.src = src;
+    }
+
     // --- Navbar Logo Image ---
     const navbarLogoEl = document.querySelector('.navbar-logo');
     if (navbarLogoEl && !navbarLogoEl.querySelector('.navbar-logo-img')) {
-      // Wrap existing text content in .navbar-logo-text for vertical stacking
       if (!navbarLogoEl.querySelector('.navbar-logo-text')) {
         const textWrapper = document.createElement('div');
         textWrapper.className = 'navbar-logo-text';
@@ -1098,8 +1213,9 @@ document.querySelectorAll('.counter').forEach(el => {
         navbarLogoEl.appendChild(textWrapper);
       }
       const logoImg = document.createElement('img');
-      logoImg.src = 'images/JUDDEVlogomenu.png';
+      logoImg.src = getLogoSrc();
       logoImg.className = 'navbar-logo-img';
+      logoImg.id = 'navbar-logo-img';
       logoImg.alt = 'JUDDEV';
       logoImg.onerror = function() { this.style.display = 'none'; };
       navbarLogoEl.prepend(logoImg);
@@ -1107,10 +1223,11 @@ document.querySelectorAll('.counter').forEach(el => {
 
     // --- Footer Logo ---
     const footerLogoLink = document.querySelector('footer .footer-logo');
-    if (footerLogoLink && !footerLogoLink.previousElementSibling?.classList.contains('footer-logo-img')) {
+    if (footerLogoLink && !document.getElementById('footer-logo-img')) {
       const img = document.createElement('img');
-      img.src = 'images/JUDDEV.jpg';
+      img.src = getLogoSrc();
       img.className = 'footer-logo-img';
+      img.id = 'footer-logo-img';
       img.alt = 'JUDDEV CORPORATION Logo';
       img.loading = 'lazy';
       img.onerror = function() { this.style.display = 'none'; };
@@ -1152,6 +1269,8 @@ document.querySelectorAll('.counter').forEach(el => {
       const title = next === 'light' ? 'Mode sombre' : 'Mode clair';
       if (t1) t1.title = title;
       if (t2) t2.title = title;
+      // Update logo images
+      updateAllLogos();
     }
 
     const themeBtn = document.getElementById('theme-toggle');

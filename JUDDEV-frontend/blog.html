@@ -356,8 +356,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const carousel = document.getElementById('blog-carousel');
   if (carousel) initCarousel(carousel);
 
-  // Initial articles render
+  // Read URL params: ?tag=xxx or ?cat=xxx
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlTag = urlParams.get('tag');
+  const urlCat = urlParams.get('cat');
+
+  // Initial articles render (apply URL filter if present)
   filteredArticles = JUDDEV_DATA.articles;
+  if (urlTag) {
+    filteredArticles = JUDDEV_DATA.articles.filter(a => (a.tags || []).map(t => t.toLowerCase()).includes(urlTag.toLowerCase()));
+    if (blogActiveLabel) blogActiveLabel.textContent = `#${urlTag}`;
+    const toggleBtn = document.getElementById('blog-filter-toggle');
+    if (toggleBtn) toggleBtn.classList.add('has-active');
+    // Show a tag filter notice
+    const wrapper = document.querySelector('.filter-dropdown-wrapper');
+    if (wrapper) {
+      const notice = document.createElement('div');
+      notice.id = 'tag-filter-notice';
+      notice.style.cssText = 'display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;padding:0.75rem 1rem;background:rgba(0,102,255,0.08);border:1px solid rgba(0,102,255,0.25);border-radius:var(--radius-lg);font-size:0.875rem;color:var(--text-muted)';
+      notice.innerHTML = `<i class="fas fa-tag" style="color:var(--accent-light)"></i> Articles avec le tag : <strong style="color:var(--text-primary)">#${urlTag}</strong> <a href="blog.html" style="margin-left:auto;color:var(--text-dim);font-size:0.8rem"><i class="fas fa-times"></i> Effacer</a>`;
+      wrapper.parentNode.insertBefore(notice, wrapper);
+    }
+  } else if (urlCat) {
+    filteredArticles = JUDDEV_DATA.articles.filter(a => a.category && a.category.toLowerCase() === urlCat.toLowerCase());
+    if (blogActiveLabel) blogActiveLabel.textContent = urlCat;
+    // Activate matching filter btn if exists
+    document.querySelectorAll('#blog-filters .filter-btn').forEach(b => {
+      if (b.dataset.filter && b.dataset.filter.toLowerCase() === urlCat.toLowerCase()) {
+        document.querySelectorAll('#blog-filters .filter-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+      }
+    });
+  }
   renderArticlesPage(1);
 
   // Newsletter form

@@ -99,31 +99,78 @@ router.post('/from-pdf', auth, uploadMixed.fields([
 
     const pdfFile = req.files.pdfFile[0];
 
-    // Extract text from PDF
+    // Extract text from PDF with formatting detection
     let content = '';
     let pdfFilename = '';
     try {
-      // Importer directement la lib (évite l'erreur de fichier test sur Render)
       const pdfParse = require('pdf-parse/lib/pdf-parse.js');
       const dataBuffer = pdfFile.buffer;
       const pdfData = await pdfParse(dataBuffer);
 
-      // Convert plain text to HTML paragraphs
       const rawText = pdfData.text || '';
-      const paragraphs = rawText
-        .split(/\n\n+/)
-        .map(p => p.trim())
-        .filter(p => p.length > 10);
-
       const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      content = paragraphs.map(p => {
-        // Detect headings (short lines, all caps, or ending with colon)
-        const lines = p.split('\n').map(l => l.trim()).filter(Boolean);
-        if (lines.length === 1 && (p.length < 80 || p === p.toUpperCase() || p.endsWith(':'))) {
-          return `<h2>${esc(p)}</h2>`;
+
+      // Split into lines and group them smartly
+      const lines = rawText.split('\n');
+      const blocks = [];
+      let currentBlock = [];
+
+      for (const raw of lines) {
+        const line = raw.trimEnd();
+        if (line.trim() === '') {
+          if (currentBlock.length) { blocks.push(currentBlock); currentBlock = []; }
+        } else {
+          currentBlock.push(line);
         }
-        return `<p>${lines.map(esc).join(' ')}</p>`;
-      }).join('\n');
+      }
+      if (currentBlock.length) blocks.push(currentBlock);
+
+      const htmlParts = [];
+      for (const block of blocks) {
+        const text = block.join(' ').trim();
+        if (!text || text.length < 3) continue;
+
+        // H1: very short, all-caps, no punctuation mid-text
+        if (block.length === 1 && text.length < 60 && text === text.toUpperCase() && /^[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ0-9\s\-:&'«»()]+$/u.test(text)) {
+          htmlParts.push(`<h2>${esc(text)}</h2>`);
+          continue;
+        }
+
+        // H2: short single line that looks like a heading (title-case, ends with colon, or numbered)
+        if (block.length === 1 && text.length < 100 && (
+          text.endsWith(':') ||
+          /^\d+[\.\)]\s/.test(text) ||
+          /^[IVX]+\.\s/.test(text) ||
+          (/^[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ]/.test(text) && text.length < 60 && !/[.!?]$/.test(text))
+        )) {
+          htmlParts.push(`<h3>${esc(text)}</h3>`);
+          continue;
+        }
+
+        // List items: lines starting with bullet-like chars
+        const listLines = block.filter(l => /^[\-\•\*\–\—✓✔▶►]\s/.test(l.trim()) || /^\d+[\.\)]\s/.test(l.trim()));
+        if (listLines.length > 0 && listLines.length >= block.length * 0.6) {
+          const items = block.map(l => {
+            const stripped = l.trim().replace(/^[\-\•\*\–\—✓✔▶►]\s+/, '').replace(/^\d+[\.\)]\s+/, '');
+            return `<li>${esc(stripped)}</li>`;
+          }).join('');
+          htmlParts.push(`<ul style="padding-left:1.5rem;margin:0.75rem 0">${items}</ul>`);
+          continue;
+        }
+
+        // Bold detection: lines that are short and at start of block (likely bold lead-in)
+        const paraLines = block.map((l, i) => {
+          const trimmed = l.trim();
+          // First line short and followed by more content → likely bold
+          if (i === 0 && block.length > 1 && trimmed.length < 80 && !trimmed.endsWith(',')) {
+            return `<strong>${esc(trimmed)}</strong>`;
+          }
+          return esc(trimmed);
+        });
+        htmlParts.push(`<p>${paraLines.join(' ')}</p>`);
+      }
+
+      content = htmlParts.join('\n') || '<p>Contenu non disponible.</p>';
 
     } catch (pdfErr) {
       console.error('PDF parse error:', pdfErr);

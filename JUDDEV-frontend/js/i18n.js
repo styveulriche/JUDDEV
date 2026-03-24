@@ -85,6 +85,12 @@ const JUDDEV_TRANSLATIONS = {
     'about.mission.title': 'Notre <span>Mission</span>',
     'about.team.badge': 'LES ARTISANS DE VOTRE SUCCÈS',
     'about.team.title': 'Notre <span>Équipe d\'Experts</span>',
+    'about.values.badge': 'CE QUI NOUS GUIDE',
+    'about.values.title': 'Nos <span>Valeurs</span>',
+    'about.stats.badge': 'JUDDEV EN CHIFFRES',
+    'about.stats.title': 'Notre <span>Impact</span>',
+    'about.cta.title': 'Prêt à construire quelque chose <span>d\'extraordinaire</span> ?',
+    'about.cta.subtitle': 'Rejoignez les entreprises qui nous font confiance pour transformer leur présence digitale.',
 
     // SERVICES PAGE
     'services.hero.badge': 'NOS EXPERTISES',
@@ -92,26 +98,51 @@ const JUDDEV_TRANSLATIONS = {
     'services.hero.subtitle': 'De la stratégie digitale au déploiement technique, nous couvrons l\'intégralité de vos besoins avec une expertise reconnue.',
     'services.process.badge': 'COMMENT NOUS TRAVAILLONS',
     'services.process.title': 'Notre <span>Processus</span> de Travail',
+    'services.cta.title': 'Besoin d\'un service <span>sur mesure</span> ?',
+    'services.cta.subtitle': 'Discutons de vos besoins et construisons ensemble la solution idéale.',
 
     // CONTACT PAGE
     'contact.hero.badge': 'PARLONS DE VOTRE PROJET',
     'contact.hero.title': 'Contactez <span>JUDDEV CORPORATION</span>',
     'contact.hero.subtitle': 'Une question, un projet, ou simplement envie d\'en savoir plus ? Notre équipe est disponible pour vous accompagner.',
+    'contact.info.badge': 'INFORMATIONS DE CONTACT',
+    'contact.info.title': 'Nous sommes <span>là pour vous</span>',
+    'contact.info.desc': 'Que vous ayez une question sur nos services, un projet en tête ou simplement envie de discuter, n\'hésitez pas à nous contacter. Nous répondons généralement dans les 24 heures.',
+    'contact.social.badge': 'RÉSEAUX SOCIAUX',
+    'contact.social.title': 'Suivez-nous sur les <span>réseaux</span>',
+    'contact.social.subtitle': 'Restez connectés et suivez notre actualité sur les plateformes sociales.',
+    'contact.faq.badge': 'FAQ',
+    'contact.faq.title': 'Questions <span>Fréquentes</span>',
     'contact.form.title': 'Envoyez-nous un message',
+    'contact.form.desc': 'Nous vous répondrons dans les plus brefs délais.',
+    'contact.form.firstname': 'Prénom *',
+    'contact.form.lastname': 'Nom *',
     'contact.form.name': 'Nom complet *',
     'contact.form.email': 'Email *',
     'contact.form.phone': 'Téléphone',
-    'contact.form.subject': 'Sujet',
+    'contact.form.subject': 'Sujet *',
+    'contact.form.subject.placeholder': 'Choisissez un sujet',
     'contact.form.message': 'Message *',
-    'contact.form.privacy': 'J\'accepte la politique de confidentialité',
-    'contact.form.submit': 'Envoyer le Message',
+    'contact.form.message.placeholder': 'Décrivez votre demande ou projet...',
+    'contact.form.privacy': 'J\'accepte la politique de confidentialité et que mes données soient utilisées pour répondre à ma demande.',
+    'contact.form.submit': 'Envoyer le message',
 
     // BLOG PAGE
     'blog.hero.badge': 'NOTRE BLOG',
     'blog.hero.title': 'Actualités & <span>Insights</span>',
     'blog.hero.subtitle': 'Explorez nos articles sur les dernières tendances du numérique, bonnes pratiques et actualités du secteur tech.',
+    'blog.section.badge': 'INSIGHTS & EXPERTISES',
+    'blog.section.title': 'Tous nos <span>Articles</span>',
+    'blog.section.subtitle': 'Restez à la pointe de l\'innovation avec nos publications expertes.',
+    'blog.newsletter.badge': 'NEWSLETTER',
+    'blog.newsletter.title': 'Restez <span>informé</span>',
+    'blog.newsletter.subtitle': 'Recevez nos derniers articles et insights directement dans votre boîte mail.',
+    'blog.newsletter.placeholder': 'votre@email.com',
+    'blog.newsletter.btn': 'S\'abonner',
+    'blog.newsletter.note': 'Pas de spam, désinscription facile à tout moment.',
     'blog.readmore': 'Lire l\'article',
     'blog.by': 'Par',
+    'blog.filter.label': 'Catégorie',
 
     // FORMATIONS PAGE
     'formations.hero.badge': 'MONTEZ EN COMPÉTENCES',
@@ -123,6 +154,35 @@ const JUDDEV_TRANSLATIONS = {
     'realisations.hero.badge': 'NOS PROJETS',
     'realisations.hero.title': 'Nos <span>Réalisations</span>',
     'realisations.hero.subtitle': 'Des solutions numériques concrètes, livrées avec excellence pour des clients qui nous font confiance.',
+    'realisations.cta.title': 'Votre projet sera notre <span>prochaine réalisation</span>',
+    'realisations.cta.subtitle': 'Rejoignez nos clients satisfaits et donnez vie à votre vision digitale.',
+
+    // SERVICE DETAIL
+    'service.features.title': 'Ce que nous <span>faisons</span>',
+    'service.tech.title': 'Technologies utilisées',
+    'service.process.title': 'Notre Processus',
+    'service.cta.title': 'Intéressé par ce service ?',
+    'service.cta.subtitle': 'Discutons de votre projet et trouvons la meilleure solution pour vos besoins spécifiques.',
+    'service.cta.devis': 'Demander un Devis',
+    'service.cta.contact': 'Nous Contacter',
+    'service.related.title': 'Autres <span>Services</span>',
+
+    // ARTICLE PAGE
+    'article.comments': 'Commentaires',
+    'article.comment.name': 'Votre nom *',
+    'article.comment.email': 'Votre email (optionnel)',
+    'article.comment.text': 'Votre commentaire...',
+    'article.comment.submit': 'Envoyer le commentaire',
+    'article.tags': 'Tags :',
+    'article.recent': 'Articles récents',
+    'article.categories': 'Catégories',
+    'article.related': 'Articles Connexes',
+    'article.others': 'Autres Articles',
+    'article.page.prev': 'Précédent',
+    'article.page.next': 'Suivant',
+    'article.devis.title': 'Besoin d\'un projet ?',
+    'article.devis.subtitle': 'Transformons votre idée en réalité numérique.',
+    'article.devis.btn': 'Demander un Devis',
 
     // COMMON
     'common.read': 'Lire',
@@ -136,6 +196,8 @@ const JUDDEV_TRANSLATIONS = {
     'common.year': 'Année',
     'common.client': 'Client',
     'common.sector': 'Secteur',
+    'common.seeall': 'Voir tout',
+    'common.hours': 'Lundi - Vendredi : 8h00 - 18h00 | Samedi : 9h00 - 13h00',
 
     // THEME/LANG TOGGLE
     'toggle.light': 'Mode Clair',
@@ -225,6 +287,12 @@ const JUDDEV_TRANSLATIONS = {
     'about.mission.title': 'Our <span>Mission</span>',
     'about.team.badge': 'THE CRAFTSMEN OF YOUR SUCCESS',
     'about.team.title': 'Our <span>Expert Team</span>',
+    'about.values.badge': 'WHAT DRIVES US',
+    'about.values.title': 'Our <span>Values</span>',
+    'about.stats.badge': 'JUDDEV BY THE NUMBERS',
+    'about.stats.title': 'Our <span>Impact</span>',
+    'about.cta.title': 'Ready to build something <span>extraordinary</span>?',
+    'about.cta.subtitle': 'Join the companies that trust us to transform their digital presence.',
 
     // SERVICES PAGE
     'services.hero.badge': 'OUR EXPERTISE',
@@ -232,26 +300,51 @@ const JUDDEV_TRANSLATIONS = {
     'services.hero.subtitle': 'From digital strategy to technical deployment, we cover all your needs with recognized expertise.',
     'services.process.badge': 'HOW WE WORK',
     'services.process.title': 'Our Work <span>Process</span>',
+    'services.cta.title': 'Need a <span>custom solution</span>?',
+    'services.cta.subtitle': 'Let\'s discuss your needs and build the ideal solution together.',
 
     // CONTACT PAGE
     'contact.hero.badge': 'DISCUSS YOUR PROJECT',
     'contact.hero.title': 'Contact <span>JUDDEV CORPORATION</span>',
     'contact.hero.subtitle': 'A question, a project, or just want to learn more? Our team is available to support you.',
+    'contact.info.badge': 'CONTACT INFORMATION',
+    'contact.info.title': 'We\'re <span>here for you</span>',
+    'contact.info.desc': 'Whether you have a question about our services, a project in mind, or just want to chat, feel free to reach out. We typically respond within 24 hours.',
+    'contact.social.badge': 'SOCIAL MEDIA',
+    'contact.social.title': 'Follow us on <span>social media</span>',
+    'contact.social.subtitle': 'Stay connected and follow our latest news on social platforms.',
+    'contact.faq.badge': 'FAQ',
+    'contact.faq.title': 'Frequently Asked <span>Questions</span>',
     'contact.form.title': 'Send us a message',
+    'contact.form.desc': 'We will get back to you as soon as possible.',
+    'contact.form.firstname': 'First Name *',
+    'contact.form.lastname': 'Last Name *',
     'contact.form.name': 'Full Name *',
     'contact.form.email': 'Email *',
     'contact.form.phone': 'Phone',
-    'contact.form.subject': 'Subject',
+    'contact.form.subject': 'Subject *',
+    'contact.form.subject.placeholder': 'Choose a subject',
     'contact.form.message': 'Message *',
-    'contact.form.privacy': 'I accept the privacy policy',
+    'contact.form.message.placeholder': 'Describe your request or project...',
+    'contact.form.privacy': 'I accept the privacy policy and that my data will be used to respond to my request.',
     'contact.form.submit': 'Send Message',
 
     // BLOG PAGE
     'blog.hero.badge': 'OUR BLOG',
     'blog.hero.title': 'News & <span>Insights</span>',
     'blog.hero.subtitle': 'Explore our articles on the latest digital trends, best practices and tech industry news.',
+    'blog.section.badge': 'INSIGHTS & EXPERTISE',
+    'blog.section.title': 'All our <span>Articles</span>',
+    'blog.section.subtitle': 'Stay ahead of innovation with our expert publications.',
+    'blog.newsletter.badge': 'NEWSLETTER',
+    'blog.newsletter.title': 'Stay <span>informed</span>',
+    'blog.newsletter.subtitle': 'Receive our latest articles and insights directly in your inbox.',
+    'blog.newsletter.placeholder': 'your@email.com',
+    'blog.newsletter.btn': 'Subscribe',
+    'blog.newsletter.note': 'No spam, easy unsubscribe at any time.',
     'blog.readmore': 'Read article',
     'blog.by': 'By',
+    'blog.filter.label': 'Category',
 
     // FORMATIONS PAGE
     'formations.hero.badge': 'UPSKILL YOURSELF',
@@ -263,6 +356,35 @@ const JUDDEV_TRANSLATIONS = {
     'realisations.hero.badge': 'OUR PROJECTS',
     'realisations.hero.title': 'Our <span>Portfolio</span>',
     'realisations.hero.subtitle': 'Concrete digital solutions, delivered with excellence for clients who trust us.',
+    'realisations.cta.title': 'Your project will be our <span>next achievement</span>',
+    'realisations.cta.subtitle': 'Join our satisfied clients and bring your digital vision to life.',
+
+    // SERVICE DETAIL
+    'service.features.title': 'What we <span>do</span>',
+    'service.tech.title': 'Technologies used',
+    'service.process.title': 'Our Process',
+    'service.cta.title': 'Interested in this service?',
+    'service.cta.subtitle': 'Let\'s discuss your project and find the best solution for your specific needs.',
+    'service.cta.devis': 'Get a Quote',
+    'service.cta.contact': 'Contact Us',
+    'service.related.title': 'Other <span>Services</span>',
+
+    // ARTICLE PAGE
+    'article.comments': 'Comments',
+    'article.comment.name': 'Your name *',
+    'article.comment.email': 'Your email (optional)',
+    'article.comment.text': 'Your comment...',
+    'article.comment.submit': 'Post comment',
+    'article.tags': 'Tags:',
+    'article.recent': 'Recent Articles',
+    'article.categories': 'Categories',
+    'article.related': 'Related Articles',
+    'article.others': 'Other Articles',
+    'article.page.prev': 'Previous',
+    'article.page.next': 'Next',
+    'article.devis.title': 'Have a project?',
+    'article.devis.subtitle': 'Let\'s turn your idea into a digital reality.',
+    'article.devis.btn': 'Get a Quote',
 
     // COMMON
     'common.read': 'Read',
@@ -276,6 +398,8 @@ const JUDDEV_TRANSLATIONS = {
     'common.year': 'Year',
     'common.client': 'Client',
     'common.sector': 'Sector',
+    'common.seeall': 'See all',
+    'common.hours': 'Mon - Fri: 8:00 AM - 6:00 PM | Sat: 9:00 AM - 1:00 PM',
 
     // THEME/LANG TOGGLE
     'toggle.light': 'Light Mode',
@@ -354,6 +478,10 @@ const JUDDEV_I18N = {
     const footerCopyright = document.querySelector('.footer-copyright');
     if (footerCopyright) footerCopyright.textContent = this.t('footer.copyright');
 
+    // 5. Page-specific static text (identified by unique selectors)
+    const page = window.location.pathname.split('/').pop() || 'index.html';
+    this._translatePage(page);
+
     // 5. Update html lang attribute
     document.documentElement.lang = this.currentLang;
 
@@ -376,6 +504,134 @@ const JUDDEV_I18N = {
     document.dispatchEvent(new CustomEvent('juddev:langChanged', {
       detail: { lang: this.currentLang }
     }));
+  },
+
+  // Helper: set innerHTML safely (keeping span.gradient syntax)
+  _setHtml(el, key) {
+    if (!el) return;
+    el.innerHTML = this.t(key);
+  },
+  _setText(el, key) {
+    if (!el) return;
+    el.textContent = this.t(key);
+  },
+  _setPlaceholder(el, key) {
+    if (!el) return;
+    el.placeholder = this.t(key);
+  },
+
+  _translatePage(page) {
+    const t = (k) => this.t(k);
+
+    // ---- CONTACT PAGE ----
+    if (page === 'contact.html') {
+      this._setHtml(document.querySelector('.page-hero-title'), 'contact.hero.title');
+      this._setText(document.querySelector('.page-hero-subtitle'), 'contact.hero.subtitle');
+      const infoBadge = document.querySelector('.section .section-badge');
+      if (infoBadge) infoBadge.textContent = t('contact.info.badge');
+      const infoTitle = document.querySelector('.section .section-title');
+      if (infoTitle) infoTitle.innerHTML = t('contact.info.title');
+      const infoDesc = document.querySelector('.reveal-left > p');
+      if (infoDesc) infoDesc.textContent = t('contact.info.desc');
+      const formTitle = document.querySelector('.reveal-right h3');
+      if (formTitle) formTitle.textContent = t('contact.form.title');
+      const formDesc = document.querySelector('.reveal-right p');
+      if (formDesc) formDesc.textContent = t('contact.form.desc');
+      document.querySelectorAll('.form-label').forEach((label, i) => {
+        const keys = ['contact.form.firstname','contact.form.lastname','contact.form.email','contact.form.phone','contact.form.subject','contact.form.message'];
+        if (keys[i]) label.textContent = t(keys[i]);
+      });
+      const msgTextarea = document.querySelector('textarea[name="message"]');
+      if (msgTextarea) msgTextarea.placeholder = t('contact.form.message.placeholder');
+      const subjSelect = document.querySelector('select[name="subject"] option[value=""]');
+      if (subjSelect) subjSelect.textContent = t('contact.form.subject.placeholder');
+      const privacySpan = document.querySelector('label span[style*="font-size:0.8rem"]');
+      if (privacySpan) privacySpan.textContent = t('contact.form.privacy');
+      const submitBtn = document.querySelector('#contact-form button[type="submit"]');
+      if (submitBtn) submitBtn.innerHTML = `<i class="fas fa-paper-plane"></i> ${t('contact.form.submit')}`;
+    }
+
+    // ---- BLOG PAGE ----
+    if (page === 'blog.html') {
+      const badge = document.querySelector('.section-badge');
+      if (badge) badge.textContent = t('blog.section.badge');
+      const title = document.querySelector('.section-title');
+      if (title) title.innerHTML = t('blog.section.title');
+      const subtitle = document.querySelector('.section-subtitle');
+      if (subtitle) subtitle.textContent = t('blog.section.subtitle');
+      const nlBadge = document.querySelector('[style*="NEWSLETTER"], .section-badge:last-of-type');
+      // Newsletter
+      const nlEmail = document.querySelector('#newsletter-email');
+      if (nlEmail) nlEmail.placeholder = t('blog.newsletter.placeholder');
+      const nlBtn = document.querySelector('#newsletter-btn');
+      if (nlBtn) nlBtn.innerHTML = `<i class="fas fa-paper-plane"></i> ${t('blog.newsletter.btn')}`;
+      const filterLabel = document.querySelector('#blog-filter-toggle > span');
+      if (filterLabel) filterLabel.innerHTML = `<i class="fas fa-tag"></i> ${t('blog.filter.label')}`;
+    }
+
+    // ---- REALISATIONS PAGE ----
+    if (page === 'realisations.html') {
+      this._setHtml(document.querySelector('.page-hero-title'), 'realisations.hero.title');
+      this._setText(document.querySelector('.page-hero-subtitle'), 'realisations.hero.subtitle');
+      const badge = document.querySelector('.page-hero .section-badge, .page-hero-content .section-badge');
+      if (badge) badge.textContent = t('realisations.hero.badge');
+    }
+
+    // ---- SERVICES PAGE ----
+    if (page === 'services.html') {
+      this._setHtml(document.querySelector('.page-hero-title'), 'services.hero.title');
+      this._setText(document.querySelector('.page-hero-subtitle'), 'services.hero.subtitle');
+    }
+
+    // ---- A-PROPOS PAGE ----
+    if (page === 'a-propos.html') {
+      this._setHtml(document.querySelector('.page-hero-title'), 'about.hero.title');
+      this._setText(document.querySelector('.page-hero-subtitle'), 'about.hero.subtitle');
+    }
+
+    // ---- FORMATIONS PAGE ----
+    if (page === 'formations.html') {
+      this._setHtml(document.querySelector('.page-hero-title'), 'formations.hero.title');
+      this._setText(document.querySelector('.page-hero-subtitle'), 'formations.hero.subtitle');
+    }
+
+    // ---- HOME (index) ----
+    if (page === 'index.html' || page === '') {
+      const heroTitle = document.querySelector('.hero-title');
+      if (heroTitle) heroTitle.innerHTML = t('hero.title');
+    }
+
+    // ---- SERVICE DETAIL ----
+    if (page === 'service-detail.html') {
+      // Dynamic content — handled when loaded, but static CTA text:
+      document.querySelectorAll('.cta-section .btn-primary').forEach(b => {
+        if (b.textContent.includes('Devis') || b.textContent.includes('Quote')) {
+          b.innerHTML = `<i class="fas fa-paper-plane"></i> ${t('service.cta.devis')}`;
+        }
+      });
+    }
+
+    // ---- ARTICLE DETAIL ----
+    if (page === 'article-detail.html') {
+      // Dynamic — but when translated, update comment form placeholders if rendered
+      const cName = document.getElementById('comment-name');
+      const cEmail = document.getElementById('comment-email');
+      const cText = document.getElementById('comment-text');
+      const cBtn = document.getElementById('comment-submit-btn');
+      if (cName) cName.placeholder = t('article.comment.name');
+      if (cEmail) cEmail.placeholder = t('article.comment.email');
+      if (cText) cText.placeholder = t('article.comment.text');
+      if (cBtn) cBtn.textContent = t('article.comment.submit');
+    }
+
+    // ---- DEVIS MODAL (all pages) ----
+    const modalTitle = document.querySelector('.modal-title');
+    if (modalTitle) modalTitle.textContent = t('modal.devis.title');
+    const devisSubmit = document.querySelector('.modal-submit');
+    if (devisSubmit) devisSubmit.innerHTML = `<i class="fas fa-paper-plane"></i> ${t('modal.devis.submit')}`;
+    document.querySelectorAll('[data-i18n-devis]').forEach(el => {
+      el.textContent = t(el.getAttribute('data-i18n-devis'));
+    });
   },
 
   setLang(lang) {
