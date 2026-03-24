@@ -392,9 +392,7 @@ function openModal(title, bodyHTML, onSubmit, submitLabel = 'Sauvegarder') {
           <button type="button" onclick="closeModal()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:var(--text-muted);padding:0.65rem 1.25rem;border-radius:0.5rem;cursor:pointer;font-family:inherit;font-size:0.85rem">
             Annuler
           </button>
-          <button type="button" id="modal-submit-btn" onclick="${onSubmit}()" style="background:var(--gradient-primary);border:none;color:white;padding:0.65rem 1.5rem;border-radius:0.5rem;cursor:pointer;font-weight:600;font-family:inherit;font-size:0.85rem;display:flex;align-items:center;gap:0.5rem">
-            <i class="fas fa-check"></i> ${submitLabel}
-          </button>
+          ${onSubmit ? `<button type="button" id="modal-submit-btn" onclick="${onSubmit}()" style="background:var(--gradient-primary);border:none;color:white;padding:0.65rem 1.5rem;border-radius:0.5rem;cursor:pointer;font-weight:600;font-family:inherit;font-size:0.85rem;display:flex;align-items:center;gap:0.5rem"><i class="fas fa-check"></i> ${submitLabel}</button>` : ''}
         </div>
       </form>
     </div>
