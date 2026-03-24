@@ -1173,31 +1173,25 @@ async function loadMessages() {
 
     function renderMessageCard(m) {
       return `
-        <div id="msg-${m._id}" style="background:${m.read ? 'var(--bg-card)' : 'rgba(0,102,255,0.05)'};border:1px solid ${m.read ? 'var(--border-color)' : 'rgba(0,102,255,0.3)'};border-radius:0.75rem;padding:1.25rem;margin-bottom:0.75rem">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap">
-            <div style="flex:1;min-width:0">
-              <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap">
-                <div style="width:38px;height:38px;background:var(--gradient-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.9rem;flex-shrink:0">${m.name ? m.name[0].toUpperCase() : '?'}</div>
+        <div id="msg-${m._id}" class="msg-card${m.read ? '' : ' unread'}">
+          <div class="msg-card-inner">
+            <div class="msg-card-body">
+              <div class="msg-card-header">
+                <div class="msg-card-avatar">${m.name ? m.name[0].toUpperCase() : '?'}</div>
                 <div>
-                  <div style="font-weight:600;color:var(--text-primary);font-size:0.9rem">${escapeHtml(m.name || 'Anonyme')}</div>
-                  <div style="font-size:0.78rem;color:var(--text-muted)">${escapeHtml(m.email || '')} ${m.phone ? '· ' + escapeHtml(m.phone) : ''}</div>
+                  <div class="msg-card-name">${escapeHtml(m.name || 'Anonyme')}</div>
+                  <div class="msg-card-email">${escapeHtml(m.email || '')}${m.phone ? ' · ' + escapeHtml(m.phone) : ''}</div>
                 </div>
-                ${!m.read ? '<span style="background:var(--accent-blue);color:white;border-radius:999px;padding:0.1rem 0.5rem;font-size:0.68rem;font-weight:700">NOUVEAU</span>' : ''}
+                ${!m.read ? '<span class="msg-card-badge-new">NOUVEAU</span>' : ''}
               </div>
-              ${m.subject ? `<div style="font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.5rem">Sujet: ${escapeHtml(m.subject)}</div>` : ''}
-              <div style="font-size:0.85rem;color:var(--text-muted);line-height:1.8;background:rgba(0,0,0,0.2);border-radius:0.5rem;padding:0.75rem;word-break:break-word">${escapeHtml(m.message || '').replace(/\n/g, '<br>')}</div>
-              <div style="font-size:0.73rem;color:var(--text-dim);margin-top:0.5rem">${new Date(m.createdAt).toLocaleString('fr-FR')}</div>
+              ${m.subject ? `<div class="msg-card-subject">Sujet : ${escapeHtml(m.subject)}</div>` : ''}
+              <div class="msg-card-text">${escapeHtml(m.message || '').replace(/\n/g, '<br>')}</div>
+              <div class="msg-card-date">${new Date(m.createdAt).toLocaleString('fr-FR')}</div>
             </div>
-            <div style="display:flex;gap:0.5rem;flex-shrink:0">
-              ${!m.read ? `<button onclick="markMessageRead('${m._id}')" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#4ade80;border-radius:0.375rem;padding:0.4rem 0.7rem;cursor:pointer;font-size:0.78rem;font-family:inherit" title="Marquer comme lu">
-                <i class="fas fa-check"></i>
-              </button>` : ''}
-              <a href="mailto:${m.email}" style="background:rgba(0,102,255,0.1);border:1px solid rgba(0,102,255,0.2);color:var(--accent-light);border-radius:0.375rem;padding:0.4rem 0.7rem;cursor:pointer;font-size:0.78rem;text-decoration:none;display:inline-flex;align-items:center" title="Répondre par email">
-                <i class="fas fa-reply"></i>
-              </a>
-              <button onclick="deleteMessage('${m._id}')" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;border-radius:0.375rem;padding:0.4rem 0.7rem;cursor:pointer;font-size:0.78rem;font-family:inherit" title="Supprimer">
-                <i class="fas fa-trash"></i>
-              </button>
+            <div class="msg-card-actions">
+              ${!m.read ? `<button onclick="markMessageRead('${m._id}')" class="msg-action-btn read" title="Marquer comme lu"><i class="fas fa-check"></i></button>` : ''}
+              <a href="mailto:${m.email}" class="msg-action-btn reply" title="Répondre par email"><i class="fas fa-reply"></i></a>
+              <button onclick="deleteMessage('${m._id}')" class="msg-action-btn delete" title="Supprimer"><i class="fas fa-trash"></i></button>
             </div>
           </div>
         </div>

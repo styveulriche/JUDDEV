@@ -58,15 +58,24 @@
       <p class="section-subtitle">Restez à la pointe de l'innovation avec nos publications expertes.</p>
     </div>
 
-    <!-- Category Filters -->
-    <div class="filter-bar reveal" id="blog-filters">
-      <button class="filter-btn active" data-filter="all">Tous</button>
-      <button class="filter-btn" data-filter="Intelligence Artificielle">IA</button>
-      <button class="filter-btn" data-filter="Architecture">Architecture</button>
-      <button class="filter-btn" data-filter="Mobile">Mobile</button>
-      <button class="filter-btn" data-filter="Cloud">Cloud</button>
-      <button class="filter-btn" data-filter="Design">Design</button>
-      <button class="filter-btn" data-filter="Startup">Startup</button>
+    <!-- Category Filter Dropdown -->
+    <div class="filter-dropdown-wrapper reveal">
+      <button class="filter-toggle-btn" id="blog-filter-toggle" aria-expanded="false">
+        <span><i class="fas fa-tag"></i> Catégorie</span>
+        <span class="filter-active-label" id="blog-active-label">Tous</span>
+        <i class="fas fa-chevron-down filter-toggle-chevron"></i>
+      </button>
+      <div class="filter-panel" id="blog-filter-panel">
+        <div class="filter-bar" id="blog-filters">
+          <button class="filter-btn active" data-filter="all">Tous</button>
+          <button class="filter-btn" data-filter="Intelligence Artificielle">IA</button>
+          <button class="filter-btn" data-filter="Architecture">Architecture</button>
+          <button class="filter-btn" data-filter="Mobile">Mobile</button>
+          <button class="filter-btn" data-filter="Cloud">Cloud</button>
+          <button class="filter-btn" data-filter="Design">Design</button>
+          <button class="filter-btn" data-filter="Startup">Startup</button>
+        </div>
+      </div>
     </div>
 
     <div class="grid-3" id="articles-grid">
@@ -123,6 +132,9 @@
           <a href="service-detail.html?id=dev-mobile">Applications Mobiles</a>
           <a href="service-detail.html?id=saas">Produits SaaS</a>
           <a href="service-detail.html?id=ux-design">UI/UX Design</a>
+          <a href="service-detail.html?id=cloud">Cloud Engineering</a>
+          <a href="service-detail.html?id=ia-solutions">IA & Automatisation</a>
+          <a href="service-detail.html?id=cybersecurite">Cybersécurité</a>
         </div>
       </div>
       <div>
@@ -372,11 +384,13 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Blog category filters
+  const blogActiveLabel = document.getElementById('blog-active-label');
   document.querySelectorAll('#blog-filters .filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('#blog-filters .filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const filter = btn.dataset.filter;
+      if (blogActiveLabel) blogActiveLabel.textContent = btn.textContent;
       filteredArticles = filter === 'all'
         ? JUDDEV_DATA.articles
         : JUDDEV_DATA.articles.filter(a => a.category === filter);
@@ -384,6 +398,16 @@ document.addEventListener('DOMContentLoaded', () => {
       renderArticlesPage(1);
     });
   });
+
+  // Blog filter dropdown toggle
+  const blogToggle = document.getElementById('blog-filter-toggle');
+  const blogPanel = document.getElementById('blog-filter-panel');
+  if (blogToggle && blogPanel) {
+    blogToggle.addEventListener('click', () => {
+      const isOpen = blogPanel.classList.toggle('open');
+      blogToggle.setAttribute('aria-expanded', isOpen);
+    });
+  }
 
   // Auto-refresh: re-render when API data updates (every 30s via data.js polling)
   document.addEventListener('juddev:dataUpdated', (e) => {

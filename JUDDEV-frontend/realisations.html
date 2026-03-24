@@ -83,25 +83,34 @@
       <h2 class="section-title">Tous nos <span>Projets</span></h2>
     </div>
 
-    <!-- Filter Buttons -->
-    <div class="filter-bar reveal" id="filter-container">
-      <div class="filter-bar-row">
-        <span class="filter-bar-label"><i class="fas fa-layer-group"></i> Domaine</span>
-        <div class="filter-btn-group" id="filter-domain-btns">
-          <button class="filter-btn active" data-value="">Tous</button>
+    <!-- Filter Dropdown -->
+    <div class="filter-dropdown-wrapper reveal" id="filter-container">
+      <button class="filter-toggle-btn" id="filter-toggle" aria-expanded="false">
+        <span><i class="fas fa-sliders"></i> Filtrer les projets</span>
+        <span class="filter-active-label" id="filter-active-label"></span>
+        <i class="fas fa-chevron-down filter-toggle-chevron"></i>
+      </button>
+      <div class="filter-panel" id="filter-panel">
+        <div class="filter-bar">
+          <div class="filter-bar-row">
+            <span class="filter-bar-label"><i class="fas fa-layer-group"></i> Domaine</span>
+            <div class="filter-btn-group" id="filter-domain-btns">
+              <button class="filter-btn active" data-value="">Tous</button>
+            </div>
+          </div>
+          <div class="filter-bar-row">
+            <span class="filter-bar-label"><i class="fas fa-code"></i> Technologie</span>
+            <div class="filter-btn-group" id="filter-tech-btns">
+              <button class="filter-btn active" data-value="">Toutes</button>
+            </div>
+          </div>
+          <div class="filter-bar-meta">
+            <span class="filter-count-badge" id="filter-count"></span>
+            <button class="filter-reset-btn" id="filter-reset" style="display:none">
+              <i class="fas fa-rotate-left"></i> Réinitialiser
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="filter-bar-row">
-        <span class="filter-bar-label"><i class="fas fa-code"></i> Technologie</span>
-        <div class="filter-btn-group" id="filter-tech-btns">
-          <button class="filter-btn active" data-value="">Toutes</button>
-        </div>
-      </div>
-      <div class="filter-bar-meta">
-        <span class="filter-count-badge" id="filter-count"></span>
-        <button class="filter-reset-btn" id="filter-reset" style="display:none">
-          <i class="fas fa-rotate-left"></i> Réinitialiser
-        </button>
       </div>
     </div>
 
@@ -159,7 +168,7 @@
           <a href="service-detail.html?id=saas">Produits SaaS</a>
           <a href="service-detail.html?id=ux-design">UI/UX Design</a>
           <a href="service-detail.html?id=cloud">Cloud Engineering</a>
-          <a href="service-detail.html?id=ia-solutions">IA & Automatisation</a>
+          <a href="service-detail.html?id=ia-solutions">IA & Automatisation</a><a href="service-detail.html?id=cybersecurite">Cybersécurité</a>
         </div>
       </div>
       <div>
@@ -486,6 +495,37 @@ document.addEventListener('DOMContentLoaded', async () => {
       setActiveBtn('filter-domain-btns', '');
       setActiveBtn('filter-tech-btns', '');
       applyFilters();
+    });
+  }
+
+  // Filter dropdown toggle
+  const filterToggle = document.getElementById('filter-toggle');
+  const filterPanel = document.getElementById('filter-panel');
+  const filterActiveLabel = document.getElementById('filter-active-label');
+
+  function updateFilterActiveLabel() {
+    const parts = [];
+    if (activeDomain) parts.push(activeDomain);
+    if (activeTech) parts.push(activeTech);
+    if (filterActiveLabel) {
+      filterActiveLabel.textContent = parts.length ? parts.join(', ') : '';
+      filterActiveLabel.style.display = parts.length ? 'inline' : 'none';
+    }
+    if (filterToggle) {
+      filterToggle.classList.toggle('has-active', parts.length > 0);
+    }
+  }
+
+  const origApplyFilters = applyFilters;
+  applyFilters = function() {
+    origApplyFilters();
+    updateFilterActiveLabel();
+  };
+
+  if (filterToggle && filterPanel) {
+    filterToggle.addEventListener('click', () => {
+      const isOpen = filterPanel.classList.toggle('open');
+      filterToggle.setAttribute('aria-expanded', isOpen);
     });
   }
 
