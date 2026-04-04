@@ -1144,12 +1144,37 @@ textarea.form-input {
   flex-shrink: 0;
 }
 
+/* ============================================================
+   DASHBOARD FORM GRIDS — responsive
+   ============================================================ */
+.dash-form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.dash-form-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
 @media (max-width: 600px) {
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .quick-actions { grid-template-columns: 1fr; }
   .content-area { padding: 1rem; }
   .topbar { padding: 0 1rem; }
   .modal-dialog { padding: 1.25rem; }
+  /* Tous les grids de formulaires s'empilent verticalement sur mobile */
+  .dash-form-grid-2,
+  .dash-form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+  /* Modal plus responsive sur petit écran */
+  #dash-modal > div:last-child {
+    padding: 1.25rem !important;
+    margin: 0.5rem !important;
+  }
 }
 
 /* ============================================================

@@ -392,7 +392,7 @@ function openModal(title, bodyHTML, onSubmit, submitLabel = 'Sauvegarder') {
           <button type="button" onclick="closeModal()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:var(--text-muted);padding:0.65rem 1.25rem;border-radius:0.5rem;cursor:pointer;font-family:inherit;font-size:0.85rem">
             Annuler
           </button>
-          ${onSubmit ? `<button type="button" id="modal-submit-btn" onclick="${onSubmit}()" style="background:var(--gradient-primary);border:none;color:white;padding:0.65rem 1.5rem;border-radius:0.5rem;cursor:pointer;font-weight:600;font-family:inherit;font-size:0.85rem;display:flex;align-items:center;gap:0.5rem"><i class="fas fa-check"></i> ${submitLabel}</button>` : ''}
+          <button type="button" id="modal-submit-btn" ${onSubmit ? `onclick="${onSubmit}()"` : ''} style="background:var(--gradient-primary);border:none;color:white;padding:0.65rem 1.5rem;border-radius:0.5rem;cursor:pointer;font-weight:600;font-family:inherit;font-size:0.85rem;display:flex;align-items:center;gap:0.5rem"><i class="fas fa-check"></i> ${submitLabel}</button>
         </div>
       </form>
     </div>
@@ -456,11 +456,11 @@ function renderServices() {
 
 function getServiceForm(s = {}) {
   return `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div class="dash-form-grid-2">
       ${formField('Titre *', `<input id="s-title" style="${inputStyle}" value="${s.title||''}" placeholder="Ex: Développement Web" required />`)}
       ${formField('Sous-titre', `<input id="s-subtitle" style="${inputStyle}" value="${s.subtitle||''}" placeholder="Ex: Maîtrisez votre présence en ligne" />`)}
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div class="dash-form-grid-2">
       ${formField('Icône (emoji)', `<input id="s-icon" style="${inputStyle}" value="${s.icon||'⚙️'}" placeholder="💻" />`)}
       ${formField('Catégorie', `<input id="s-category" list="s-category-list" style="${inputStyle}" value="${s.category||'web'}" placeholder="web, mobile, cloud, design, desktop, ia, marketing..." /><datalist id="s-category-list"><option value="web">Web</option><option value="mobile">Mobile</option><option value="cloud">Cloud/SaaS</option><option value="design">Design</option><option value="ia">IA & Automatisation</option><option value="marketing">Marketing Digital</option><option value="desktop">Application Desktop</option><option value="autre">Autre</option></datalist>`)}
     </div>
@@ -562,11 +562,11 @@ async function loadRealisations() {
 
 function getRealisationForm(r = {}) {
   return `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div class="dash-form-grid-2">
       ${formField('Titre *', `<input id="r-title" style="${inputStyle}" value="${r.title||''}" required />`)}
       ${formField('Catégorie', `<input id="r-category" list="r-category-list" style="${inputStyle}" value="${r.category||''}" placeholder="E-commerce, Mobile, Desktop..." /><datalist id="r-category-list"><option value="E-commerce"></option><option value="Mobile"></option><option value="SaaS"></option><option value="Web App"></option><option value="Site Vitrine"></option><option value="UI/UX Design"></option><option value="IA / ML"></option><option value="Cloud"></option><option value="Application Desktop"></option><option value="MVP"></option><option value="Autre"></option></datalist>`)}
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
+    <div class="dash-form-grid-3">
       ${formField('Client', `<input id="r-client" style="${inputStyle}" value="${r.client||''}" />`)}
       ${formField('Année', `<input id="r-year" style="${inputStyle}" value="${r.year||''}" placeholder="2025" />`)}
       ${formField('Secteur', `<select id="r-sector" style="${inputStyle}"><option value="">-- Choisir --</option><option value="Commerce" ${r.sector==='Commerce'?'selected':''}>Commerce</option><option value="Finance" ${r.sector==='Finance'?'selected':''}>Finance</option><option value="Santé" ${r.sector==='Santé'?'selected':''}>Santé</option><option value="Éducation" ${r.sector==='Éducation'?'selected':''}>Éducation</option><option value="Immobilier" ${r.sector==='Immobilier'?'selected':''}>Immobilier</option><option value="Logistique" ${r.sector==='Logistique'?'selected':''}>Logistique</option><option value="Agriculture" ${r.sector==='Agriculture'?'selected':''}>Agriculture</option><option value="Tourisme" ${r.sector==='Tourisme'?'selected':''}>Tourisme</option><option value="Industrie" ${r.sector==='Industrie'?'selected':''}>Industrie</option><option value="ONG / Associatif" ${r.sector==='ONG / Associatif'?'selected':''}>ONG / Associatif</option><option value="Tech & Startups" ${r.sector==='Tech & Startups'?'selected':''}>Tech & Startups</option><option value="Autre" ${r.sector==='Autre'?'selected':''}>Autre</option></select>`)}
@@ -576,11 +576,11 @@ function getRealisationForm(r = {}) {
     ${formField('Description longue', `<textarea id="r-longdesc" style="${textareaStyle}">${r.longDesc||''}</textarea>`)}
     ${formField('Points forts', `<textarea id="r-highlights" style="${textareaStyle};min-height:60px" placeholder="Un point par ligne...">${(r.highlights||[]).join('\n')}</textarea>`, 'Un point fort par ligne')}
     ${formField('Technologies', `<input id="r-techs" style="${inputStyle}" value="${(r.technologies||[]).join(', ')}" placeholder="React, Node.js..." />`)}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div class="dash-form-grid-2">
       ${formField('URL du site', `<input id="r-url" style="${inputStyle}" value="${r.url||''}" placeholder="https://..." />`)}
       ${formField('URL YouTube', `<input id="r-youtube" style="${inputStyle}" value="${r.youtubeUrl||''}" placeholder="https://youtube.com/..." />`)}
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div class="dash-form-grid-2">
       ${formField('Bouton "Visiter le site"', `<select id="r-showsite" style="${inputStyle}"><option value="true" ${r.showSiteBtn!==false?'selected':''}>Visible</option><option value="false" ${r.showSiteBtn===false?'selected':''}>Masqué</option></select>`, 'Affiche le bouton si une URL est renseignée')}
       ${formField('Bouton "Voir la vidéo"', `<select id="r-showyoutube" style="${inputStyle}"><option value="false" ${!r.showYoutubeBtn?'selected':''}>Masqué</option><option value="true" ${r.showYoutubeBtn?'selected':''}>Visible</option></select>`, 'Affiche le bouton si une URL YouTube est renseignée')}
     </div>
@@ -716,7 +716,7 @@ function getArticleForm(a = {}) {
     <!-- Common fields (always required) -->
     ${formField('Titre *', `<input id="a-title" style="${inputStyle}" value="${a.title||''}" placeholder="Titre de l'article" required />`)}
     ${formField('Image de couverture * <span style="color:var(--accent-blue);font-size:0.72rem">(obligatoire)</span>', `<input type="file" id="a-image" accept="image/*" style="${inputStyle};padding:0.5rem" ${!a.id ? '' : ''} />${a.image ? `<div style="margin-top:0.5rem"><img src="${resolveImageUrl(a.image)}" style="height:60px;border-radius:0.375rem;object-fit:cover" onerror="this.style.display='none'" /></div>` : ''}`)}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div class="dash-form-grid-2">
       ${formField('Catégorie', `<select id="a-category" style="${inputStyle}"><option value="">-- Choisir --</option><option value="Intelligence Artificielle" ${a.category==='Intelligence Artificielle'?'selected':''}>Intelligence Artificielle</option><option value="Architecture" ${a.category==='Architecture'?'selected':''}>Architecture</option><option value="Mobile" ${a.category==='Mobile'?'selected':''}>Mobile</option><option value="Cloud" ${a.category==='Cloud'?'selected':''}>Cloud</option><option value="Design" ${a.category==='Design'?'selected':''}>Design</option><option value="Startup" ${a.category==='Startup'?'selected':''}>Startup</option><option value="Développement Web" ${a.category==='Développement Web'?'selected':''}>Développement Web</option><option value="Sécurité" ${a.category==='Sécurité'?'selected':''}>Sécurité</option><option value="DevOps" ${a.category==='DevOps'?'selected':''}>DevOps</option><option value="Autre" ${a.category==='Autre'?'selected':''}>Autre</option></select>`)}
       ${formField('Auteur', `<input id="a-author" style="${inputStyle}" value="${a.author||''}" placeholder="JAYSON STANLEY" />`)}
     </div>
@@ -897,11 +897,11 @@ async function loadFormations() {
 
 function getFormationForm(f = {}) {
   return `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div class="dash-form-grid-2">
       ${formField('Titre *', `<input id="f-title" style="${inputStyle}" value="${f.title||''}" required />`)}
       ${formField('Icône (emoji)', `<input id="f-icon" style="${inputStyle}" value="${f.icon||'📚'}" />`)}
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
+    <div class="dash-form-grid-3">
       ${formField('Durée', `<input id="f-duration" style="${inputStyle}" value="${f.duration||''}" placeholder="3 mois" />`)}
       ${formField('Niveau', `<input id="f-level" style="${inputStyle}" value="${f.level||''}" placeholder="Débutant à Avancé" />`)}
       ${formField('Prix', `<input id="f-price" style="${inputStyle}" value="${f.price||'Sur devis'}" placeholder="Sur devis" />`)}
@@ -986,14 +986,14 @@ async function loadContacts() {
         </button>
       </div>
       <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+        <div class="dash-form-grid-2" style="margin-bottom:1rem">
           ${formField('<i class="fas fa-envelope" style="color:var(--accent-blue)"></i> Email', `<input id="c-email" style="${inputStyle}" value="${info.email||''}" type="email" />`)}
           ${formField('<i class="fas fa-phone" style="color:var(--accent-blue)"></i> Téléphone', `<input id="c-phone" style="${inputStyle}" value="${info.phone||''}" />`)}
           ${formField('<i class="fas fa-location-dot" style="color:var(--accent-blue)"></i> Adresse', `<input id="c-address" style="${inputStyle}" value="${info.address||''}" />`)}
           ${formField('<i class="fas fa-clock" style="color:var(--accent-blue)"></i> Horaires', `<input id="c-hours" style="${inputStyle}" value="${info.hours||''}" />`)}
         </div>
         <h3 style="font-size:0.9rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem">Réseaux Sociaux</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="dash-form-grid-2">
           ${formField('<i class="fab fa-linkedin" style="color:#0077b5"></i> LinkedIn', `<input id="c-linkedin" style="${inputStyle}" value="${info.social?.linkedin||''}" placeholder="https://linkedin.com/..." />`)}
           ${formField('<i class="fab fa-twitter" style="color:#1da1f2"></i> Twitter/X', `<input id="c-twitter" style="${inputStyle}" value="${info.social?.twitter||''}" placeholder="https://x.com/..." />`)}
           ${formField('<i class="fab fa-facebook" style="color:#1877f2"></i> Facebook', `<input id="c-facebook" style="${inputStyle}" value="${info.social?.facebook||''}" placeholder="https://facebook.com/..." />`)}
@@ -1418,7 +1418,7 @@ async function loadTeam() {
 
 function getTeamForm(m = {}) {
   return `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div class="dash-form-grid-2">
       ${formField('Nom complet *', `<input id="t-name" style="${inputStyle}" value="${m.name||''}" required />`)}
       ${formField('Initiales', `<input id="t-initials" style="${inputStyle}" value="${m.initials||''}" placeholder="JS" maxlength="3" />`)}
     </div>
@@ -1426,7 +1426,7 @@ function getTeamForm(m = {}) {
     ${formField('Photo', `<input type="file" id="t-photo" accept="image/*" style="${inputStyle};padding:0.5rem" />${m.photo ? `<div style="margin-top:0.5rem"><img src="${resolveImageUrl(m.photo)}" style="height:60px;width:60px;border-radius:50%;object-fit:cover" onerror="this.style.display='none'" /></div>` : ''}`, 'Laissez vide pour afficher les initiales')}
     ${formField('Compétences (tags)', `<input id="t-tags" style="${inputStyle}" value="${(m.tags||[]).join(', ')}" placeholder="React, Node.js, UI/UX..." />`, 'Séparées par des virgules')}
     <h4 style="font-size:0.8rem;font-weight:700;color:var(--text-secondary);margin-bottom:0.75rem;margin-top:0.5rem">Réseaux sociaux</h4>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div class="dash-form-grid-2">
       ${formField('<i class="fab fa-linkedin" style="color:#0077b5"></i> LinkedIn', `<input id="t-linkedin" style="${inputStyle}" value="${m.socials?.linkedin||''}" placeholder="https://linkedin.com/..." />`)}
       ${formField('<i class="fab fa-github" style="color:#6e5494"></i> GitHub', `<input id="t-github" style="${inputStyle}" value="${m.socials?.github||''}" placeholder="https://github.com/..." />`)}
       ${formField('<i class="fab fa-twitter" style="color:#1da1f2"></i> Twitter', `<input id="t-twitter" style="${inputStyle}" value="${m.socials?.twitter||''}" placeholder="https://x.com/..." />`)}

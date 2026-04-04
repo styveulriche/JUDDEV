@@ -199,6 +199,53 @@ const JUDDEV_TRANSLATIONS = {
     'common.seeall': 'Voir tout',
     'common.hours': 'Lundi - Vendredi : 8h00 - 18h00 | Samedi : 9h00 - 13h00',
 
+    // A-PROPOS - sections supplémentaires
+    'about.histoire.badge': 'NOTRE HISTOIRE',
+    'about.histoire.title': 'Qui sommes-nous <span>?</span>',
+    'about.fondations.badge': 'NOS FONDATIONS',
+    'about.fondations.title': 'Notre Mission & <span>Objectifs</span>',
+    'about.values.subtitle': 'Les principes fondamentaux qui orientent notre travail au quotidien.',
+    'about.equipe.badge': 'LES EXPERTS',
+    'about.equipe.title': 'Notre <span>Équipe</span>',
+    'about.equipe.subtitle': 'Des experts passionnés et dédiés à la réussite de vos projets digitaux.',
+
+    // SERVICES - sections supplémentaires
+    'services.hero.badge': 'NOS EXPERTISES',
+    'services.expertise.badge': 'EXPERTISE',
+    'services.expertise.title': 'Tous nos <span>Services</span>',
+    'services.method.badge': 'MÉTHODE',
+    'services.method.subtitle': 'Une approche éprouvée qui garantit des résultats de qualité à chaque projet.',
+
+    // RÉALISATIONS - sections supplémentaires
+    'realisations.hero.badge': 'NOS PROJETS',
+    'realisations.portfolio.badge': 'PORTFOLIO',
+    'realisations.portfolio.title': 'Tous nos <span>Projets</span>',
+    'realisations.stat1': 'Projets livrés',
+    'realisations.stat2': 'Secteurs couverts',
+    'realisations.stat3': 'Clients satisfaits',
+    'realisations.stat4': 'Satisfaction',
+
+    // FORMATIONS - sections supplémentaires
+    'formations.hero.badge': 'MONTEZ EN COMPÉTENCES',
+    'formations.why.badge': 'POURQUOI SE FORMER AVEC NOUS',
+    'formations.why.title': 'Développez vos <span>compétences</span> avec JUDDEV',
+    'formations.why.subtitle': 'Des formations pratiques et orientées terrain pour vous rendre opérationnel rapidement.',
+    'formations.programs.badge': 'NOS PROGRAMMES',
+    'formations.programs.title': 'Choisissez votre <span>Formation</span>',
+    'formations.programs.subtitle': '5 programmes complets pour maîtriser les technologies digitales les plus demandées.',
+    'formations.process.badge': 'COMMENT ÇA MARCHE',
+    'formations.process.title': 'Le processus <span>d\'inscription</span>',
+    'formations.cta.title': 'Besoin d\'une formation sur <span>mesure</span> ?',
+    'formations.cta.subtitle': 'Nous concevons des programmes adaptés à votre équipe et vos objectifs.',
+
+    // CONTACT - sections supplémentaires
+    'contact.hero.badge': 'PARLONS DE VOTRE PROJET',
+
+    // BLOG - sections supplémentaires
+    'blog.hero.badge': 'NOTRE BLOG',
+    'blog.newsletter.badge': 'NEWSLETTER',
+    'blog.newsletter.note': 'Pas de spam, désinscription facile à tout moment.',
+
     // THEME/LANG TOGGLE
     'toggle.light': 'Mode Clair',
     'toggle.dark': 'Mode Sombre',
@@ -401,6 +448,53 @@ const JUDDEV_TRANSLATIONS = {
     'common.seeall': 'See all',
     'common.hours': 'Mon - Fri: 8:00 AM - 6:00 PM | Sat: 9:00 AM - 1:00 PM',
 
+    // A-PROPOS - additional sections
+    'about.histoire.badge': 'OUR STORY',
+    'about.histoire.title': 'Who are <span>we?</span>',
+    'about.fondations.badge': 'OUR FOUNDATIONS',
+    'about.fondations.title': 'Our Mission & <span>Goals</span>',
+    'about.values.subtitle': 'The core principles that guide our work every day.',
+    'about.equipe.badge': 'THE EXPERTS',
+    'about.equipe.title': 'Our <span>Team</span>',
+    'about.equipe.subtitle': 'Passionate experts dedicated to the success of your digital projects.',
+
+    // SERVICES - additional sections
+    'services.hero.badge': 'OUR EXPERTISE',
+    'services.expertise.badge': 'EXPERTISE',
+    'services.expertise.title': 'All our <span>Services</span>',
+    'services.method.badge': 'METHOD',
+    'services.method.subtitle': 'A proven approach that delivers quality results on every project.',
+
+    // REALISATIONS - additional sections
+    'realisations.hero.badge': 'OUR PROJECTS',
+    'realisations.portfolio.badge': 'PORTFOLIO',
+    'realisations.portfolio.title': 'All our <span>Projects</span>',
+    'realisations.stat1': 'Projects Delivered',
+    'realisations.stat2': 'Sectors Covered',
+    'realisations.stat3': 'Happy Clients',
+    'realisations.stat4': 'Satisfaction',
+
+    // FORMATIONS - additional sections
+    'formations.hero.badge': 'UPSKILL YOURSELF',
+    'formations.why.badge': 'WHY TRAIN WITH US',
+    'formations.why.title': 'Develop your <span>skills</span> with JUDDEV',
+    'formations.why.subtitle': 'Practical, hands-on training to get you operational quickly.',
+    'formations.programs.badge': 'OUR PROGRAMS',
+    'formations.programs.title': 'Choose your <span>Training</span>',
+    'formations.programs.subtitle': '5 comprehensive programs to master the most in-demand digital technologies.',
+    'formations.process.badge': 'HOW IT WORKS',
+    'formations.process.title': 'The <span>registration</span> process',
+    'formations.cta.title': 'Need a <span>custom</span> training program?',
+    'formations.cta.subtitle': 'We design programs tailored to your team and objectives.',
+
+    // CONTACT - additional
+    'contact.hero.badge': 'DISCUSS YOUR PROJECT',
+
+    // BLOG - additional
+    'blog.hero.badge': 'OUR BLOG',
+    'blog.newsletter.badge': 'NEWSLETTER',
+    'blog.newsletter.note': 'No spam, easy unsubscribe at any time.',
+
     // THEME/LANG TOGGLE
     'toggle.light': 'Light Mode',
     'toggle.dark': 'Dark Mode',
@@ -460,7 +554,16 @@ const JUDDEV_I18N = {
     document.querySelectorAll('.navbar-links a, .navbar-mobile a').forEach(link => {
       const href = link.getAttribute('href');
       if (href && navMap[href]) {
-        link.textContent = navMap[href];
+        const arrow = link.querySelector('i.nav-arrow');
+        if (arrow) {
+          // Preserve the chevron icon — update only the text node
+          Array.from(link.childNodes)
+            .filter(n => n.nodeType === 3)
+            .forEach(n => n.parentNode.removeChild(n));
+          link.insertBefore(document.createTextNode(navMap[href] + ' '), arrow);
+        } else {
+          link.textContent = navMap[href];
+        }
       }
     });
     const devisLinks = document.querySelectorAll('.btn-devis-nav');
@@ -473,10 +576,32 @@ const JUDDEV_I18N = {
     if (ctaTitle) ctaTitle.innerHTML = this.t('section.cta.title').replace('<span>', '<span class="cta-highlight">');
     const ctaSubtitle = document.querySelector('.cta-subtitle');
     if (ctaSubtitle) ctaSubtitle.textContent = this.t('section.cta.subtitle');
+    // CTA buttons
+    const ctaBtn1 = document.querySelector('.cta-buttons .btn-primary');
+    if (ctaBtn1) {
+      const ic1 = ctaBtn1.querySelector('i');
+      ctaBtn1.innerHTML = `<i class="${ic1 ? ic1.className : 'fas fa-paper-plane'}"></i> ${this.t('section.cta.devis')}`;
+    }
+    const ctaBtn2 = document.querySelector('.cta-buttons .btn-outline');
+    if (ctaBtn2) {
+      const ic2 = ctaBtn2.querySelector('i');
+      ctaBtn2.innerHTML = `<i class="${ic2 ? ic2.className : 'fas fa-envelope'}"></i> ${this.t('section.cta.contact')}`;
+    }
 
     // 4. Translate footer
     const footerCopyright = document.querySelector('.footer-copyright');
     if (footerCopyright) footerCopyright.textContent = this.t('footer.copyright');
+    const footerDesc = document.querySelector('.footer-desc');
+    if (footerDesc) footerDesc.textContent = this.t('footer.desc');
+    const footerLegal = document.querySelector('.footer-bottom-links a:first-child');
+    if (footerLegal) footerLegal.textContent = this.t('footer.legal');
+    const footerPrivacy = document.querySelector('.footer-bottom-links a:last-child');
+    if (footerPrivacy) footerPrivacy.textContent = this.t('footer.privacy');
+    // Also translate footer navigation links (same href-map as navbar)
+    document.querySelectorAll('.footer-links a').forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && navMap[href]) link.textContent = navMap[href];
+    });
 
     // 5. Page-specific static text (identified by unique selectors)
     const page = window.location.pathname.split('/').pop() || 'index.html';

@@ -256,9 +256,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .navbar-logo-img {
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
   object-fit: contain;
+  object-position: center center;
   flex-shrink: 0;
   background: none;
   border: none;
@@ -3664,11 +3665,7 @@ html.light-mode .navbar-logo {
   -webkit-text-fill-color: transparent;
 }
 
-/* Dark mode: logo sombre agrandi pour correspondre visuellement au mode clair */
-html:not(.light-mode) .navbar-logo-img {
-  width: 72px;
-  height: 72px;
-}
+/* Les deux logos utilisent la même taille — aucune surcharge par mode */
 
 html.light-mode .form-input {
   background: #f8faff;
@@ -4321,8 +4318,8 @@ html.light-mode .nav-dropdown {
     min-width: 0;
   }
   .navbar-logo-img {
-    width: 45px;
-    height: 45px;
+    width: 58px;
+    height: 58px;
     flex-shrink: 0;
   }
   .navbar-hamburger {
