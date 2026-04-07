@@ -256,14 +256,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .navbar-logo-img {
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
   object-fit: contain;
   object-position: center center;
   flex-shrink: 0;
   background: none;
   border: none;
   border-radius: 0;
+}
+
+/* Light mode: slightly smaller logo */
+html.light-mode .navbar-logo-img {
+  width: 68px;
+  height: 68px;
 }
 
 .navbar-logo:hover {

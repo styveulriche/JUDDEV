@@ -883,7 +883,7 @@ const JUDDEV_DATA_DEFAULT = {
 // DATA MANAGEMENT - API + LocalStorage sync
 // ============================================================
 const _API_BASE = (typeof JUDDEV_CONFIG !== 'undefined') ? JUDDEV_CONFIG.API_URL : 'http://localhost:5000/api';
-const _DATA_VERSION = '3.1'; // New articles added
+const _DATA_VERSION = '3.2'; // Merge default articles with API
 
 function getJUDDEVData() {
   try {
@@ -951,7 +951,12 @@ async function syncFromAPI() {
     // Update in-memory data
     if (services.length) JUDDEV_DATA.services = services;
     if (realisations.length) JUDDEV_DATA.realisations = realisations;
-    if (articles.length) JUDDEV_DATA.articles = articles;
+    if (articles.length) {
+      // Merge: keep default articles not yet in the database
+      const apiIds = new Set(articles.map(a => a.id));
+      const defaultOnly = JUDDEV_DATA_DEFAULT.articles.filter(a => !apiIds.has(a.id));
+      JUDDEV_DATA.articles = [...articles, ...defaultOnly];
+    }
     if (formations.length) JUDDEV_DATA.formations = formations;
     if (contactInfo) JUDDEV_DATA.contacts = contactInfo;
 

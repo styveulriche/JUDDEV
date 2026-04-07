@@ -32,42 +32,93 @@ function contentToHtml(content) {
   if (!content) return '';
   // Already HTML? Return as-is
   if (/<[a-zA-Z][\s\S]*?>/i.test(content)) return content;
-  // Convert plain text to structured HTML
+
+  // Convert plain text (e.g. extracted from PDF) to structured HTML
   const lines = content.split(/\r?\n/);
   let html = '';
-  let inList = false;
+  let inUl = false;
+  let inOl = false;
+  let blankCount = 0;
+
+  const closeList = () => {
+    if (inUl) { html += '</ul>\n'; inUl = false; }
+    if (inOl) { html += '</ol>\n'; inOl = false; }
+  };
+
   for (let i = 0; i < lines.length; i++) {
     const raw = lines[i];
     const line = raw.trim();
+
+    // Blank line
     if (!line) {
-      if (inList) { html += '</ul>\n'; inList = false; }
+      blankCount++;
+      if (blankCount >= 2) closeList();
       continue;
     }
-    // Markdown-style headings
+    blankCount = 0;
+
+    // Markdown H1
     if (line.startsWith('# ')) {
-      if (inList) { html += '</ul>\n'; inList = false; }
-      html += '<h2>' + line.slice(2) + '</h2>\n';
+      closeList();
+      html += '<h2>' + line.slice(2).trim() + '</h2>\n';
+    // Markdown H2
     } else if (line.startsWith('## ')) {
-      if (inList) { html += '</ul>\n'; inList = false; }
-      html += '<h3>' + line.slice(3) + '</h3>\n';
-    // ALL-CAPS short line → treat as h2 heading
-    } else if (/^[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ\s\-:]{4,60}$/.test(line) && line.length < 70) {
-      if (inList) { html += '</ul>\n'; inList = false; }
+      closeList();
+      html += '<h3>' + line.slice(3).trim() + '</h3>\n';
+    // Markdown H3
+    } else if (line.startsWith('### ')) {
+      closeList();
+      html += '<h3>' + line.slice(4).trim() + '</h3>\n';
+    // ALL-CAPS line (4-80 chars, no lowercase) → h2 heading
+    } else if (/^[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ0-9\s\-:''"".,!?()]{4,}$/.test(line) &&
+               !/[a-zàâäéèêëîïôùûüç]/.test(line) &&
+               line.length <= 80 &&
+               /[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ]{3}/.test(line)) {
+      closeList();
       html += '<h2>' + line + '</h2>\n';
-    // Numbered list items
-    } else if (/^\d+\.\s/.test(line)) {
-      if (inList) { html += '</ul>\n'; inList = false; }
-      html += '<p>' + line + '</p>\n';
-    // Bullet list items
-    } else if (/^[\-\•\*\u2022]\s/.test(line)) {
-      if (!inList) { html += '<ul>\n'; inList = true; }
-      html += '<li>' + line.slice(2).trim() + '</li>\n';
+    // Line ending with ":" that looks like a section header (short, title-like)
+    } else if (/^.{3,50}:$/.test(line) && !/[.!?,]/.test(line.slice(0, -1))) {
+      closeList();
+      html += '<h3>' + line.slice(0, -1) + '</h3>\n';
+    // Numbered ordered list
+    } else if (/^\d+[\.\)]\s+/.test(line)) {
+      if (inUl) { html += '</ul>\n'; inUl = false; }
+      if (!inOl) { html += '<ol>\n'; inOl = true; }
+      html += '<li>' + line.replace(/^\d+[\.\)]\s+/, '').trim() + '</li>\n';
+    // Bullet list items (-, •, *, ·, ▪, ▸, ➤, →)
+    } else if (/^[\-\•\*\·\▪\▸\➤\→\u2022\u2023\u25E6\u2043]\s/.test(line)) {
+      if (inOl) { html += '</ol>\n'; inOl = false; }
+      if (!inUl) { html += '<ul>\n'; inUl = true; }
+      html += '<li>' + line.replace(/^.\s+?/, '').trim() + '</li>\n';
+    // Indented line (likely continuation or sub-content)
+    } else if (/^\s{4,}/.test(raw)) {
+      if (!inUl && !inOl) html += '<p style="margin-left:1.5rem">' + line + '</p>\n';
+      else html += '<li>' + line + '</li>\n';
+    // Quote-like lines starting with "
+    } else if (/^["«]/.test(line) && line.length < 200) {
+      closeList();
+      html += '<blockquote>' + line + '</blockquote>\n';
+    // Regular paragraph
     } else {
-      if (inList) { html += '</ul>\n'; inList = false; }
-      html += '<p>' + line + '</p>\n';
+      closeList();
+      // Merge short consecutive lines into one paragraph (PDF line-wrap)
+      let para = line;
+      while (
+        i + 1 < lines.length &&
+        lines[i + 1].trim() &&
+        lines[i + 1].trim().length > 20 &&
+        !lines[i + 1].trim().startsWith('#') &&
+        !/^[\-\•\*\d]/.test(lines[i + 1].trim()) &&
+        !/^[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ0-9\s\-:''"".,!?()]{4,}$/.test(lines[i + 1].trim().replace(/[a-zàâäéèêëîïôùûüç]/g, '')) &&
+        para.length < 400
+      ) {
+        i++;
+        para += ' ' + lines[i].trim();
+      }
+      html += '<p>' + para + '</p>\n';
     }
   }
-  if (inList) html += '</ul>\n';
+  closeList();
   return html || '<p>' + content + '</p>';
 }
 

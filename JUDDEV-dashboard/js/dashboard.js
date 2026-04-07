@@ -551,7 +551,9 @@ async function loadRealisations() {
       onAdd: 'showAddRealisation',
       items: allRealisations,
       renderItem: (r) => itemCard({
-        image: r.image, title: r.title, subtitle: `${r.client || ''} · ${r.year || ''} · ${r.sector || ''}`, badge: r.category,
+        image: r.image, title: r.title,
+        subtitle: `${r.client || ''} · ${r.year || ''} · ${r.sector || ''}${r.updatedAt ? ` · <span style="color:var(--accent-cyan)"><i class="fas fa-pen-to-square"></i> modifié ${new Date(r.updatedAt).toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</span>` : ''}`,
+        badge: r.category,
         onEdit: `editRealisation('${r.id}')`, onDelete: `deleteRealisation('${r.id}')`
       })
     });
@@ -563,22 +565,23 @@ async function loadRealisations() {
 function getRealisationForm(r = {}) {
   return `
     <div class="dash-form-grid-2">
-      ${formField('Titre *', `<input id="r-title" style="${inputStyle}" value="${r.title||''}" required />`)}
-      ${formField('Catégorie', `<input id="r-category" list="r-category-list" style="${inputStyle}" value="${r.category||''}" placeholder="E-commerce, Mobile, Desktop..." /><datalist id="r-category-list"><option value="E-commerce"></option><option value="Mobile"></option><option value="SaaS"></option><option value="Web App"></option><option value="Site Vitrine"></option><option value="UI/UX Design"></option><option value="IA / ML"></option><option value="Cloud"></option><option value="Application Desktop"></option><option value="MVP"></option><option value="Autre"></option></datalist>`)}
+      ${formField('Titre *', `<input id="r-title" style="${inputStyle}" value="${escapeHtml(r.title)}" required />`)}
+      ${formField('Catégorie', `<input id="r-category" list="r-category-list" style="${inputStyle}" value="${escapeHtml(r.category)}" placeholder="E-commerce, Mobile, Desktop..." /><datalist id="r-category-list"><option value="E-commerce"></option><option value="Mobile"></option><option value="SaaS"></option><option value="Web App"></option><option value="Site Vitrine"></option><option value="UI/UX Design"></option><option value="IA / ML"></option><option value="Cloud"></option><option value="Application Desktop"></option><option value="MVP"></option><option value="Autre"></option></datalist>`)}
     </div>
     <div class="dash-form-grid-3">
-      ${formField('Client', `<input id="r-client" style="${inputStyle}" value="${r.client||''}" />`)}
-      ${formField('Année', `<input id="r-year" style="${inputStyle}" value="${r.year||''}" placeholder="2025" />`)}
+      ${formField('Client', `<input id="r-client" style="${inputStyle}" value="${escapeHtml(r.client)}" />`)}
+      ${formField('Année', `<input id="r-year" style="${inputStyle}" value="${escapeHtml(r.year)}" placeholder="2025" />`)}
       ${formField('Secteur', `<select id="r-sector" style="${inputStyle}"><option value="">-- Choisir --</option><option value="Commerce" ${r.sector==='Commerce'?'selected':''}>Commerce</option><option value="Finance" ${r.sector==='Finance'?'selected':''}>Finance</option><option value="Santé" ${r.sector==='Santé'?'selected':''}>Santé</option><option value="Éducation" ${r.sector==='Éducation'?'selected':''}>Éducation</option><option value="Immobilier" ${r.sector==='Immobilier'?'selected':''}>Immobilier</option><option value="Logistique" ${r.sector==='Logistique'?'selected':''}>Logistique</option><option value="Agriculture" ${r.sector==='Agriculture'?'selected':''}>Agriculture</option><option value="Tourisme" ${r.sector==='Tourisme'?'selected':''}>Tourisme</option><option value="Industrie" ${r.sector==='Industrie'?'selected':''}>Industrie</option><option value="ONG / Associatif" ${r.sector==='ONG / Associatif'?'selected':''}>ONG / Associatif</option><option value="Tech & Startups" ${r.sector==='Tech & Startups'?'selected':''}>Tech & Startups</option><option value="Autre" ${r.sector==='Autre'?'selected':''}>Autre</option></select>`)}
     </div>
+    ${r.updatedAt ? `<div style="font-size:0.75rem;color:var(--accent-cyan);margin-bottom:0.5rem"><i class="fas fa-clock"></i> Dernière modification : ${new Date(r.updatedAt).toLocaleString('fr-FR')}</div>` : ''}
     ${formField('Image principale', `<input type="file" id="r-image" accept="image/*" style="${inputStyle};padding:0.5rem" />${r.image ? `<div style="margin-top:0.5rem"><img src="${resolveImageUrl(r.image)}" style="height:60px;border-radius:0.375rem;object-fit:cover" onerror="this.style.display='none'" /></div>` : ''}`)}
-    ${formField('Description courte', `<textarea id="r-shortdesc" style="${textareaStyle};min-height:60px">${r.shortDesc||''}</textarea>`)}
-    ${formField('Description longue', `<textarea id="r-longdesc" style="${textareaStyle}">${r.longDesc||''}</textarea>`)}
-    ${formField('Points forts', `<textarea id="r-highlights" style="${textareaStyle};min-height:60px" placeholder="Un point par ligne...">${(r.highlights||[]).join('\n')}</textarea>`, 'Un point fort par ligne')}
-    ${formField('Technologies', `<input id="r-techs" style="${inputStyle}" value="${(r.technologies||[]).join(', ')}" placeholder="React, Node.js..." />`)}
+    ${formField('Description courte', `<textarea id="r-shortdesc" style="${textareaStyle};min-height:60px">${escapeHtml(r.shortDesc)}</textarea>`)}
+    ${formField('Description longue', `<textarea id="r-longdesc" style="${textareaStyle}">${escapeHtml(r.longDesc)}</textarea>`)}
+    ${formField('Points forts', `<textarea id="r-highlights" style="${textareaStyle};min-height:60px" placeholder="Un point par ligne...">${escapeHtml((r.highlights||[]).join('\n'))}</textarea>`, 'Un point fort par ligne')}
+    ${formField('Technologies', `<input id="r-techs" style="${inputStyle}" value="${escapeHtml((r.technologies||[]).join(', '))}" placeholder="React, Node.js..." />`)}
     <div class="dash-form-grid-2">
-      ${formField('URL du site', `<input id="r-url" style="${inputStyle}" value="${r.url||''}" placeholder="https://..." />`)}
-      ${formField('URL YouTube', `<input id="r-youtube" style="${inputStyle}" value="${r.youtubeUrl||''}" placeholder="https://youtube.com/..." />`)}
+      ${formField('URL du site', `<input id="r-url" style="${inputStyle}" value="${escapeHtml(r.url)}" placeholder="https://..." />`)}
+      ${formField('URL YouTube', `<input id="r-youtube" style="${inputStyle}" value="${escapeHtml(r.youtubeUrl)}" placeholder="https://youtube.com/..." />`)}
     </div>
     <div class="dash-form-grid-2">
       ${formField('Bouton "Visiter le site"', `<select id="r-showsite" style="${inputStyle}"><option value="true" ${r.showSiteBtn!==false?'selected':''}>Visible</option><option value="false" ${r.showSiteBtn===false?'selected':''}>Masqué</option></select>`, 'Affiche le bouton si une URL est renseignée')}
@@ -677,7 +680,7 @@ async function loadArticles() {
       items: allArticles,
       renderItem: (a) => itemCard({
         image: a.image, title: a.title,
-        subtitle: `${a.author || ''} · ${new Date(a.date).toLocaleDateString('fr-FR')}`,
+        subtitle: `${a.author || ''} · ${new Date(a.date).toLocaleDateString('fr-FR')}${a.updatedAt ? ` · <span style="color:var(--accent-cyan)"><i class="fas fa-pen-to-square"></i> modifié ${new Date(a.updatedAt).toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</span>` : ''}`,
         badge: a.category,
         extra: `
           ${a.sourceType === 'pdf' ? '<span style="font-size:0.7rem;color:#f59e0b;margin-top:0.3rem;display:block"><i class="fas fa-file-pdf"></i> PDF</span>' : ''}
@@ -714,14 +717,15 @@ function getArticleForm(a = {}) {
     </div>
 
     <!-- Common fields (always required) -->
-    ${formField('Titre *', `<input id="a-title" style="${inputStyle}" value="${a.title||''}" placeholder="Titre de l'article" required />`)}
-    ${formField('Image de couverture * <span style="color:var(--accent-blue);font-size:0.72rem">(obligatoire)</span>', `<input type="file" id="a-image" accept="image/*" style="${inputStyle};padding:0.5rem" ${!a.id ? '' : ''} />${a.image ? `<div style="margin-top:0.5rem"><img src="${resolveImageUrl(a.image)}" style="height:60px;border-radius:0.375rem;object-fit:cover" onerror="this.style.display='none'" /></div>` : ''}`)}
+    ${formField('Titre *', `<input id="a-title" style="${inputStyle}" value="${escapeHtml(a.title)}" placeholder="Titre de l'article" required />`)}
+    ${formField('Image de couverture * <span style="color:var(--accent-blue);font-size:0.72rem">(obligatoire)</span>', `<input type="file" id="a-image" accept="image/*" style="${inputStyle};padding:0.5rem" />${a.image ? `<div style="margin-top:0.5rem"><img src="${resolveImageUrl(a.image)}" style="height:60px;border-radius:0.375rem;object-fit:cover" onerror="this.style.display='none'" /></div>` : ''}`)}
     <div class="dash-form-grid-2">
-      ${formField('Catégorie', `<select id="a-category" style="${inputStyle}"><option value="">-- Choisir --</option><option value="Intelligence Artificielle" ${a.category==='Intelligence Artificielle'?'selected':''}>Intelligence Artificielle</option><option value="Architecture" ${a.category==='Architecture'?'selected':''}>Architecture</option><option value="Mobile" ${a.category==='Mobile'?'selected':''}>Mobile</option><option value="Cloud" ${a.category==='Cloud'?'selected':''}>Cloud</option><option value="Design" ${a.category==='Design'?'selected':''}>Design</option><option value="Startup" ${a.category==='Startup'?'selected':''}>Startup</option><option value="Développement Web" ${a.category==='Développement Web'?'selected':''}>Développement Web</option><option value="Sécurité" ${a.category==='Sécurité'?'selected':''}>Sécurité</option><option value="DevOps" ${a.category==='DevOps'?'selected':''}>DevOps</option><option value="Autre" ${a.category==='Autre'?'selected':''}>Autre</option></select>`)}
-      ${formField('Auteur', `<input id="a-author" style="${inputStyle}" value="${a.author||''}" placeholder="JAYSON STANLEY" />`)}
+      ${formField('Catégorie', `<select id="a-category" style="${inputStyle}"><option value="">-- Choisir --</option><option value="Intelligence Artificielle" ${a.category==='Intelligence Artificielle'?'selected':''}>Intelligence Artificielle</option><option value="Architecture" ${a.category==='Architecture'?'selected':''}>Architecture</option><option value="Mobile" ${a.category==='Mobile'?'selected':''}>Mobile</option><option value="Cloud" ${a.category==='Cloud'?'selected':''}>Cloud</option><option value="Design" ${a.category==='Design'?'selected':''}>Design</option><option value="Startup" ${a.category==='Startup'?'selected':''}>Startup</option><option value="Développement Web" ${a.category==='Développement Web'?'selected':''}>Développement Web</option><option value="Sécurité" ${a.category==='Sécurité'?'selected':''}>Sécurité</option><option value="DevOps" ${a.category==='DevOps'?'selected':''}>DevOps</option><option value="Innovation" ${a.category==='Innovation'?'selected':''}>Innovation</option><option value="Autre" ${a.category==='Autre'?'selected':''}>Autre</option></select>`)}
+      ${formField('Auteur', `<input id="a-author" style="${inputStyle}" value="${escapeHtml(a.author)}" placeholder="JAYSON STANLEY" />`)}
     </div>
-    ${formField('Tags', `<select id="a-tags" multiple style="${inputStyle};height:120px"><option value="IA" ${(a.tags||[]).includes('IA')?'selected':''}>IA</option><option value="Web" ${(a.tags||[]).includes('Web')?'selected':''}>Web</option><option value="Mobile" ${(a.tags||[]).includes('Mobile')?'selected':''}>Mobile</option><option value="Cloud" ${(a.tags||[]).includes('Cloud')?'selected':''}>Cloud</option><option value="Design" ${(a.tags||[]).includes('Design')?'selected':''}>Design</option><option value="Innovation" ${(a.tags||[]).includes('Innovation')?'selected':''}>Innovation</option><option value="Startup" ${(a.tags||[]).includes('Startup')?'selected':''}>Startup</option><option value="Architecture" ${(a.tags||[]).includes('Architecture')?'selected':''}>Architecture</option><option value="DevOps" ${(a.tags||[]).includes('DevOps')?'selected':''}>DevOps</option><option value="Sécurité" ${(a.tags||[]).includes('Sécurité')?'selected':''}>Sécurité</option><option value="Machine Learning" ${(a.tags||[]).includes('Machine Learning')?'selected':''}>Machine Learning</option></select>`, 'Maintenez Ctrl / Cmd pour sélectionner plusieurs tags')}
-    ${formField('Description courte', `<textarea id="a-shortdesc" style="${textareaStyle};min-height:60px" placeholder="Résumé de l'article...">${a.shortDesc||''}</textarea>`)}
+    ${a.updatedAt ? `<div style="font-size:0.75rem;color:var(--accent-cyan);margin-bottom:0.5rem"><i class="fas fa-clock"></i> Dernière modification : ${new Date(a.updatedAt).toLocaleString('fr-FR')}</div>` : ''}
+    ${formField('Tags', `<div style="display:flex;flex-wrap:wrap;gap:0.5rem;padding:0.75rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:0.5rem">${['IA','Web','Mobile','Cloud','Design','Innovation','Startup','Architecture','DevOps','Sécurité','Machine Learning','Afrique','Éthique','Fintech','CI/CD','Infrastructure','Cybersécurité','OWASP','Productivité','Développement','Technologie'].map(tag=>`<label style="display:flex;align-items:center;gap:0.35rem;padding:0.3rem 0.65rem;border:1px solid rgba(255,255,255,0.1);border-radius:999px;cursor:pointer;font-size:0.78rem;color:var(--text-muted);background:rgba(255,255,255,0.03)"><input type="checkbox" name="a-tag" value="${tag}" ${(a.tags||[]).includes(tag)?'checked':''} style="accent-color:var(--accent-blue);width:13px;height:13px" />${tag}</label>`).join('')}</div>`, 'Cochez les tags correspondants')}
+    ${formField('Description courte', `<textarea id="a-shortdesc" style="${textareaStyle};min-height:60px" placeholder="Résumé de l'article...">${escapeHtml(a.shortDesc)}</textarea>`)}
 
     <!-- Manual mode content -->
     <div id="manual-section">
@@ -795,7 +799,7 @@ function saveNewArticle() {
   fd.append('title', document.getElementById('a-title').value);
   fd.append('category', document.getElementById('a-category').value);
   fd.append('author', document.getElementById('a-author').value);
-  fd.append('tags', [...document.getElementById('a-tags').selectedOptions].map(o => o.value).join(', '));
+  fd.append('tags', [...document.querySelectorAll('input[name="a-tag"]:checked')].map(cb => cb.value).join(', '));
   fd.append('shortDesc', document.getElementById('a-shortdesc').value);
   const imgFile = document.getElementById('a-image')?.files[0];
   if (imgFile) fd.append('image', imgFile);
@@ -829,7 +833,7 @@ function saveEditArticle(id) {
   fd.append('title', document.getElementById('a-title').value);
   fd.append('category', document.getElementById('a-category').value);
   fd.append('author', document.getElementById('a-author').value);
-  fd.append('tags', [...document.getElementById('a-tags').selectedOptions].map(o => o.value).join(', '));
+  fd.append('tags', [...document.querySelectorAll('input[name="a-tag"]:checked')].map(cb => cb.value).join(', '));
   fd.append('shortDesc', document.getElementById('a-shortdesc').value);
   fd.append('content', document.getElementById('a-content')?.value || '');
   const imgFile = document.getElementById('a-image')?.files[0];
@@ -913,7 +917,7 @@ async function loadFormations() {
       items: allFormations,
       renderItem: (f) => itemCard({
         icon: f.icon, title: `${f.icon || '📚'} ${f.title}`,
-        subtitle: `${f.duration || ''} · ${f.level || ''} · ${f.price || ''}`,
+        subtitle: `${f.duration || ''} · ${f.level || ''} · ${f.price || ''}${f.updatedAt ? ` · <span style="color:var(--accent-cyan)"><i class="fas fa-pen-to-square"></i> modifié ${new Date(f.updatedAt).toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</span>` : ''}`,
         onEdit: `editFormation('${f.id}')`, onDelete: `deleteFormation('${f.id}')`
       })
     });
@@ -925,16 +929,17 @@ async function loadFormations() {
 function getFormationForm(f = {}) {
   return `
     <div class="dash-form-grid-2">
-      ${formField('Titre *', `<input id="f-title" style="${inputStyle}" value="${f.title||''}" required />`)}
-      ${formField('Icône (emoji)', `<input id="f-icon" style="${inputStyle}" value="${f.icon||'📚'}" />`)}
+      ${formField('Titre *', `<input id="f-title" style="${inputStyle}" value="${escapeHtml(f.title)}" required />`)}
+      ${formField('Icône (emoji)', `<input id="f-icon" style="${inputStyle}" value="${escapeHtml(f.icon||'📚')}" />`)}
     </div>
     <div class="dash-form-grid-3">
-      ${formField('Durée', `<input id="f-duration" style="${inputStyle}" value="${f.duration||''}" placeholder="3 mois" />`)}
-      ${formField('Niveau', `<input id="f-level" style="${inputStyle}" value="${f.level||''}" placeholder="Débutant à Avancé" />`)}
-      ${formField('Prix', `<input id="f-price" style="${inputStyle}" value="${f.price||'Sur devis'}" placeholder="Sur devis" />`)}
+      ${formField('Durée', `<input id="f-duration" style="${inputStyle}" value="${escapeHtml(f.duration)}" placeholder="3 mois" />`)}
+      ${formField('Niveau', `<input id="f-level" style="${inputStyle}" value="${escapeHtml(f.level)}" placeholder="Débutant à Avancé" />`)}
+      ${formField('Prix', `<input id="f-price" style="${inputStyle}" value="${escapeHtml(f.price||'Sur devis')}" placeholder="Sur devis" />`)}
     </div>
-    ${formField('Description', `<textarea id="f-description" style="${textareaStyle};min-height:80px">${f.description||''}</textarea>`)}
-    ${formField('Programme', `<textarea id="f-program" style="${textareaStyle}" placeholder="Un module par ligne...">${(f.program||[]).join('\n')}</textarea>`, 'Un module par ligne')}
+    ${f.updatedAt ? `<div style="font-size:0.75rem;color:var(--accent-cyan);margin-bottom:0.5rem"><i class="fas fa-clock"></i> Dernière modification : ${new Date(f.updatedAt).toLocaleString('fr-FR')}</div>` : ''}
+    ${formField('Description', `<textarea id="f-description" style="${textareaStyle};min-height:80px">${escapeHtml(f.description)}</textarea>`)}
+    ${formField('Programme', `<textarea id="f-program" style="${textareaStyle}" placeholder="Un module par ligne...">${escapeHtml((f.program||[]).join('\n'))}</textarea>`, 'Un module par ligne')}
   `;
 }
 

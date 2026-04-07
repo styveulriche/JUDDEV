@@ -2,8 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/x-icon" href="favicon.ico" />
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+  <link rel="icon" href="images/favicon.jpg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Blog - JUDDEV CORPORATION</title>
   <meta name="description" content="Blog JUDDEV CORPORATION : articles experts sur le développement web, mobile, l'IA, le cloud et le design digital." />
@@ -119,7 +118,23 @@
           <button class="filter-btn" data-filter="Cloud">Cloud</button>
           <button class="filter-btn" data-filter="Design">Design</button>
           <button class="filter-btn" data-filter="Startup">Startup</button>
+          <button class="filter-btn" data-filter="Sécurité">Sécurité</button>
+          <button class="filter-btn" data-filter="Innovation">Innovation</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Tags Filter -->
+    <div id="tags-filter-section" class="reveal" style="margin-top:1rem;padding:1rem 1.25rem;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg)">
+      <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.75rem">
+        <i class="fas fa-hashtag" style="color:var(--accent-cyan);font-size:0.85rem"></i>
+        <span style="font-size:0.8rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em">Filtrer par tags</span>
+        <button id="clear-tags-btn" onclick="clearTagFilter()" style="display:none;margin-left:auto;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;border-radius:999px;padding:0.2rem 0.65rem;font-size:0.72rem;cursor:pointer;font-family:inherit">
+          <i class="fas fa-times"></i> Effacer les tags
+        </button>
+      </div>
+      <div id="blog-tags-list" style="display:flex;flex-wrap:wrap;gap:0.5rem">
+        <!-- Populated by JS -->
       </div>
     </div>
 
@@ -458,6 +473,58 @@ document.addEventListener('DOMContentLoaded', () => {
     }).catch(() => {});
   };
 
+  // Build tags filter
+  const allTags = [...new Set(JUDDEV_DATA.articles.flatMap(a => a.tags || []))].sort();
+  const tagsListEl = document.getElementById('blog-tags-list');
+  if (tagsListEl && allTags.length) {
+    tagsListEl.innerHTML = allTags.map(tag => `
+      <label style="display:flex;align-items:center;gap:0.35rem;padding:0.3rem 0.75rem;border:1px solid var(--border-color);border-radius:999px;cursor:pointer;font-size:0.78rem;color:var(--text-muted);background:rgba(255,255,255,0.03);transition:all 0.15s;user-select:none" class="tag-filter-label">
+        <input type="checkbox" name="blog-tag" value="${tag}" style="accent-color:var(--accent-blue);width:13px;height:13px" />
+        #${tag}
+      </label>
+    `).join('');
+
+    tagsListEl.querySelectorAll('input[name="blog-tag"]').forEach(cb => {
+      cb.parentElement.addEventListener('mouseenter', () => cb.parentElement.style.borderColor = 'rgba(0,102,255,0.4)');
+      cb.parentElement.addEventListener('mouseleave', () => cb.parentElement.style.borderColor = cb.checked ? 'var(--accent-blue)' : 'var(--border-color)');
+      cb.addEventListener('change', applyTagFilter);
+    });
+  }
+
+  function applyTagFilter() {
+    const selectedTags = [...document.querySelectorAll('input[name="blog-tag"]:checked')].map(cb => cb.value);
+    const clearBtn = document.getElementById('clear-tags-btn');
+    if (clearBtn) clearBtn.style.display = selectedTags.length ? 'inline-flex' : 'none';
+
+    // Highlight checked labels
+    document.querySelectorAll('.tag-filter-label').forEach(label => {
+      const cb = label.querySelector('input');
+      label.style.borderColor = cb.checked ? 'var(--accent-blue)' : 'var(--border-color)';
+      label.style.background = cb.checked ? 'rgba(0,102,255,0.12)' : 'rgba(255,255,255,0.03)';
+      label.style.color = cb.checked ? 'var(--text-primary)' : 'var(--text-muted)';
+    });
+
+    const activeCat = document.querySelector('#blog-filters .filter-btn.active')?.dataset?.filter || 'all';
+    let base = activeCat === 'all' ? JUDDEV_DATA.articles : JUDDEV_DATA.articles.filter(a => a.category === activeCat);
+    if (selectedTags.length) {
+      base = base.filter(a => (a.tags || []).some(t => selectedTags.includes(t)));
+    }
+    filteredArticles = base;
+    articlesPage = 1;
+    renderArticlesPage(1);
+  }
+
+  window.clearTagFilter = function() {
+    document.querySelectorAll('input[name="blog-tag"]').forEach(cb => { cb.checked = false; });
+    applyTagFilter();
+  };
+
+  // Precheck tag from URL
+  if (urlTag) {
+    const matchCb = document.querySelector(`input[name="blog-tag"][value="${urlTag}"]`);
+    if (matchCb) { matchCb.checked = true; applyTagFilter(); }
+  }
+
   // Blog category filters
   const blogActiveLabel = document.getElementById('blog-active-label');
   document.querySelectorAll('#blog-filters .filter-btn').forEach(btn => {
@@ -465,10 +532,11 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('#blog-filters .filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const filter = btn.dataset.filter;
-      if (blogActiveLabel) blogActiveLabel.textContent = btn.textContent;
-      filteredArticles = filter === 'all'
-        ? JUDDEV_DATA.articles
-        : JUDDEV_DATA.articles.filter(a => a.category === filter);
+      if (blogActiveLabel) blogActiveLabel.textContent = btn.textContent.trim();
+      const selectedTags = [...document.querySelectorAll('input[name="blog-tag"]:checked')].map(cb => cb.value);
+      let base = filter === 'all' ? JUDDEV_DATA.articles : JUDDEV_DATA.articles.filter(a => a.category === filter);
+      if (selectedTags.length) base = base.filter(a => (a.tags || []).some(t => selectedTags.includes(t)));
+      filteredArticles = base;
       articlesPage = 1;
       renderArticlesPage(1);
     });
@@ -489,7 +557,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const articles = e.detail.articles;
     if (!articles || !articles.length) return;
     const activeFilter = document.querySelector('#blog-filters .filter-btn.active')?.dataset?.filter || 'all';
-    filteredArticles = activeFilter === 'all' ? articles : articles.filter(a => a.category === activeFilter);
+    const selectedTags = [...document.querySelectorAll('input[name="blog-tag"]:checked')].map(cb => cb.value);
+    let base = activeFilter === 'all' ? articles : articles.filter(a => a.category === activeFilter);
+    if (selectedTags.length) base = base.filter(a => (a.tags || []).some(t => selectedTags.includes(t)));
+    filteredArticles = base;
     articlesPage = 1;
     renderArticlesPage(1);
   });
