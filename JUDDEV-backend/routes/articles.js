@@ -12,6 +12,66 @@ async function safeUpload(file, folder) {
   catch (e) { console.error('[Cloudinary]', e.message); return ''; }
 }
 
+function fixPdfEncoding(text = '') {
+  if (!text) return '';
+  try {
+    const converted = Buffer.from(text, 'latin1').toString('utf8');
+    const rawNoise = (text.match(/[√¬‚Äú‚Äù‚Äô‚Äì‚Äî?]/g) || []).length;
+    const convertedNoise = (converted.match(/[√¬‚Äú‚Äù‚Äô‚Äì‚Äî?]/g) || []).length;
+    return convertedNoise < rawNoise ? converted : text;
+  } catch {
+    return text;
+  }
+}
+
+function pdfTextToHtml(rawText = '') {
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const text = fixPdfEncoding(rawText).replace(/\r/g, '');
+  const blocks = text
+    .split(/\n\s*\n+/)
+    .map(block => block.split('\n').map(line => line.trim()).filter(Boolean))
+    .filter(block => block.length);
+
+  if (!blocks.length) return '<p>Contenu non disponible.</p>';
+
+  const htmlParts = [];
+  for (const block of blocks) {
+    const joined = block.join(' ').replace(/\s+/g, ' ').trim();
+    if (!joined || joined.length < 2) continue;
+    if (/^page\s+\d+$/i.test(joined) || /^\d+\s*\/\s*\d+$/.test(joined)) continue;
+
+    if (block.length === 1 && joined.length <= 90 && !/[.!?]$/.test(joined) && (joined === joined.toUpperCase() || /^[A-Z¿¬ƒ…» ÀŒœ‘Ÿ€‹«][^:]{0,80}:?$/.test(joined))) {
+      htmlParts.push(`<h2>${esc(joined.replace(/:$/, ''))}</h2>`);
+      continue;
+    }
+
+    const listItems = block.filter(line => /^([-*ï??ñó]|\d+[.)])\s+/.test(line));
+    if (listItems.length && listItems.length >= Math.ceil(block.length * 0.6)) {
+      const tag = listItems.every(line => /^\d+[.)]\s+/.test(line)) ? 'ol' : 'ul';
+      htmlParts.push(`<${tag}>${block.map(line => `<li>${esc(line.replace(/^([-*ï??ñó]|\d+[.)])\s+/, ''))}</li>`).join('')}</${tag}>`);
+      continue;
+    }
+
+    if (block.length === 1 && joined.length <= 120 && (/^[IVXLC]+\./i.test(joined) || /^\d+[.)]\s+/.test(joined) || joined.endsWith(':'))) {
+      htmlParts.push(`<h3>${esc(joined.replace(/:$/, ''))}</h3>`);
+      continue;
+    }
+
+    const paragraph = block
+      .map((line, index) => {
+        if (index < block.length - 1 && line.endsWith('-')) return line.slice(0, -1);
+        return line;
+      })
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    htmlParts.push(`<p>${esc(paragraph)}</p>`);
+  }
+
+  return htmlParts.join('\n') || '<p>Contenu non disponible.</p>';
+}
+
 // GET /api/articles
 router.get('/', async (req, res) => {
   try {
@@ -51,7 +111,7 @@ router.get('/comments', auth, async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const article = await Article.findOne({ id: req.params.id });
-    if (!article) return res.status(404).json({ message: 'Article non trouv√©.' });
+    if (!article) return res.status(404).json({ message: 'Article non trouvÈ.' });
     res.json(article);
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur.' });
@@ -75,7 +135,6 @@ router.post('/', auth, uploadMixed.fields([{ name: 'image', maxCount: 1 }]), asy
       date: new Date()
     });
     await article.save();
-    // Notify newsletter subscribers
     notifySubscribers(article).catch(() => {});
     res.status(201).json(article);
   } catch (err) {
@@ -98,86 +157,18 @@ router.post('/from-pdf', auth, uploadMixed.fields([
     }
 
     const pdfFile = req.files.pdfFile[0];
-
-    // Extract text from PDF with formatting detection
     let content = '';
     let pdfFilename = '';
+
     try {
       const pdfParse = require('pdf-parse/lib/pdf-parse.js');
-      const dataBuffer = pdfFile.buffer;
-      const pdfData = await pdfParse(dataBuffer);
-
-      const rawText = pdfData.text || '';
-      const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
-      // Split into lines and group them smartly
-      const lines = rawText.split('\n');
-      const blocks = [];
-      let currentBlock = [];
-
-      for (const raw of lines) {
-        const line = raw.trimEnd();
-        if (line.trim() === '') {
-          if (currentBlock.length) { blocks.push(currentBlock); currentBlock = []; }
-        } else {
-          currentBlock.push(line);
-        }
-      }
-      if (currentBlock.length) blocks.push(currentBlock);
-
-      const htmlParts = [];
-      for (const block of blocks) {
-        const text = block.join(' ').trim();
-        if (!text || text.length < 3) continue;
-
-        // H1: very short, all-caps, no punctuation mid-text
-        if (block.length === 1 && text.length < 60 && text === text.toUpperCase() && /^[A-Z√Ä√Ç√Ñ√â√à√ä√ã√é√è√î√ô√õ√ú√á0-9\s\-:&'¬´¬ª()]+$/u.test(text)) {
-          htmlParts.push(`<h2>${esc(text)}</h2>`);
-          continue;
-        }
-
-        // H2: short single line that looks like a heading (title-case, ends with colon, or numbered)
-        if (block.length === 1 && text.length < 100 && (
-          text.endsWith(':') ||
-          /^\d+[\.\)]\s/.test(text) ||
-          /^[IVX]+\.\s/.test(text) ||
-          (/^[A-Z√Ä√Ç√Ñ√â√à√ä√ã√é√è√î√ô√õ√ú√á]/.test(text) && text.length < 60 && !/[.!?]$/.test(text))
-        )) {
-          htmlParts.push(`<h3>${esc(text)}</h3>`);
-          continue;
-        }
-
-        // List items: lines starting with bullet-like chars
-        const listLines = block.filter(l => /^[\-\‚Ä¢\*\‚Äì\‚Äî‚úì‚úî‚ñ∂‚ñ∫]\s/.test(l.trim()) || /^\d+[\.\)]\s/.test(l.trim()));
-        if (listLines.length > 0 && listLines.length >= block.length * 0.6) {
-          const items = block.map(l => {
-            const stripped = l.trim().replace(/^[\-\‚Ä¢\*\‚Äì\‚Äî‚úì‚úî‚ñ∂‚ñ∫]\s+/, '').replace(/^\d+[\.\)]\s+/, '');
-            return `<li>${esc(stripped)}</li>`;
-          }).join('');
-          htmlParts.push(`<ul style="padding-left:1.5rem;margin:0.75rem 0">${items}</ul>`);
-          continue;
-        }
-
-        // Bold detection: lines that are short and at start of block (likely bold lead-in)
-        const paraLines = block.map((l, i) => {
-          const trimmed = l.trim();
-          // First line short and followed by more content ‚Üí likely bold
-          if (i === 0 && block.length > 1 && trimmed.length < 80 && !trimmed.endsWith(',')) {
-            return `<strong>${esc(trimmed)}</strong>`;
-          }
-          return esc(trimmed);
-        });
-        htmlParts.push(`<p>${paraLines.join(' ')}</p>`);
-      }
-
-      content = htmlParts.join('\n') || '<p>Contenu non disponible.</p>';
-
+      const pdfData = await pdfParse(pdfFile.buffer);
+      content = pdfTextToHtml(pdfData.text || '');
     } catch (pdfErr) {
       console.error('PDF parse error:', pdfErr);
       content = `<p>Contenu extrait du PDF. Erreur de parsing: ${pdfErr.message}</p>`;
     }
 
-    // Upload PDF to Cloudinary if parse succeeded (optional)
     try {
       pdfFilename = await uploadToCloudinary(pdfFile, 'juddev/pdfs');
     } catch (e) {
@@ -195,7 +186,6 @@ router.post('/from-pdf', auth, uploadMixed.fields([
       date: new Date()
     });
     await article.save();
-    // Notify newsletter subscribers
     notifySubscribers(article).catch(() => {});
     res.status(201).json(article);
   } catch (err) {
@@ -215,7 +205,7 @@ router.put('/:id', auth, uploadMixed.fields([{ name: 'image', maxCount: 1 }]), a
     else if (req.body.image) updateData.image = req.body.image;
 
     const article = await Article.findOneAndUpdate({ id: req.params.id }, updateData, { new: true });
-    if (!article) return res.status(404).json({ message: 'Article non trouv√©.' });
+    if (!article) return res.status(404).json({ message: 'Article non trouvÈ.' });
     res.json(article);
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur: ' + err.message });
@@ -226,8 +216,8 @@ router.put('/:id', auth, uploadMixed.fields([{ name: 'image', maxCount: 1 }]), a
 router.delete('/:id', auth, async (req, res) => {
   try {
     const article = await Article.findOneAndDelete({ id: req.params.id });
-    if (!article) return res.status(404).json({ message: 'Article non trouv√©.' });
-    res.json({ message: 'Article supprim√©.' });
+    if (!article) return res.status(404).json({ message: 'Article non trouvÈ.' });
+    res.json({ message: 'Article supprimÈ.' });
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur.' });
   }
@@ -239,7 +229,7 @@ router.post('/:id/comments', async (req, res) => {
     const { name, email, text } = req.body;
     if (!name || !text) return res.status(400).json({ message: 'Nom et commentaire requis.' });
     const article = await Article.findOne({ id: req.params.id });
-    if (!article) return res.status(404).json({ message: 'Article non trouv√©.' });
+    if (!article) return res.status(404).json({ message: 'Article non trouvÈ.' });
     article.comments.push({ name, email: email || '', text });
     await article.save();
     res.status(201).json(article.comments);
@@ -252,12 +242,12 @@ router.post('/:id/comments', async (req, res) => {
 router.delete('/:id/comments/:commentId', auth, async (req, res) => {
   try {
     const article = await Article.findOne({ id: req.params.id });
-    if (!article) return res.status(404).json({ message: 'Article non trouv√©.' });
+    if (!article) return res.status(404).json({ message: 'Article non trouvÈ.' });
     const comment = article.comments.id(req.params.commentId);
-    if (!comment) return res.status(404).json({ message: 'Commentaire non trouv√©.' });
+    if (!comment) return res.status(404).json({ message: 'Commentaire non trouvÈ.' });
     comment.deleteOne();
     await article.save();
-    res.json({ message: 'Commentaire supprim√©.' });
+    res.json({ message: 'Commentaire supprimÈ.' });
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur: ' + err.message });
   }

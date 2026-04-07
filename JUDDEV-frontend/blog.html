@@ -124,17 +124,25 @@
       </div>
     </div>
 
-    <!-- Tags Filter -->
-    <div id="tags-filter-section" class="reveal" style="margin-top:1rem;padding:1rem 1.25rem;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg)">
-      <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.75rem">
-        <i class="fas fa-hashtag" style="color:var(--accent-cyan);font-size:0.85rem"></i>
-        <span style="font-size:0.8rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em">Filtrer par tags</span>
-        <button id="clear-tags-btn" onclick="clearTagFilter()" style="display:none;margin-left:auto;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;border-radius:999px;padding:0.2rem 0.65rem;font-size:0.72rem;cursor:pointer;font-family:inherit">
-          <i class="fas fa-times"></i> Effacer les tags
-        </button>
-      </div>
-      <div id="blog-tags-list" style="display:flex;flex-wrap:wrap;gap:0.5rem">
-        <!-- Populated by JS -->
+    <div class="filter-dropdown-wrapper reveal">
+      <button class="filter-toggle-btn" id="blog-tags-toggle" aria-expanded="false">
+        <span><i class="fas fa-hashtag"></i> Tags</span>
+        <span class="filter-active-label" id="blog-tags-active-label">Tous</span>
+        <i class="fas fa-chevron-down filter-toggle-chevron"></i>
+      </button>
+      <div class="filter-panel" id="blog-tags-panel">
+        <div id="tags-filter-section" style="padding:1rem 1.25rem;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg)">
+          <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.75rem">
+            <i class="fas fa-hashtag" style="color:var(--accent-cyan);font-size:0.85rem"></i>
+            <span style="font-size:0.8rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em">Filtrer par tags</span>
+            <button id="clear-tags-btn" onclick="clearTagFilter()" style="display:none;margin-left:auto;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;border-radius:999px;padding:0.2rem 0.65rem;font-size:0.72rem;cursor:pointer;font-family:inherit">
+              <i class="fas fa-times"></i> Effacer les tags
+            </button>
+          </div>
+          <div id="blog-tags-list" style="display:flex;flex-wrap:wrap;gap:0.5rem">
+            <!-- Populated by JS -->
+          </div>
+        </div>
       </div>
     </div>
 
@@ -318,7 +326,7 @@ function renderArticlesPage(page) {
   grid.innerHTML = slice.map((a, i) => `
     <a href="article-detail.html?id=${a.id}" class="blog-card reveal stagger-${(i % 3) + 1}" style="text-decoration:none" data-filter-cat="${a.category}">
       <div class="blog-card-img">
-        <img src="${a.image}" alt="${a.title}" loading="lazy" onerror="this.style.background='var(--bg-secondary)'" />
+        <img src="${resolveArticleImg(a.image)}" alt="${a.title}" loading="lazy" onerror="this.style.background='var(--bg-secondary)'" />
       </div>
       <div class="blog-card-body">
         <div class="blog-card-meta">
@@ -381,6 +389,10 @@ function renderArticlesPagination(total, current) {
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof JUDDEV_DATA === 'undefined') return;
 
+  const resolveArticleImg = (path) => (typeof JUDDEV_CONFIG !== 'undefined' ? JUDDEV_CONFIG.getImageUrl(path) : path);
+  const blogActiveLabel = document.getElementById('blog-active-label');
+  const blogTagsActiveLabel = document.getElementById('blog-tags-active-label');
+
   // Build carousel
   const carouselTrack = document.getElementById('carousel-track');
   const carouselDots = document.getElementById('carousel-dots');
@@ -389,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (carouselTrack) {
     carouselTrack.innerHTML = featuredArticles.map(a => `
       <div class="carousel-slide">
-        <img src="${a.image}" alt="${a.title}" onerror="this.style.background='var(--bg-secondary)'" />
+        <img src="${resolveArticleImg(a.image)}" alt="${a.title}" onerror="this.style.background='var(--bg-secondary)'" />
         <div class="carousel-overlay"></div>
         <div class="carousel-content">
           <div class="carousel-meta">
@@ -495,6 +507,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectedTags = [...document.querySelectorAll('input[name="blog-tag"]:checked')].map(cb => cb.value);
     const clearBtn = document.getElementById('clear-tags-btn');
     if (clearBtn) clearBtn.style.display = selectedTags.length ? 'inline-flex' : 'none';
+    if (blogTagsActiveLabel) blogTagsActiveLabel.textContent = selectedTags.length ? selectedTags.join(', ') : 'Tous';
+    const tagsToggle = document.getElementById('blog-tags-toggle');
+    if (tagsToggle) tagsToggle.classList.toggle('has-active', selectedTags.length > 0);
 
     // Highlight checked labels
     document.querySelectorAll('.tag-filter-label').forEach(label => {
@@ -526,7 +541,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Blog category filters
-  const blogActiveLabel = document.getElementById('blog-active-label');
   document.querySelectorAll('#blog-filters .filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('#blog-filters .filter-btn').forEach(b => b.classList.remove('active'));
@@ -552,6 +566,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  const blogTagsToggle = document.getElementById('blog-tags-toggle');
+  const blogTagsPanel = document.getElementById('blog-tags-panel');
+  if (blogTagsToggle && blogTagsPanel) {
+    blogTagsToggle.addEventListener('click', () => {
+      const isOpen = blogTagsPanel.classList.toggle('open');
+      blogTagsToggle.setAttribute('aria-expanded', isOpen);
+    });
+  }
+
   // Auto-refresh: re-render when API data updates (every 30s via data.js polling)
   document.addEventListener('juddev:dataUpdated', (e) => {
     const articles = e.detail.articles;
@@ -568,3 +591,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+

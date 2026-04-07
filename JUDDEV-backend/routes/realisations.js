@@ -72,12 +72,25 @@ router.put('/:id', auth, uploadImage.single('image'), async (req, res) => {
     const showSiteBtn = req.body.showSiteBtn !== 'false' && req.body.showSiteBtn !== false;
     const showYoutubeBtn = req.body.showYoutubeBtn === 'true' || req.body.showYoutubeBtn === true;
 
+    const current = await Realisation.findOne({ id: req.params.id });
+    if (!current) return res.status(404).json({ message: 'Réalisation non trouvée.' });
+
     const updateData = { title, category, service, sector, shortDesc, longDesc, client, year, technologies, highlights, url: url || '#', youtubeUrl, showSiteBtn, showYoutubeBtn, order: order || 0 };
+    let images = req.body.images ? (Array.isArray(req.body.images) ? req.body.images : [req.body.images]) : null;
+    if (images) images = images.map(img => String(img || '').trim()).filter(Boolean);
+
     if (req.file) updateData.image = await safeUpload(req.file, 'juddev/realisations');
     else if (req.body.image) updateData.image = req.body.image;
 
+    if (images) updateData.images = images;
+    if (updateData.image) {
+      const nextImages = Array.isArray(updateData.images) ? updateData.images : (current.images || []);
+      updateData.images = [updateData.image, ...nextImages.filter(img => img && img !== updateData.image)];
+    } else if (Array.isArray(updateData.images) && updateData.images.length) {
+      updateData.image = updateData.images[0];
+    }
+
     const realisation = await Realisation.findOneAndUpdate({ id: req.params.id }, updateData, { new: true });
-    if (!realisation) return res.status(404).json({ message: 'Réalisation non trouvée.' });
     res.json(realisation);
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur: ' + err.message });
@@ -88,7 +101,7 @@ router.put('/:id', auth, uploadImage.single('image'), async (req, res) => {
 router.delete('/:id', auth, async (req, res) => {
   try {
     const r = await Realisation.findOneAndDelete({ id: req.params.id });
-    if (!r) return res.status(404).json({ message: 'Réalisation non trouvée.' });
+    if (!r) return res.status(404).json({ message: 'Réalisation supprimée.' });
     res.json({ message: 'Réalisation supprimée.' });
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur.' });
@@ -96,3 +109,4 @@ router.delete('/:id', auth, async (req, res) => {
 });
 
 module.exports = router;
+

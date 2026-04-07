@@ -688,7 +688,16 @@ async function loadRealisationDetail() {
     const res = await fetch(`${API}/realisations/${id}`);
     if (res.ok) {
       project = await res.json();
-      if (!project.images || !project.images.length) project.images = [project.image].filter(Boolean);
+      // Resolve image URLs using config helper
+      const resolveImg = (p) => (typeof JUDDEV_CONFIG !== 'undefined' ? JUDDEV_CONFIG.getImageUrl(p) : p);
+      if (project.image) project.image = resolveImg(project.image);
+      if (project.images && project.images.length) {
+        project.images = project.images.map(resolveImg);
+      }
+      const resolvedImages = Array.isArray(project.images) ? project.images.map(resolveImg).filter(Boolean) : [];
+      const leadImage = project.image || resolvedImages[0] || '';
+      project.image = leadImage;
+      project.images = [leadImage, ...resolvedImages.filter(img => img && img !== leadImage)].filter(Boolean);
       if (!project.highlights) project.highlights = [];
       if (!project.technologies) project.technologies = [];
       if (!project.longDesc) project.longDesc = project.description || project.shortDesc || '';
@@ -861,6 +870,9 @@ async function loadArticleDetail() {
     return;
   }
 
+  const resolveArticleImg = (path) => (typeof JUDDEV_CONFIG !== 'undefined' ? JUDDEV_CONFIG.getImageUrl(path) : path);
+  article.image = resolveArticleImg(article.image);
+
   document.title = `${article.title} - JUDDEV Blog`;
   const heroTitle = document.getElementById('page-hero-title');
   const breadcrumbCurrent = document.getElementById('breadcrumb-current');
@@ -895,25 +907,8 @@ async function loadArticleDetail() {
 
   // Pagination pour longs articles (split sur <!-- page-break --> ou auto à 4000 chars)
   function buildArticlePages(content) {
-    const manualPages = content.split(/<!--\s*page-break\s*-->/i);
-    if (manualPages.length > 1) return manualPages;
-    // Auto-split: couper à la limite de 4000 chars sur une balise de fermeture
-    const LIMIT = 4000;
-    if (content.length <= LIMIT) return [content];
-    const pages = [];
-    let remaining = content;
-    while (remaining.length > LIMIT) {
-      let cut = remaining.lastIndexOf('</p>', LIMIT);
-      if (cut < 0) cut = remaining.lastIndexOf('</h2>', LIMIT);
-      if (cut < 0) cut = remaining.lastIndexOf('</h3>', LIMIT);
-      if (cut < 0) cut = LIMIT;
-      else cut += cut === remaining.lastIndexOf('</p>', LIMIT) ? 4 :
-                  cut === remaining.lastIndexOf('</h2>', LIMIT) ? 5 : 5;
-      pages.push(remaining.slice(0, cut));
-      remaining = remaining.slice(cut);
-    }
-    if (remaining.trim()) pages.push(remaining);
-    return pages;
+    const manualPages = content.split(/<!--\s*page-break\s*-->/i).map(page => page.trim()).filter(Boolean);
+    return manualPages.length > 1 ? manualPages : [content];
   }
 
   const articlePages = buildArticlePages(contentToHtml(article.content || ''));
@@ -1486,3 +1481,5 @@ document.querySelectorAll('.counter').forEach(el => {
     init();
   }
 })();
+
+

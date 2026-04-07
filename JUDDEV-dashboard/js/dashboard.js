@@ -666,6 +666,25 @@ function deleteRealisation(id) {
 let allArticles = [];
 let articleMode = 'manual'; // 'manual' | 'pdf'
 
+function addNewArticleTag() {
+  const input = document.getElementById('article-new-tag-input');
+  const tagsWrap = document.getElementById('article-tags-wrap');
+  if (!input || !tagsWrap) return;
+
+  const tag = input.value.trim();
+  if (!tag) return;
+
+  const exists = [...tagsWrap.querySelectorAll('input[name="a-tag"]')].some(cb => cb.value.toLowerCase() === tag.toLowerCase());
+  if (exists) {
+    input.value = '';
+    return;
+  }
+
+  const safeTag = escapeHtml(tag);
+  tagsWrap.insertAdjacentHTML('beforeend', `<label style="display:flex;align-items:center;gap:0.35rem;padding:0.3rem 0.65rem;border:1px solid rgba(255,255,255,0.1);border-radius:999px;cursor:pointer;font-size:0.78rem;color:var(--text-muted);background:rgba(255,255,255,0.03)"><input type="checkbox" name="a-tag" value="${safeTag}" checked style="accent-color:var(--accent-blue);width:13px;height:13px" />${safeTag}</label>`);
+  input.value = '';
+}
+
 async function loadArticles() {
   const section = document.getElementById('section-articles');
   if (!section) return;
@@ -724,7 +743,8 @@ function getArticleForm(a = {}) {
       ${formField('Auteur', `<input id="a-author" style="${inputStyle}" value="${escapeHtml(a.author)}" placeholder="JAYSON STANLEY" />`)}
     </div>
     ${a.updatedAt ? `<div style="font-size:0.75rem;color:var(--accent-cyan);margin-bottom:0.5rem"><i class="fas fa-clock"></i> Dernière modification : ${new Date(a.updatedAt).toLocaleString('fr-FR')}</div>` : ''}
-    ${formField('Tags', `<div style="display:flex;flex-wrap:wrap;gap:0.5rem;padding:0.75rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:0.5rem">${['IA','Web','Mobile','Cloud','Design','Innovation','Startup','Architecture','DevOps','Sécurité','Machine Learning','Afrique','Éthique','Fintech','CI/CD','Infrastructure','Cybersécurité','OWASP','Productivité','Développement','Technologie'].map(tag=>`<label style="display:flex;align-items:center;gap:0.35rem;padding:0.3rem 0.65rem;border:1px solid rgba(255,255,255,0.1);border-radius:999px;cursor:pointer;font-size:0.78rem;color:var(--text-muted);background:rgba(255,255,255,0.03)"><input type="checkbox" name="a-tag" value="${tag}" ${(a.tags||[]).includes(tag)?'checked':''} style="accent-color:var(--accent-blue);width:13px;height:13px" />${tag}</label>`).join('')}</div>`, 'Cochez les tags correspondants')}
+    ${formField('Tags', `<div id="article-tags-wrap" style="display:flex;flex-wrap:wrap;gap:0.5rem;padding:0.75rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:0.5rem">${['IA','Web','Mobile','Cloud','Design','Innovation','Startup','Architecture','DevOps','Sécurité','Machine Learning','Afrique','Éthique','Fintech','CI/CD','Infrastructure','Cybersécurité','OWASP','Productivité','Développement','Technologie'].map(tag=>`<label style="display:flex;align-items:center;gap:0.35rem;padding:0.3rem 0.65rem;border:1px solid rgba(255,255,255,0.1);border-radius:999px;cursor:pointer;font-size:0.78rem;color:var(--text-muted);background:rgba(255,255,255,0.03)"><input type="checkbox" name="a-tag" value="${tag}" ${(a.tags||[]).includes(tag)?'checked':''} style="accent-color:var(--accent-blue);width:13px;height:13px" />${tag}</label>`).join('')}</div>`, 'Cochez les tags correspondants')}
+    ${formField('Nouveau tag', `<div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap"><input id="article-new-tag-input" style="${inputStyle};flex:1;min-width:180px" placeholder="Ajouter un tag..." /><button type="button" onclick="addNewArticleTag()" style="background:rgba(0,102,255,0.12);border:1px solid rgba(0,102,255,0.25);color:var(--accent-light);border-radius:0.5rem;padding:0.65rem 0.9rem;cursor:pointer;font-size:0.8rem;font-weight:600;font-family:inherit;white-space:nowrap"><i class="fas fa-plus"></i> Ajouter un nouveau tag</button></div>`, 'Le tag sera ajouté à la liste ci-dessus et coché automatiquement')}
     ${formField('Description courte', `<textarea id="a-shortdesc" style="${textareaStyle};min-height:60px" placeholder="Résumé de l'article...">${escapeHtml(a.shortDesc)}</textarea>`)}
 
     <!-- Manual mode content -->
