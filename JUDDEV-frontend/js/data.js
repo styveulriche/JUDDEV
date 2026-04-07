@@ -546,6 +546,224 @@ const JUDDEV_DATA_DEFAULT = {
 <p>Les principales erreurs que nous observons chez nos clients : construire trop de fonctionnalités, ne pas parler aux utilisateurs assez tôt, confondre MVP avec prototype, et surtout attendre que le produit soit "parfait" avant de lancer.</p>`,
       author: 'FOKOUA STYVE',
       tags: ['MVP', 'Startup', 'Lean Startup', 'Product', 'Agilité']
+    },
+    {
+      id: 'article-cybersecurite',
+      title: 'La cybersécurité devient critique',
+      category: 'Sécurité',
+      date: '2026-03-28',
+      image: 'images/dev7.PNG',
+      shortDesc: 'Les cyberattaques explosent en Afrique et dans le monde. Comprendre les enjeux et les bonnes pratiques pour protéger votre entreprise est devenu une priorité absolue.',
+      content: `<h2>Pourquoi la cybersécurité est devenue incontournable</h2>
+<p>En 2025, une entreprise est victime d'une cyberattaque toutes les 39 secondes dans le monde. En Afrique, les pertes liées à la cybercriminalité ont dépassé 3,5 milliards de dollars. Ces chiffres alarmants illustrent une réalité : la cybersécurité n'est plus une option, c'est une nécessité absolue pour toute organisation numérique.</p>
+
+<h2>Les menaces les plus répandues</h2>
+
+<h3>Le phishing et l'ingénierie sociale</h3>
+<p>90% des violations de données commencent par un email de phishing. Les attaquants usurpent l'identité de partenaires, de banques ou de services connus pour tromper les employés et obtenir des accès non autorisés. La formation des collaborateurs est la première ligne de défense.</p>
+
+<h3>Les ransomwares</h3>
+<p>Les logiciels de rançon chiffrent vos données et exigent un paiement pour les récupérer. Les PME africaines sont particulièrement ciblées car elles disposent souvent de moyens limités pour se défendre. Une entreprise victime d'un ransomware met en moyenne 287 jours à détecter et contenir l'incident.</p>
+
+<h3>Les attaques sur les APIs</h3>
+<p>Avec l'explosion des applications mobiles et web, les APIs sont devenues des cibles privilégiées. Une API mal sécurisée peut exposer des millions de données utilisateurs en quelques heures. L'authentification forte, le chiffrement et les tests de pénétration réguliers sont essentiels.</p>
+
+<h2>Les 5 piliers d'une cybersécurité solide</h2>
+<ul>
+  <li><strong>Identification :</strong> Cartographiez vos actifs numériques et évaluez vos risques</li>
+  <li><strong>Protection :</strong> Mettez à jour vos systèmes, utilisez des mots de passe forts et l'authentification à deux facteurs</li>
+  <li><strong>Détection :</strong> Installez des outils de monitoring pour détecter les comportements anormaux</li>
+  <li><strong>Réponse :</strong> Préparez un plan de réponse aux incidents avant qu'ils ne surviennent</li>
+  <li><strong>Récupération :</strong> Sauvegardez régulièrement vos données selon la règle 3-2-1</li>
+</ul>
+
+<h2>L'approche JUDDEV en matière de sécurité</h2>
+<p>Chez JUDDEV CORPORATION, la sécurité est intégrée dès la conception de chaque projet — le principe "Security by Design". Nous réalisons des audits de sécurité, des tests de pénétration et formons vos équipes aux bonnes pratiques pour vous prémunir contre les menaces actuelles et futures.</p>`,
+      author: 'NGUEYE NGUEYE DURAND',
+      tags: ['Sécurité', 'Cybersécurité', 'Ransomware', 'Phishing', 'API']
+    },
+    {
+      id: 'article-tech-afrique',
+      title: 'La tech en Afrique monte en puissance',
+      category: 'Innovation',
+      date: '2026-03-20',
+      image: 'images/a-propos.jpeg',
+      shortDesc: "L'écosystème technologique africain connaît une croissance sans précédent. Startups, financements, talents locaux : le continent s'affirme comme un acteur incontournable de la tech mondiale.",
+      content: `<h2>L'Afrique, nouveau eldorado de la tech</h2>
+<p>En 2025, les startups africaines ont levé plus de 5 milliards de dollars de financement, un record absolu. Des villes comme Lagos, Nairobi, Johannesburg, Le Caire et Yaoundé émergent comme des hubs technologiques dynamiques qui attirent investisseurs et talents du monde entier.</p>
+
+<h2>Les secteurs qui explosent</h2>
+
+<h3>La fintech : révolution des paiements</h3>
+<p>Avec 66% de la population africaine non bancarisée, la fintech a trouvé un terrain de jeu idéal. Des solutions comme M-Pesa au Kenya, Wave au Sénégal ou MoMo de MTN ont transformé l'accès aux services financiers. La fintech représente aujourd'hui 38% de tous les financements tech africains.</p>
+
+<h3>L'agritech : nourrir un continent</h3>
+<p>L'agriculture emploie plus de 60% des Africains. Des startups comme Twiga Foods (Kenya) ou Hello Tractor (Nigeria) utilisent la technologie pour améliorer la chaîne de valeur agricole, réduire le gaspillage et augmenter les revenus des agriculteurs.</p>
+
+<h3>L'edtech : démocratiser l'éducation</h3>
+<p>Avec 60% de la population africaine ayant moins de 25 ans, l'edtech représente une opportunité massive. Des plateformes comme Atingi, Andela ou uLesson forment la prochaine génération de développeurs et professionnels africains.</p>
+
+<h2>Cameroun : un écosystème en plein essor</h2>
+<p>Yaoundé et Douala voient émerger une nouvelle génération d'entrepreneurs tech. Des incubateurs comme Silicon Mountain à Buea, les programmes gouvernementaux et des agences comme JUDDEV CORPORATION contribuent à structurer cet écosystème. La demande en solutions digitales pour les entreprises locales n'a jamais été aussi forte.</p>
+
+<h2>Les défis à surmonter</h2>
+<ul>
+  <li>Accès à l'électricité et à une connectivité fiable</li>
+  <li>Formation des talents techniques locaux</li>
+  <li>Cadres réglementaires adaptés aux startups</li>
+  <li>Accès au financement pour les early-stage</li>
+</ul>
+
+<p>Malgré ces défis, l'énergie et l'innovation des entrepreneurs africains sont une force incomparable. L'Afrique ne rattrape plus son retard — elle trace sa propre voie.</p>`,
+      author: 'JAYSON STANLEY DJEMETIO',
+      tags: ['Afrique', 'Tech', 'Innovation', 'Startup', 'Fintech']
+    },
+    {
+      id: 'article-ia-confiance',
+      title: 'Peut-on faire confiance à l\'intelligence artificielle ?',
+      category: 'Intelligence Artificielle',
+      date: '2026-03-10',
+      image: 'images/ia.jpg',
+      shortDesc: "L'IA prend des décisions qui affectent nos vies : recrutement, crédit, santé, justice. Peut-on lui faire confiance ? Quels sont les risques et comment les maîtriser ?",
+      content: `<h2>L'IA décide déjà pour nous</h2>
+<p>Sans le savoir, vos demandes de crédit, votre fil d'actualité, votre score d'assurance, les candidatures que vous recevez (ou ne recevez pas) sont filtrés par des algorithmes d'IA. Ces systèmes prennent des décisions aux conséquences réelles sur nos vies. La question de la confiance n'est plus théorique.</p>
+
+<h2>Les biais : le talon d'Achille de l'IA</h2>
+<p>Un algorithme de reconnaissance faciale testée par le MIT Media Lab avait un taux d'erreur de 0,8% sur les hommes blancs, mais de 34,7% sur les femmes noires. Ces biais ne viennent pas d'une malveillance des développeurs, mais des données d'entraînement qui reflètent les inégalités existantes dans la société.</p>
+
+<h3>Comment les biais se forment</h3>
+<p>Les modèles d'IA apprennent à partir de données historiques. Si ces données reflètent des préjugés systémiques — discrimination à l'embauche, inégalités de genre, biais raciaux — l'IA les amplifie et les automatise à grande échelle.</p>
+
+<h2>L'opacité des boîtes noires</h2>
+<p>Les modèles de deep learning les plus performants sont aussi les moins interprétables. On parle de "boîte noire" : on connaît les entrées et les sorties, mais pas le raisonnement interne. Comment contester une décision d'IA qu'on ne peut pas comprendre ?</p>
+
+<h2>Vers une IA digne de confiance</h2>
+<h3>Les principes de l'IA responsable</h3>
+<ul>
+  <li><strong>Transparence :</strong> Les décisions doivent pouvoir être expliquées</li>
+  <li><strong>Équité :</strong> L'IA ne doit pas discriminer ni amplifier les biais</li>
+  <li><strong>Robustesse :</strong> Les systèmes doivent être fiables et résilients</li>
+  <li><strong>Vie privée :</strong> Les données personnelles doivent être protégées</li>
+  <li><strong>Responsabilité :</strong> Un humain doit toujours être responsable des décisions finales</li>
+</ul>
+
+<h2>Notre position chez JUDDEV</h2>
+<p>Nous développons des solutions d'IA en suivant les principes de l'IA responsable. Chaque système que nous déployons inclut une composante d'explicabilité, des audits de biais réguliers et un mécanisme de supervision humaine. L'IA doit augmenter l'humain, pas le remplacer.</p>`,
+      author: 'NGUEYE NGUEYE DURAND',
+      tags: ['IA', 'Éthique', 'Biais', 'Innovation', 'Technologie']
+    },
+    {
+      id: 'article-cloud-devops',
+      title: 'C\'est quoi le Cloud et le DevOps ?',
+      category: 'Cloud',
+      date: '2026-02-25',
+      image: 'images/dev3.jpg',
+      shortDesc: 'Cloud et DevOps sont devenus incontournables dans le monde du développement moderne. Démystifions ces concepts clés et découvrons comment ils transforment la manière dont les logiciels sont construits et déployés.',
+      content: `<h2>Le Cloud : l'informatique comme service</h2>
+<p>Le cloud computing, c'est simplement l'accès à des ressources informatiques — serveurs, stockage, bases de données, réseaux, logiciels — via Internet, à la demande, sans avoir besoin de les posséder physiquement. Pensez-y comme à l'électricité : vous ne gérez pas votre propre centrale, vous payez ce que vous consommez.</p>
+
+<h3>Les trois modèles du cloud</h3>
+<ul>
+  <li><strong>IaaS (Infrastructure as a Service) :</strong> Vous louez des serveurs virtuels (AWS EC2, Google Compute Engine). Vous gérez tout depuis l'OS.</li>
+  <li><strong>PaaS (Platform as a Service) :</strong> La plateforme gère l'infrastructure, vous vous concentrez sur votre code (Heroku, Railway, Render).</li>
+  <li><strong>SaaS (Software as a Service) :</strong> Vous utilisez directement le logiciel via le navigateur (Google Workspace, Salesforce).</li>
+</ul>
+
+<h3>Pourquoi migrer vers le cloud ?</h3>
+<p>Pour une startup ou PME africaine, le cloud élimine le besoin d'investir dans du matériel coûteux. Vous démarrez avec 0 investissement matériel, vous scalez en quelques clics, et vous payez uniquement ce que vous utilisez. C'est un game-changer pour l'entrepreneuriat africain.</p>
+
+<h2>Le DevOps : relier développement et opérations</h2>
+<p>DevOps est une culture et un ensemble de pratiques qui rapprochent les équipes de développement (Dev) et d'opérations (Ops) pour livrer des logiciels plus vite, plus souvent et plus fiablement.</p>
+
+<h3>Les pratiques DevOps essentielles</h3>
+<ul>
+  <li><strong>CI/CD :</strong> Intégration et déploiement continus — chaque modification de code est automatiquement testée et déployée</li>
+  <li><strong>Infrastructure as Code :</strong> Votre infrastructure est définie dans des fichiers de configuration versionnés</li>
+  <li><strong>Monitoring :</strong> Surveillance en temps réel de vos applications en production</li>
+  <li><strong>Conteneurisation :</strong> Docker et Kubernetes pour des déploiements reproductibles</li>
+</ul>
+
+<h2>Cloud + DevOps : la combinaison gagnante</h2>
+<p>Ensemble, le cloud et le DevOps permettent aux entreprises de livrer des fonctionnalités en heures plutôt qu'en mois, de réduire les coûts d'infrastructure de 30 à 50%, d'augmenter la disponibilité (99,9% d'uptime) et de répondre rapidement aux changements du marché. Chez JUDDEV, nous accompagnons nos clients dans leur transformation cloud-native et l'adoption des pratiques DevOps modernes.</p>`,
+      author: 'FOKOUA STYVE',
+      tags: ['Cloud', 'DevOps', 'AWS', 'Infrastructure', 'CI/CD']
+    },
+    {
+      id: 'article-ia-developpement',
+      title: 'IA et développement logiciel',
+      category: 'Intelligence Artificielle',
+      date: '2026-02-15',
+      image: 'images/dev7.PNG',
+      shortDesc: "L'IA révolutionne le développement logiciel : génération de code, revue automatique, tests, documentation... Comment les développeurs s'adaptent-ils et quelles compétences seront valorisées demain ?",
+      content: `<h2>L'IA dans le quotidien du développeur</h2>
+<p>En 2025, GitHub Copilot, ChatGPT, Claude et d'autres assistants IA sont devenus des outils du quotidien pour des millions de développeurs. Une étude GitHub montre que les développeurs utilisant Copilot terminent les tâches 55% plus vite. Mais cette révolution soulève une question fondamentale : quel sera le rôle du développeur humain demain ?</p>
+
+<h2>Ce que l'IA fait déjà très bien</h2>
+
+<h3>La génération de code boilerplate</h3>
+<p>Configuration de projets, mise en place de CRUD, intégrations d'APIs standard, migrations de base de données — l'IA excelle à générer ce code répétitif en secondes. Ce qui prenait des heures prend maintenant des minutes.</p>
+
+<h3>La revue de code automatisée</h3>
+<p>Des outils comme GitHub Copilot et CodeRabbit analysent vos pull requests, détectent les bugs potentiels, les problèmes de sécurité et les violations de bonnes pratiques avant même qu'un humain ne regarde le code.</p>
+
+<h3>La génération de tests unitaires</h3>
+<p>L'écriture de tests est souvent négligée car chronophage. L'IA peut générer des suites de tests complètes à partir du code existant, améliorant significativement la couverture de tests sans effort supplémentaire de l'équipe.</p>
+
+<h2>Ce que l'IA ne peut pas (encore) faire</h2>
+<ul>
+  <li>Comprendre les besoins métier complexes et les enjeux business</li>
+  <li>Concevoir des architectures innovantes pour des problèmes inédits</li>
+  <li>Naviguer dans des relations humaines complexes avec les clients et équipes</li>
+  <li>Exercer un jugement éthique sur les implications des décisions techniques</li>
+  <li>Maintenir une vision long-terme d'un produit</li>
+</ul>
+
+<h2>Les compétences du développeur de demain</h2>
+<p>L'avènement de l'IA ne rend pas les développeurs obsolètes — il change les compétences valorisées. Le "Prompt Engineering" (savoir comment communiquer efficacement avec l'IA), la capacité à valider et corriger le code généré, et la compréhension des architectures système deviennent des compétences premium.</p>
+
+<blockquote>
+"L'IA est le meilleur junior que j'aie jamais eu : rapide, sans ego, disponible 24h/24. Mais il a encore besoin d'un senior pour lui dire quoi faire et valider son travail." — JAYSON STANLEY, CTO JUDDEV
+</blockquote>`,
+      author: 'JAYSON STANLEY DJEMETIO',
+      tags: ['IA', 'Développement', 'Copilot', 'Productivité', 'Innovation']
+    },
+    {
+      id: 'article-securite-logicielle',
+      title: 'La sécurité logicielle',
+      category: 'Sécurité',
+      date: '2026-02-05',
+      image: 'images/dev1.jpg',
+      shortDesc: 'Écrire du code sécurisé n\'est pas un luxe, c\'est une responsabilité. Découvrez les principes fondamentaux de la sécurité applicative et les erreurs les plus courantes à éviter.',
+      content: `<h2>Le code non sécurisé coûte des milliards</h2>
+<p>En 2024, le coût moyen d'une violation de données a atteint 4,88 millions de dollars selon IBM. Plus de 80% de ces incidents impliquent une vulnérabilité applicative — du code mal écrit. La sécurité logicielle n'est pas qu'une préoccupation des grandes entreprises : une startup dont l'application est compromise peut fermer du jour au lendemain.</p>
+
+<h2>Le Top 10 OWASP : les vulnérabilités les plus dangereuses</h2>
+
+<h3>1. Injection SQL</h3>
+<p>La plus ancienne et la plus destructrice. Quand des données utilisateurs non validées sont insérées directement dans une requête SQL, un attaquant peut lire, modifier ou supprimer toute votre base de données. Solution : toujours utiliser des requêtes préparées et des ORM.</p>
+
+<h3>2. Authentification défaillante</h3>
+<p>Mots de passe stockés en clair, tokens prévisibles, absence de limitation des tentatives de connexion. Ces erreurs permettent à des attaquants de prendre le contrôle de comptes utilisateurs. Utilisez bcrypt pour les mots de passe, JWT signé pour les tokens.</p>
+
+<h3>3. Exposition de données sensibles</h3>
+<p>Clés API en dur dans le code, secrets dans les logs, données personnelles non chiffrées en base de données. Utilisez les variables d'environnement, le chiffrement AES-256 pour les données sensibles et auditez régulièrement vos logs.</p>
+
+<h3>4. Cross-Site Scripting (XSS)</h3>
+<p>Injection de scripts malveillants dans des pages web consultées par d'autres utilisateurs. Permet de voler des sessions, des cookies, des données bancaires. Solution : toujours échapper les données affichées, utiliser Content Security Policy.</p>
+
+<h2>Les bonnes pratiques essentielles</h2>
+<ul>
+  <li>Ne jamais faire confiance aux données venant de l'utilisateur — toujours valider et assainir</li>
+  <li>Principe du moindre privilège — chaque composant n'a accès qu'à ce dont il a besoin</li>
+  <li>Chiffrement en transit (HTTPS) et au repos pour toutes les données sensibles</li>
+  <li>Dépendances à jour — les CVE connues sont la cible principale des attaques automatisées</li>
+  <li>Tests de sécurité réguliers — SAST, DAST et pentests annuels minimum</li>
+</ul>
+
+<h2>La sécurité by design chez JUDDEV</h2>
+<p>Chez JUDDEV CORPORATION, chaque projet intègre la sécurité dès la phase de conception. Nous réalisons des audits de code, des analyses de vulnérabilités et des pentests pour garantir que vos applications résistent aux attaques. La sécurité n'est pas une fonctionnalité ajoutée à la fin — c'est une discipline transverse intégrée à chaque étape du développement.</p>`,
+      author: 'NGUEYE NGUEYE DURAND',
+      tags: ['Sécurité', 'OWASP', 'SQL Injection', 'XSS', 'Développement']
     }
   ],
 
@@ -665,7 +883,7 @@ const JUDDEV_DATA_DEFAULT = {
 // DATA MANAGEMENT - API + LocalStorage sync
 // ============================================================
 const _API_BASE = (typeof JUDDEV_CONFIG !== 'undefined') ? JUDDEV_CONFIG.API_URL : 'http://localhost:5000/api';
-const _DATA_VERSION = '3.0'; // Bump when icon format changes
+const _DATA_VERSION = '3.1'; // New articles added
 
 function getJUDDEVData() {
   try {

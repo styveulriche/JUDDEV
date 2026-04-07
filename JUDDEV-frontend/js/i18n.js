@@ -511,7 +511,10 @@ const JUDDEV_I18N = {
   currentLang: 'fr',
 
   init() {
-    const saved = localStorage.getItem('juddev_lang') || 'fr';
+    // Use smart preference (most-used language) if no explicit saved choice
+    const saved = (typeof _getSmartPreference === 'function')
+      ? _getSmartPreference('lang', 'fr')
+      : (localStorage.getItem('juddev_lang') || 'fr');
     this.currentLang = saved;
     this.apply();
     this.updateToggle();
@@ -761,7 +764,11 @@ const JUDDEV_I18N = {
 
   setLang(lang) {
     this.currentLang = lang;
-    localStorage.setItem('juddev_lang', lang);
+    if (typeof _trackPreference === 'function') {
+      _trackPreference('lang', lang);
+    } else {
+      localStorage.setItem('juddev_lang', lang);
+    }
     this.apply();
   },
 

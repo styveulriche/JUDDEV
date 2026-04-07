@@ -6,6 +6,72 @@
 'use strict';
 
 // ============================================================
+// SMART PREFERENCE HELPERS (theme + lang usage tracking)
+// ============================================================
+function _trackPreference(type, value) {
+  const key = 'juddev_' + type + '_usage';
+  const counts = JSON.parse(localStorage.getItem(key) || '{}');
+  counts[value] = (counts[value] || 0) + 1;
+  localStorage.setItem(key, JSON.stringify(counts));
+  localStorage.setItem('juddev_' + type, value);
+}
+
+function _getSmartPreference(type, fallback) {
+  const explicit = localStorage.getItem('juddev_' + type);
+  if (explicit) return explicit;
+  const counts = JSON.parse(localStorage.getItem('juddev_' + type + '_usage') || '{}');
+  const entries = Object.entries(counts);
+  if (!entries.length) return fallback;
+  return entries.sort((a, b) => b[1] - a[1])[0][0];
+}
+
+// ============================================================
+// ARTICLE CONTENT FORMATTER (plain text → HTML)
+// ============================================================
+function contentToHtml(content) {
+  if (!content) return '';
+  // Already HTML? Return as-is
+  if (/<[a-zA-Z][\s\S]*?>/i.test(content)) return content;
+  // Convert plain text to structured HTML
+  const lines = content.split(/\r?\n/);
+  let html = '';
+  let inList = false;
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i];
+    const line = raw.trim();
+    if (!line) {
+      if (inList) { html += '</ul>\n'; inList = false; }
+      continue;
+    }
+    // Markdown-style headings
+    if (line.startsWith('# ')) {
+      if (inList) { html += '</ul>\n'; inList = false; }
+      html += '<h2>' + line.slice(2) + '</h2>\n';
+    } else if (line.startsWith('## ')) {
+      if (inList) { html += '</ul>\n'; inList = false; }
+      html += '<h3>' + line.slice(3) + '</h3>\n';
+    // ALL-CAPS short line → treat as h2 heading
+    } else if (/^[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ\s\-:]{4,60}$/.test(line) && line.length < 70) {
+      if (inList) { html += '</ul>\n'; inList = false; }
+      html += '<h2>' + line + '</h2>\n';
+    // Numbered list items
+    } else if (/^\d+\.\s/.test(line)) {
+      if (inList) { html += '</ul>\n'; inList = false; }
+      html += '<p>' + line + '</p>\n';
+    // Bullet list items
+    } else if (/^[\-\•\*\u2022]\s/.test(line)) {
+      if (!inList) { html += '<ul>\n'; inList = true; }
+      html += '<li>' + line.slice(2).trim() + '</li>\n';
+    } else {
+      if (inList) { html += '</ul>\n'; inList = false; }
+      html += '<p>' + line + '</p>\n';
+    }
+  }
+  if (inList) html += '</ul>\n';
+  return html || '<p>' + content + '</p>';
+}
+
+// ============================================================
 // PAGE LOADER
 // ============================================================
 (function initLoader() {
@@ -799,7 +865,7 @@ async function loadArticleDetail() {
     return pages;
   }
 
-  const articlePages = buildArticlePages(article.content || '');
+  const articlePages = buildArticlePages(contentToHtml(article.content || ''));
   const isMultiPage = articlePages.length > 1;
   let currentPage = 0;
 
@@ -1155,10 +1221,10 @@ document.querySelectorAll('.counter').forEach(el => {
 })();
 
 // ============================================================
-// DARK / LIGHT MODE - Apply saved theme immediately
+// DARK / LIGHT MODE - Apply saved theme immediately (smart preference)
 // ============================================================
 (function initTheme() {
-  const saved = localStorage.getItem('juddev_theme') || 'light';
+  const saved = _getSmartPreference('theme', 'light');
   if (saved === 'light') {
     document.documentElement.classList.add('light-mode');
   }
@@ -1190,7 +1256,7 @@ document.querySelectorAll('.counter').forEach(el => {
 
     // --- Logo helpers ---
     function getLogoSrc() {
-      const t = localStorage.getItem('juddev_theme') || 'dark';
+      const t = localStorage.getItem('juddev_theme') || 'light';
       return t === 'light' ? 'images/logo-modeClair.png' : 'images/logo-modeSombre.png';
     }
     function updateAllLogos() {
@@ -1258,7 +1324,7 @@ document.querySelectorAll('.counter').forEach(el => {
       } else {
         document.documentElement.classList.remove('light-mode');
       }
-      localStorage.setItem('juddev_theme', next);
+      _trackPreference('theme', next);
       const cls = next === 'light' ? 'fas fa-moon' : 'fas fa-sun';
       const ic1 = document.getElementById('theme-toggle')?.querySelector('i');
       const ic2 = document.getElementById('theme-toggle-m')?.querySelector('i');
@@ -1275,12 +1341,12 @@ document.querySelectorAll('.counter').forEach(el => {
 
     const themeBtn = document.getElementById('theme-toggle');
     if (themeBtn) {
-      const current = localStorage.getItem('juddev_theme') || 'dark';
+      const current = _getSmartPreference('theme', 'light');
       const icon = themeBtn.querySelector('i');
       if (icon) icon.className = current === 'light' ? 'fas fa-moon' : 'fas fa-sun';
       themeBtn.title = current === 'light' ? 'Mode sombre' : 'Mode clair';
       themeBtn.addEventListener('click', () => {
-        const next = (localStorage.getItem('juddev_theme') || 'dark') === 'dark' ? 'light' : 'dark';
+        const next = _getSmartPreference('theme', 'light') === 'dark' ? 'light' : 'dark';
         applyTheme(next);
       });
     }
@@ -1291,7 +1357,7 @@ document.querySelectorAll('.counter').forEach(el => {
       const iconM = themeBtnM.querySelector('i');
       if (iconM) iconM.className = curM === 'light' ? 'fas fa-moon' : 'fas fa-sun';
       themeBtnM.addEventListener('click', () => {
-        const next = (localStorage.getItem('juddev_theme') || 'dark') === 'dark' ? 'light' : 'dark';
+        const next = _getSmartPreference('theme', 'light') === 'dark' ? 'light' : 'dark';
         applyTheme(next);
       });
     }

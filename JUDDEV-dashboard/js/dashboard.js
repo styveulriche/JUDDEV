@@ -725,7 +725,19 @@ function getArticleForm(a = {}) {
 
     <!-- Manual mode content -->
     <div id="manual-section">
-      ${formField('Contenu de l\'article (HTML) *', `<textarea id="a-content" style="${textareaStyle};min-height:150px;font-family:monospace;font-size:0.78rem" placeholder="<h2>Titre</h2><p>Contenu...">${a.content||''}</textarea>`, 'Vous pouvez utiliser des balises HTML: &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;blockquote&gt;...')}
+      <div style="margin-bottom:0.85rem">
+        <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-muted);margin-bottom:0.5rem">Contenu de l'article *</label>
+        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;padding:0.5rem 0.75rem;background:rgba(0,0,0,0.15);border-radius:0.5rem 0.5rem 0 0;border:1px solid var(--border-color);border-bottom:none">
+          <button type="button" onclick="insertArticleFormat('<h2>','</h2>')" title="Grand titre (H2)" style="padding:0.3rem 0.65rem;border-radius:0.35rem;border:1px solid var(--border-color);background:rgba(0,102,255,0.1);color:var(--text-primary);font-size:0.8rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s">H1 Grand titre</button>
+          <button type="button" onclick="insertArticleFormat('<h3>','</h3>')" title="Petit titre (H3)" style="padding:0.3rem 0.65rem;border-radius:0.35rem;border:1px solid var(--border-color);background:rgba(0,102,255,0.08);color:var(--text-primary);font-size:0.75rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s">H2 Petit titre</button>
+          <button type="button" onclick="insertArticleFormat('<p>','</p>')" title="Paragraphe" style="padding:0.3rem 0.65rem;border-radius:0.35rem;border:1px solid var(--border-color);background:rgba(255,255,255,0.05);color:var(--text-muted);font-size:0.78rem;cursor:pointer;font-family:inherit;transition:all 0.15s">¶ Texte</button>
+          <button type="button" onclick="insertArticleFormat('<ul>\\n<li>','</li>\\n</ul>')" title="Liste à puces" style="padding:0.3rem 0.65rem;border-radius:0.35rem;border:1px solid var(--border-color);background:rgba(255,255,255,0.05);color:var(--text-muted);font-size:0.78rem;cursor:pointer;font-family:inherit;transition:all 0.15s">• Liste</button>
+          <button type="button" onclick="insertArticleFormat('<blockquote>','</blockquote>')" title="Citation" style="padding:0.3rem 0.65rem;border-radius:0.35rem;border:1px solid var(--border-color);background:rgba(255,255,255,0.05);color:var(--text-muted);font-size:0.78rem;cursor:pointer;font-family:inherit;transition:all 0.15s">❝ Citation</button>
+          <button type="button" onclick="insertArticleFormat('<strong>','</strong>')" title="Texte en gras" style="padding:0.3rem 0.65rem;border-radius:0.35rem;border:1px solid var(--border-color);background:rgba(255,255,255,0.05);color:var(--text-muted);font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s">G Gras</button>
+        </div>
+        <textarea id="a-content" style="${textareaStyle};min-height:200px;border-radius:0 0 0.5rem 0.5rem" placeholder="Sélectionnez du texte puis cliquez un bouton de format, ou cliquez un bouton puis tapez votre texte...">${a.content||''}</textarea>
+        <p style="font-size:0.72rem;color:var(--text-dim);margin-top:0.3rem"><i class="fas fa-info-circle"></i> Sélectionnez du texte puis cliquez un bouton pour formater. Sans sélection, la balise est insérée à la position du curseur.</p>
+      </div>
     </div>
 
     <!-- PDF mode content -->
@@ -737,6 +749,21 @@ function getArticleForm(a = {}) {
       ${formField('Fichier PDF *', `<input type="file" id="a-pdf" accept=".pdf" style="${inputStyle};padding:0.5rem" />`, 'Taille max: 50MB')}
     </div>
   `;
+}
+
+function insertArticleFormat(tagOpen, tagClose) {
+  const ta = document.getElementById('a-content');
+  if (!ta) return;
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const selected = ta.value.substring(start, end);
+  const placeholder = selected || 'Votre texte ici';
+  const insertion = tagOpen + placeholder + tagClose;
+  ta.value = ta.value.substring(0, start) + insertion + ta.value.substring(end);
+  // Place cursor right after inserted text
+  const cursorPos = start + tagOpen.length + placeholder.length + tagClose.length;
+  ta.setSelectionRange(cursorPos, cursorPos);
+  ta.focus();
 }
 
 function switchArticleMode(mode) {
@@ -1429,8 +1456,8 @@ function getTeamForm(m = {}) {
     <div class="dash-form-grid-2">
       ${formField('<i class="fab fa-linkedin" style="color:#0077b5"></i> LinkedIn', `<input id="t-linkedin" style="${inputStyle}" value="${m.socials?.linkedin||''}" placeholder="https://linkedin.com/..." />`)}
       ${formField('<i class="fab fa-github" style="color:#6e5494"></i> GitHub', `<input id="t-github" style="${inputStyle}" value="${m.socials?.github||''}" placeholder="https://github.com/..." />`)}
-      ${formField('<i class="fab fa-twitter" style="color:#1da1f2"></i> Twitter', `<input id="t-twitter" style="${inputStyle}" value="${m.socials?.twitter||''}" placeholder="https://x.com/..." />`)}
-      ${formField('<i class="fab fa-behance" style="color:#1769ff"></i> Behance', `<input id="t-behance" style="${inputStyle}" value="${m.socials?.behance||''}" placeholder="https://behance.net/..." />`)}
+      ${formField('<i class="fas fa-globe" style="color:#0099cc"></i> Portfolio', `<input id="t-portfolio" style="${inputStyle}" value="${m.socials?.portfolio||''}" placeholder="https://portfolio.com/..." />`)}
+      ${formField('<i class="fab fa-youtube" style="color:#ff0000"></i> YouTube', `<input id="t-youtube" style="${inputStyle}" value="${m.socials?.youtube||''}" placeholder="https://youtube.com/..." />`)}
     </div>
     ${formField('Ordre d\'affichage', `<input id="t-order" type="number" style="${inputStyle}" value="${m.order||0}" min="0" />`)}
   `;
@@ -1449,8 +1476,8 @@ function saveNewTeamMember() {
   fd.append('tags', document.getElementById('t-tags').value);
   fd.append('linkedin', document.getElementById('t-linkedin').value);
   fd.append('github', document.getElementById('t-github').value);
-  fd.append('twitter', document.getElementById('t-twitter').value);
-  fd.append('behance', document.getElementById('t-behance').value);
+  fd.append('portfolio', document.getElementById('t-portfolio').value);
+  fd.append('youtube', document.getElementById('t-youtube').value);
   fd.append('order', document.getElementById('t-order').value);
   const photo = document.getElementById('t-photo').files[0];
   if (photo) fd.append('photo', photo);
@@ -1476,8 +1503,8 @@ function saveEditTeamMember(id) {
   fd.append('tags', document.getElementById('t-tags').value);
   fd.append('linkedin', document.getElementById('t-linkedin').value);
   fd.append('github', document.getElementById('t-github').value);
-  fd.append('twitter', document.getElementById('t-twitter').value);
-  fd.append('behance', document.getElementById('t-behance').value);
+  fd.append('portfolio', document.getElementById('t-portfolio').value);
+  fd.append('youtube', document.getElementById('t-youtube').value);
   fd.append('order', document.getElementById('t-order').value);
   const photo = document.getElementById('t-photo').files[0];
   if (photo) fd.append('photo', photo);
