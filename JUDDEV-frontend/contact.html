@@ -91,8 +91,8 @@
       <span class="breadcrumb-sep">›</span>
       <span>Contact</span>
     </nav>
-    <h1 class="page-hero-title">CONTACTEZ-<span>NOUS</span></h1>
-    <p class="page-hero-subtitle">Parlons de votre projet. Notre équipe est disponible pour répondre à toutes vos questions.</p>
+    <h1 class="page-hero-title" data-i18n="contact.hero.title">CONTACTEZ-<span>NOUS</span></h1>
+    <p class="page-hero-subtitle" data-i18n="contact.hero.subtitle">Parlons de votre projet. Notre équipe est disponible pour répondre à toutes vos questions.</p>
   </div>
 </section>
 
@@ -103,9 +103,9 @@
 
       <!-- LEFT: Info + Map -->
       <div class="reveal-left">
-        <span class="section-badge" style="margin-bottom:1.5rem;display:inline-block">INFORMATIONS DE CONTACT</span>
-        <h2 class="section-title" style="text-align:left;margin-bottom:0.75rem">Nous sommes <span>là pour vous</span></h2>
-        <p style="color:var(--text-muted);margin-bottom:2rem;line-height:1.8">Que vous ayez une question sur nos services, un projet en tête ou simplement envie de discuter, n'hésitez pas à nous contacter. Nous répondons généralement dans les 24 heures.</p>
+        <span class="section-badge" style="margin-bottom:1.5rem;display:inline-block" data-i18n="contact.info.badge">INFORMATIONS DE CONTACT</span>
+        <h2 class="section-title" style="text-align:left;margin-bottom:0.75rem" data-i18n="contact.info.title">Nous sommes <span>là pour vous</span></h2>
+        <p style="color:var(--text-muted);margin-bottom:2rem;line-height:1.8" data-i18n="contact.info.desc">Que vous ayez une question sur nos services, un projet en tête ou simplement envie de discuter, n'hésitez pas à nous contacter. Nous répondons généralement dans les 24 heures.</p>
 
         <div style="display:flex;flex-direction:column;gap:1.25rem;margin-bottom:2.5rem">
           <div class="info-card">
@@ -153,31 +153,31 @@
       <!-- RIGHT: Contact Form -->
       <div class="reveal-right">
         <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-2xl);padding:2.5rem">
-          <h3 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);margin-bottom:0.5rem">Envoyez-nous un message</h3>
-          <p style="color:var(--text-muted);font-size:0.875rem;margin-bottom:2rem">Nous vous répondrons dans les plus brefs délais.</p>
+          <h3 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);margin-bottom:0.5rem" data-i18n="contact.form.title">Envoyez-nous un message</h3>
+          <p style="color:var(--text-muted);font-size:0.875rem;margin-bottom:2rem" data-i18n="contact.form.desc">Nous vous répondrons dans les plus brefs délais.</p>
 
           <form id="contact-form" onsubmit="handleContactSubmit(event)">
             <div class="contact-form-grid">
               <div class="form-group">
-                <label class="form-label">Prénom *</label>
+                <label class="form-label" data-i18n="contact.form.firstname">Prénom *</label>
                 <input type="text" name="firstname" class="form-input" placeholder="Jean" required />
               </div>
               <div class="form-group">
-                <label class="form-label">Nom *</label>
+                <label class="form-label" data-i18n="contact.form.lastname">Nom *</label>
                 <input type="text" name="lastname" class="form-input" placeholder="Dupont" required />
               </div>
               <div class="form-group">
-                <label class="form-label">Email *</label>
+                <label class="form-label" data-i18n="contact.form.email">Email *</label>
                 <input type="email" name="email" class="form-input" placeholder="jean@exemple.com" required />
               </div>
               <div class="form-group">
-                <label class="form-label">Téléphone</label>
+                <label class="form-label" data-i18n="contact.form.phone">Téléphone</label>
                 <input type="tel" name="phone" class="form-input" placeholder="+237 672 600 193" />
               </div>
               <div class="form-group" style="grid-column:1/-1">
-                <label class="form-label">Sujet *</label>
+                <label class="form-label" data-i18n="contact.form.subject">Sujet *</label>
                 <select name="subject" class="form-input" required>
-                  <option value="">Choisissez un sujet</option>
+                  <option value="" data-i18n-option="contact.form.subject.placeholder">Choisissez un sujet</option>
                   <option>Demande de devis</option>
                   <option>Renseignements sur les services</option>
                   <option>Question sur une réalisation</option>
@@ -187,18 +187,18 @@
                 </select>
               </div>
               <div class="form-group" style="grid-column:1/-1">
-                <label class="form-label">Message *</label>
-                <textarea name="message" class="form-input" rows="5" placeholder="Décrivez votre demande ou projet..." required></textarea>
+                <label class="form-label" data-i18n="contact.form.message">Message *</label>
+                <textarea name="message" class="form-input" rows="5" placeholder="Décrivez votre demande ou projet..." data-i18n-placeholder="contact.form.message.placeholder" required></textarea>
               </div>
               <div style="grid-column:1/-1">
                 <label style="display:flex;align-items:flex-start;gap:0.75rem;cursor:pointer">
                   <input type="checkbox" required style="margin-top:3px;accent-color:var(--accent-blue)" />
-                  <span style="font-size:0.8rem;color:var(--text-muted)">J'accepte la politique de confidentialité et que mes données soient utilisées pour répondre à ma demande.</span>
+                  <span style="font-size:0.8rem;color:var(--text-muted)" data-i18n="contact.form.privacy">J'accepte la politique de confidentialité et que mes données soient utilisées pour répondre à ma demande.</span>
                 </label>
               </div>
             </div>
             <button type="submit" class="btn btn-primary" style="width:100%;margin-top:1.5rem;padding:1rem">
-              <i class="fas fa-paper-plane"></i> Envoyer le message
+              <i class="fas fa-paper-plane"></i> <span data-i18n="contact.form.submit">Envoyer le message</span>
             </button>
           </form>
         </div>
@@ -211,9 +211,9 @@
 <section style="padding:5rem 0;background:var(--bg-secondary);border-top:1px solid var(--border-color)">
   <div class="container">
     <div class="section-header reveal-left">
-      <span class="section-badge">RÉSEAUX SOCIAUX</span>
-      <h2 class="section-title">Suivez-nous sur les <span>réseaux</span></h2>
-      <p class="section-subtitle">Restez connectés et suivez notre actualité sur les plateformes sociales.</p>
+      <span class="section-badge" data-i18n="contact.social.badge">RÉSEAUX SOCIAUX</span>
+      <h2 class="section-title" data-i18n="contact.social.title">Suivez-nous sur les <span>réseaux</span></h2>
+      <p class="section-subtitle" data-i18n="contact.social.subtitle">Restez connectés et suivez notre actualité sur les plateformes sociales.</p>
     </div>
     <div class="social-links-grid">
       <a href="#" class="social-link-card reveal stagger-1">
@@ -244,8 +244,8 @@
 <section class="section">
   <div class="container">
     <div class="section-header reveal-left">
-      <span class="section-badge">FAQ</span>
-      <h2 class="section-title">Questions <span>Fréquentes</span></h2>
+      <span class="section-badge" data-i18n="contact.faq.badge">FAQ</span>
+      <h2 class="section-title" data-i18n="contact.faq.title">Questions <span>Fréquentes</span></h2>
     </div>
     <div style="max-width:800px;margin:0 auto" id="faq-container">
       <!-- Populated by JS -->

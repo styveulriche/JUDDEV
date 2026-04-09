@@ -177,7 +177,11 @@ const JUDDEV_TRANSLATIONS = {
     'article.recent': 'Articles récents',
     'article.categories': 'Catégories',
     'article.related': 'Articles Connexes',
-    'article.others': 'Autres Articles',
+    'article.others': 'Autres <span>Articles</span>',
+    'article.others.badge': 'EXPLOREZ AUSSI',
+    'article.others.subtitle': 'D\'autres sujets qui pourraient vous intéresser.',
+    'article.related.badge': 'DANS LA MÊME THÉMATIQUE',
+    'article.related.subtitle': 'Ces articles traitent des mêmes sujets que l\'article que vous venez de lire.',
     'article.page.prev': 'Précédent',
     'article.page.next': 'Suivant',
     'article.devis.title': 'Besoin d\'un projet ?',
@@ -198,6 +202,13 @@ const JUDDEV_TRANSLATIONS = {
     'common.sector': 'Secteur',
     'common.seeall': 'Voir tout',
     'common.hours': 'Lundi - Vendredi : 8h00 - 18h00 | Samedi : 9h00 - 13h00',
+    'common.view.details': 'Voir les détails',
+    'common.view.project': 'Voir la Réalisation',
+    'common.enroll': 'S\'inscrire',
+    'common.related.services': 'Autres <span>Services</span>',
+    'common.related.services.badge': 'AUTRES SERVICES',
+    'common.related.realisations': 'Autres <span>Réalisations</span>',
+    'common.by': 'Par',
 
     // A-PROPOS - sections supplémentaires
     'about.histoire.badge': 'NOTRE HISTOIRE',
@@ -245,6 +256,78 @@ const JUDDEV_TRANSLATIONS = {
     'blog.hero.badge': 'NOTRE BLOG',
     'blog.newsletter.badge': 'NEWSLETTER',
     'blog.newsletter.note': 'Pas de spam, désinscription facile à tout moment.',
+
+    // A-PROPOS - mission & valeurs cards
+    'about.mission.card1.title': 'Notre Mission',
+    'about.mission.card1.desc': 'Accompagner les entreprises et entrepreneurs africains dans leur transformation digitale en fournissant des solutions technologiques innovantes, accessibles et adaptées à leurs réalités spécifiques.',
+    'about.mission.card2.title': 'Notre Vision',
+    'about.mission.card2.desc': 'Devenir la référence africaine en solutions numériques innovantes, en bâtissant des partenariats durables qui contribuent au développement économique du continent à travers la technologie.',
+    'about.mission.card3.title': 'Nos Objectifs',
+    'about.mission.card3.desc': 'Livrer des projets de qualité supérieure dans les délais impartis, maintenir une satisfaction client de 100%, et innover continuellement pour anticiper les besoins du marché numérique africain.',
+    'about.value1.title': 'Innovation',
+    'about.value1.desc': 'Nous explorons constamment les dernières technologies pour apporter des solutions avant-gardistes à nos clients.',
+    'about.value2.title': 'Excellence',
+    'about.value2.desc': 'Chaque ligne de code, chaque design, chaque livraison est réalisée avec le plus haut niveau de qualité.',
+    'about.value3.title': 'Transparence',
+    'about.value3.desc': 'Nous communiquons ouvertement avec nos clients à chaque étape du projet, sans surprises ni zones d\'ombre.',
+    'about.value4.title': 'Engagement',
+    'about.value4.desc': 'Nous nous engageons pleinement dans chaque projet et tenons nos promesses en termes de délais et de qualité.',
+    'about.badge.trust': 'Agence de confiance',
+    'about.badge.since': 'depuis 2025',
+    'about.stat1.label': 'Projets livrés',
+    'about.stat2.label': 'Satisfaction client',
+
+    // FORMATIONS - value cards & process steps
+    'formations.value1.title': 'Formateurs Experts',
+    'formations.value1.desc': 'Formés par des développeurs actifs qui travaillent quotidiennement sur des projets réels.',
+    'formations.value2.title': 'Pratique Avant Tout',
+    'formations.value2.desc': '70% de pratique, 30% de théorie. Vous apprenez en construisant de vrais projets.',
+    'formations.value3.title': 'Certificat JUDDEV',
+    'formations.value3.desc': 'Un certificat de compétence reconnu à l\'issue de chaque formation pour valoriser votre parcours.',
+    'formations.value4.title': 'Suivi Personnalisé',
+    'formations.value4.desc': 'Accompagnement individuel et accès à notre communauté d\'anciens apprenants.',
+    'formations.step1.title': 'Choisissez votre formation',
+    'formations.step1.desc': 'Sélectionnez le programme qui correspond à vos objectifs et votre niveau actuel.',
+    'formations.step2.title': 'Demandez un devis',
+    'formations.step2.desc': 'Contactez-nous pour obtenir une offre personnalisée selon votre profil et vos besoins.',
+    'formations.step3.title': "Entretien d'admission",
+    'formations.step3.desc': 'Un entretien rapide pour confirmer votre niveau et adapter le programme si nécessaire.',
+    'formations.step4.title': 'Démarrez votre formation',
+    'formations.step4.desc': 'Accédez aux cours, projets pratiques et au support de votre formateur dédié.',
+    'formations.cta.btn1': "S'inscrire à une Formation",
+    'formations.cta.btn2': 'Parler à un Conseiller',
+    'formations.card.program': 'Programme',
+
+    // SERVICES PAGE - intro cards
+    'services.intro1.title': 'Sur Mesure',
+    'services.intro1.desc': 'Chaque solution est adaptée à vos besoins spécifiques.',
+    'services.intro2.title': 'Rapide & Fiable',
+    'services.intro2.desc': 'Livraison dans les délais, avec une qualité irréprochable.',
+    'services.intro3.title': 'Sécurisé',
+    'services.intro3.desc': 'Sécurité et conformité RGPD intégrées à chaque projet.',
+    'services.intro4.title': 'Support Continu',
+    'services.intro4.desc': 'Accompagnement et maintenance après livraison.',
+    // SERVICES PAGE - process steps
+    'services.step1.title': 'Analyse & Découverte',
+    'services.step1.desc': 'Compréhension approfondie de vos besoins, objectifs et contexte métier pour définir le projet idéal.',
+    'services.step2.title': 'Conception & Design',
+    'services.step2.desc': 'Création des wireframes, maquettes et architecture technique avant tout développement.',
+    'services.step3.title': 'Développement Agile',
+    'services.step3.desc': 'Développement itératif en sprints avec livraisons régulières et feedback continu de votre part.',
+    'services.step4.title': 'Livraison & Suivi',
+    'services.step4.desc': 'Déploiement, formation, documentation et support post-lancement pour garantir votre succès.',
+
+    // INDEX - FAQ section
+    'faq.badge': 'FAQ',
+    'faq.title': 'Questions <span>Fréquentes</span>',
+    'faq.subtitle': 'Tout ce que vous devez savoir pour démarrer votre projet digital.',
+
+    // BLOG - filter labels
+    'blog.filter.tags': 'Filtrer par tags',
+    'blog.filter.clear': 'Effacer les tags',
+
+    // INDEX - Tech ticker
+    'tech.title': 'TECHNOLOGIES QUE NOUS <span>MAÎTRISONS</span>',
 
     // THEME/LANG TOGGLE
     'toggle.light': 'Mode Clair',
@@ -426,7 +509,11 @@ const JUDDEV_TRANSLATIONS = {
     'article.recent': 'Recent Articles',
     'article.categories': 'Categories',
     'article.related': 'Related Articles',
-    'article.others': 'Other Articles',
+    'article.others': 'Other <span>Articles</span>',
+    'article.others.badge': 'EXPLORE MORE',
+    'article.others.subtitle': 'Other topics that might interest you.',
+    'article.related.badge': 'SAME TOPIC',
+    'article.related.subtitle': 'These articles cover the same topics as the one you just read.',
     'article.page.prev': 'Previous',
     'article.page.next': 'Next',
     'article.devis.title': 'Have a project?',
@@ -447,6 +534,13 @@ const JUDDEV_TRANSLATIONS = {
     'common.sector': 'Sector',
     'common.seeall': 'See all',
     'common.hours': 'Mon - Fri: 8:00 AM - 6:00 PM | Sat: 9:00 AM - 1:00 PM',
+    'common.view.details': 'View Details',
+    'common.view.project': 'View Project',
+    'common.enroll': 'Enroll',
+    'common.related.services': 'Other <span>Services</span>',
+    'common.related.services.badge': 'OTHER SERVICES',
+    'common.related.realisations': 'Other <span>Projects</span>',
+    'common.by': 'By',
 
     // A-PROPOS - additional sections
     'about.histoire.badge': 'OUR STORY',
@@ -494,6 +588,78 @@ const JUDDEV_TRANSLATIONS = {
     'blog.hero.badge': 'OUR BLOG',
     'blog.newsletter.badge': 'NEWSLETTER',
     'blog.newsletter.note': 'No spam, easy unsubscribe at any time.',
+
+    // A-PROPOS - mission & values cards
+    'about.mission.card1.title': 'Our Mission',
+    'about.mission.card1.desc': 'Supporting African businesses and entrepreneurs in their digital transformation by providing innovative, accessible technological solutions tailored to their specific realities.',
+    'about.mission.card2.title': 'Our Vision',
+    'about.mission.card2.desc': 'Become the African reference for innovative digital solutions, building lasting partnerships that contribute to the continent\'s economic development through technology.',
+    'about.mission.card3.title': 'Our Goals',
+    'about.mission.card3.desc': 'Deliver premium-quality projects on time, maintain 100% client satisfaction, and continuously innovate to anticipate the needs of the African digital market.',
+    'about.value1.title': 'Innovation',
+    'about.value1.desc': 'We constantly explore the latest technologies to bring avant-garde solutions to our clients.',
+    'about.value2.title': 'Excellence',
+    'about.value2.desc': 'Every line of code, every design, every delivery is crafted with the highest level of quality.',
+    'about.value3.title': 'Transparency',
+    'about.value3.desc': 'We communicate openly with our clients at every stage of the project, with no surprises or grey areas.',
+    'about.value4.title': 'Commitment',
+    'about.value4.desc': 'We commit fully to every project and keep our promises in terms of deadlines and quality.',
+    'about.badge.trust': 'Trusted Agency',
+    'about.badge.since': 'since 2025',
+    'about.stat1.label': 'Projects Delivered',
+    'about.stat2.label': 'Client Satisfaction',
+
+    // FORMATIONS - value cards & process steps
+    'formations.value1.title': 'Expert Trainers',
+    'formations.value1.desc': 'Taught by active developers who work daily on real-world projects.',
+    'formations.value2.title': 'Practice First',
+    'formations.value2.desc': '70% hands-on practice, 30% theory. You learn by building real projects.',
+    'formations.value3.title': 'JUDDEV Certificate',
+    'formations.value3.desc': 'A recognized competency certificate at the end of each training to enhance your profile.',
+    'formations.value4.title': 'Personalized Support',
+    'formations.value4.desc': 'Individual coaching and access to our community of former learners.',
+    'formations.step1.title': 'Choose your training',
+    'formations.step1.desc': 'Select the program that matches your goals and current level.',
+    'formations.step2.title': 'Request a quote',
+    'formations.step2.desc': 'Contact us for a personalized offer based on your profile and needs.',
+    'formations.step3.title': 'Admission Interview',
+    'formations.step3.desc': 'A quick interview to confirm your level and adjust the program if needed.',
+    'formations.step4.title': 'Start your training',
+    'formations.step4.desc': 'Access courses, practical projects and support from your dedicated trainer.',
+    'formations.cta.btn1': 'Enroll in a Training',
+    'formations.cta.btn2': 'Talk to an Advisor',
+    'formations.card.program': 'Program',
+
+    // SERVICES PAGE - intro cards
+    'services.intro1.title': 'Tailor-Made',
+    'services.intro1.desc': 'Every solution is tailored to your specific needs.',
+    'services.intro2.title': 'Fast & Reliable',
+    'services.intro2.desc': 'On-time delivery with impeccable quality.',
+    'services.intro3.title': 'Secure',
+    'services.intro3.desc': 'Security and GDPR compliance built into every project.',
+    'services.intro4.title': 'Continuous Support',
+    'services.intro4.desc': 'Support and maintenance after delivery.',
+    // SERVICES PAGE - process steps
+    'services.step1.title': 'Analysis & Discovery',
+    'services.step1.desc': 'In-depth understanding of your needs, goals, and business context to define the ideal project.',
+    'services.step2.title': 'Design & Architecture',
+    'services.step2.desc': 'Creating wireframes, mockups and technical architecture before any development begins.',
+    'services.step3.title': 'Agile Development',
+    'services.step3.desc': 'Iterative sprint-based development with regular deliveries and continuous feedback from you.',
+    'services.step4.title': 'Delivery & Support',
+    'services.step4.desc': 'Deployment, training, documentation and post-launch support to ensure your success.',
+
+    // INDEX - FAQ section
+    'faq.badge': 'FAQ',
+    'faq.title': 'Frequently Asked <span>Questions</span>',
+    'faq.subtitle': 'Everything you need to know to start your digital project.',
+
+    // BLOG - filter labels
+    'blog.filter.tags': 'Filter by tags',
+    'blog.filter.clear': 'Clear tags',
+
+    // INDEX - Tech ticker
+    'tech.title': 'TECHNOLOGIES WE <span>MASTER</span>',
 
     // THEME/LANG TOGGLE
     'toggle.light': 'Light Mode',
@@ -544,6 +710,11 @@ const JUDDEV_I18N = {
       el.placeholder = this.t(key);
     });
 
+    document.querySelectorAll('[data-i18n-option]').forEach(el => {
+      const key = el.getAttribute('data-i18n-option');
+      el.textContent = this.t(key);
+    });
+
     // 2. Translate navbar links by href
     const navMap = {
       'index.html': this.t('nav.home'),
@@ -572,20 +743,20 @@ const JUDDEV_I18N = {
     const devisLinks = document.querySelectorAll('.btn-devis-nav');
     devisLinks.forEach(el => el.textContent = this.t('nav.devis'));
 
-    // 3. Translate CTA section
-    const ctaBadge = document.querySelector('.cta-section .section-badge');
+    // 3. Translate CTA section (skip elements that have page-specific data-i18n)
+    const ctaBadge = document.querySelector('.cta-section .section-badge:not([data-i18n])');
     if (ctaBadge) ctaBadge.textContent = this.t('section.cta.badge');
-    const ctaTitle = document.querySelector('.cta-title');
+    const ctaTitle = document.querySelector('.cta-title:not([data-i18n])');
     if (ctaTitle) ctaTitle.innerHTML = this.t('section.cta.title').replace('<span>', '<span class="cta-highlight">');
-    const ctaSubtitle = document.querySelector('.cta-subtitle');
+    const ctaSubtitle = document.querySelector('.cta-subtitle:not([data-i18n])');
     if (ctaSubtitle) ctaSubtitle.textContent = this.t('section.cta.subtitle');
-    // CTA buttons
-    const ctaBtn1 = document.querySelector('.cta-buttons .btn-primary');
+    // CTA buttons — only translate if they don't have inner data-i18n spans
+    const ctaBtn1 = document.querySelector('.cta-buttons .btn-primary:not(:has([data-i18n]))');
     if (ctaBtn1) {
       const ic1 = ctaBtn1.querySelector('i');
       ctaBtn1.innerHTML = `<i class="${ic1 ? ic1.className : 'fas fa-paper-plane'}"></i> ${this.t('section.cta.devis')}`;
     }
-    const ctaBtn2 = document.querySelector('.cta-buttons .btn-outline');
+    const ctaBtn2 = document.querySelector('.cta-buttons .btn-outline:not(:has([data-i18n]))');
     if (ctaBtn2) {
       const ic2 = ctaBtn2.querySelector('i');
       ctaBtn2.innerHTML = `<i class="${ic2 ? ic2.className : 'fas fa-envelope'}"></i> ${this.t('section.cta.contact')}`;
@@ -652,75 +823,79 @@ const JUDDEV_I18N = {
     const t = (k) => this.t(k);
 
     // ---- CONTACT PAGE ----
+    // Most contact elements now use data-i18n; only handle remaining dynamic ones here
     if (page === 'contact.html') {
-      this._setHtml(document.querySelector('.page-hero-title'), 'contact.hero.title');
-      this._setText(document.querySelector('.page-hero-subtitle'), 'contact.hero.subtitle');
-      const infoBadge = document.querySelector('.section .section-badge');
-      if (infoBadge) infoBadge.textContent = t('contact.info.badge');
-      const infoTitle = document.querySelector('.section .section-title');
-      if (infoTitle) infoTitle.innerHTML = t('contact.info.title');
-      const infoDesc = document.querySelector('.reveal-left > p');
-      if (infoDesc) infoDesc.textContent = t('contact.info.desc');
-      const formTitle = document.querySelector('.reveal-right h3');
-      if (formTitle) formTitle.textContent = t('contact.form.title');
-      const formDesc = document.querySelector('.reveal-right p');
-      if (formDesc) formDesc.textContent = t('contact.form.desc');
-      document.querySelectorAll('.form-label').forEach((label, i) => {
-        const keys = ['contact.form.firstname','contact.form.lastname','contact.form.email','contact.form.phone','contact.form.subject','contact.form.message'];
-        if (keys[i]) label.textContent = t(keys[i]);
-      });
-      const msgTextarea = document.querySelector('textarea[name="message"]');
-      if (msgTextarea) msgTextarea.placeholder = t('contact.form.message.placeholder');
-      const subjSelect = document.querySelector('select[name="subject"] option[value=""]');
-      if (subjSelect) subjSelect.textContent = t('contact.form.subject.placeholder');
-      const privacySpan = document.querySelector('label span[style*="font-size:0.8rem"]');
-      if (privacySpan) privacySpan.textContent = t('contact.form.privacy');
-      const submitBtn = document.querySelector('#contact-form button[type="submit"]');
-      if (submitBtn) submitBtn.innerHTML = `<i class="fas fa-paper-plane"></i> ${t('contact.form.submit')}`;
+      // Nothing extra needed — all elements use data-i18n attributes
     }
 
     // ---- BLOG PAGE ----
     if (page === 'blog.html') {
-      const badge = document.querySelector('.section-badge');
-      if (badge) badge.textContent = t('blog.section.badge');
-      const title = document.querySelector('.section-title');
-      if (title) title.innerHTML = t('blog.section.title');
-      const subtitle = document.querySelector('.section-subtitle');
-      if (subtitle) subtitle.textContent = t('blog.section.subtitle');
-      const nlBadge = document.querySelector('[style*="NEWSLETTER"], .section-badge:last-of-type');
       // Newsletter
       const nlEmail = document.querySelector('#newsletter-email');
       if (nlEmail) nlEmail.placeholder = t('blog.newsletter.placeholder');
       const nlBtn = document.querySelector('#newsletter-btn');
       if (nlBtn) nlBtn.innerHTML = `<i class="fas fa-paper-plane"></i> ${t('blog.newsletter.btn')}`;
-      const filterLabel = document.querySelector('#blog-filter-toggle > span');
-      if (filterLabel) filterLabel.innerHTML = `<i class="fas fa-tag"></i> ${t('blog.filter.label')}`;
+      const nlNote = document.querySelector('.newsletter-note');
+      if (nlNote) nlNote.textContent = t('blog.newsletter.note');
+      // "Effacer les tags" button
+      const clearTagsBtn = document.querySelector('#clear-tags-btn');
+      if (clearTagsBtn) clearTagsBtn.innerHTML = `<i class="fas fa-times"></i> ${t('blog.filter.clear')}`;
     }
 
     // ---- REALISATIONS PAGE ----
     if (page === 'realisations.html') {
-      this._setHtml(document.querySelector('.page-hero-title'), 'realisations.hero.title');
-      this._setText(document.querySelector('.page-hero-subtitle'), 'realisations.hero.subtitle');
-      const badge = document.querySelector('.page-hero .section-badge, .page-hero-content .section-badge');
-      if (badge) badge.textContent = t('realisations.hero.badge');
+      // CTA override (runs after global CTA handler)
+      const ctaTitle = document.querySelector('.cta-title');
+      if (ctaTitle) ctaTitle.innerHTML = t('realisations.cta.title');
+      const ctaSubtitle = document.querySelector('.cta-subtitle');
+      if (ctaSubtitle) ctaSubtitle.textContent = t('realisations.cta.subtitle');
     }
 
     // ---- SERVICES PAGE ----
     if (page === 'services.html') {
-      this._setHtml(document.querySelector('.page-hero-title'), 'services.hero.title');
-      this._setText(document.querySelector('.page-hero-subtitle'), 'services.hero.subtitle');
+      // CTA override
+      const ctaTitle = document.querySelector('.cta-title');
+      if (ctaTitle) ctaTitle.innerHTML = t('services.cta.title');
+      const ctaSubtitle = document.querySelector('.cta-subtitle');
+      if (ctaSubtitle) ctaSubtitle.textContent = t('services.cta.subtitle');
     }
 
     // ---- A-PROPOS PAGE ----
     if (page === 'a-propos.html') {
-      this._setHtml(document.querySelector('.page-hero-title'), 'about.hero.title');
-      this._setText(document.querySelector('.page-hero-subtitle'), 'about.hero.subtitle');
+      // CTA override
+      const ctaTitle = document.querySelector('.cta-title');
+      if (ctaTitle) ctaTitle.innerHTML = t('about.cta.title');
+      const ctaSubtitle = document.querySelector('.cta-subtitle');
+      if (ctaSubtitle) ctaSubtitle.textContent = t('about.cta.subtitle');
+      const ctaBtn1 = document.querySelector('.cta-buttons .btn-primary');
+      if (ctaBtn1) {
+        const ic = ctaBtn1.querySelector('i');
+        ctaBtn1.innerHTML = `<i class="${ic ? ic.className : 'fas fa-paper-plane'}"></i> ${t('section.cta.devis')}`;
+      }
+      const ctaBtn2 = document.querySelector('.cta-buttons .btn-outline');
+      if (ctaBtn2) {
+        const ic = ctaBtn2.querySelector('i');
+        ctaBtn2.innerHTML = `<i class="${ic ? ic.className : 'fas fa-envelope'}"></i> ${t('section.cta.contact')}`;
+      }
     }
 
     // ---- FORMATIONS PAGE ----
     if (page === 'formations.html') {
-      this._setHtml(document.querySelector('.page-hero-title'), 'formations.hero.title');
-      this._setText(document.querySelector('.page-hero-subtitle'), 'formations.hero.subtitle');
+      // CTA override
+      const ctaTitle = document.querySelector('.cta-title');
+      if (ctaTitle) ctaTitle.innerHTML = t('formations.cta.title');
+      const ctaSubtitle = document.querySelector('.cta-subtitle');
+      if (ctaSubtitle) ctaSubtitle.textContent = t('formations.cta.subtitle');
+      const ctaBtn1 = document.querySelector('.cta-buttons .btn-primary');
+      if (ctaBtn1) {
+        const ic = ctaBtn1.querySelector('i');
+        ctaBtn1.innerHTML = `<i class="${ic ? ic.className : 'fas fa-graduation-cap'}"></i> ${t('formations.cta.btn1')}`;
+      }
+      const ctaBtn2 = document.querySelector('.cta-buttons .btn-outline');
+      if (ctaBtn2) {
+        const ic = ctaBtn2.querySelector('i');
+        ctaBtn2.innerHTML = `<i class="${ic ? ic.className : 'fas fa-phone'}"></i> ${t('formations.cta.btn2')}`;
+      }
     }
 
     // ---- HOME (index) ----
@@ -730,14 +905,7 @@ const JUDDEV_I18N = {
     }
 
     // ---- SERVICE DETAIL ----
-    if (page === 'service-detail.html') {
-      // Dynamic content — handled when loaded, but static CTA text:
-      document.querySelectorAll('.cta-section .btn-primary').forEach(b => {
-        if (b.textContent.includes('Devis') || b.textContent.includes('Quote')) {
-          b.innerHTML = `<i class="fas fa-paper-plane"></i> ${t('service.cta.devis')}`;
-        }
-      });
-    }
+    // Dynamic content uses data-i18n attributes and JUDDEV_I18N.t() — handled by step 1 above
 
     // ---- ARTICLE DETAIL ----
     if (page === 'article-detail.html') {

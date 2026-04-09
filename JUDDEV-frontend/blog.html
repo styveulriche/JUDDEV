@@ -97,15 +97,15 @@
 <section class="section">
   <div class="container">
     <div class="section-header reveal-left">
-      <span class="section-badge">INSIGHTS & EXPERTISES</span>
-      <h2 class="section-title">Tous nos <span>Articles</span></h2>
-      <p class="section-subtitle">Restez à la pointe de l'innovation avec nos publications expertes.</p>
+      <span class="section-badge" data-i18n="blog.section.badge">INSIGHTS & EXPERTISES</span>
+      <h2 class="section-title" data-i18n="blog.section.title">Tous nos <span>Articles</span></h2>
+      <p class="section-subtitle" data-i18n="blog.section.subtitle">Restez à la pointe de l'innovation avec nos publications expertes.</p>
     </div>
 
     <!-- Category Filter Dropdown -->
     <div class="filter-dropdown-wrapper reveal">
       <button class="filter-toggle-btn" id="blog-filter-toggle" aria-expanded="false">
-        <span><i class="fas fa-tag"></i> Catégorie</span>
+        <span><i class="fas fa-tag"></i> <span data-i18n="blog.filter.label">Catégorie</span></span>
         <span class="filter-active-label" id="blog-active-label">Tous</span>
         <i class="fas fa-chevron-down filter-toggle-chevron"></i>
       </button>
@@ -128,7 +128,7 @@
     <div id="tags-filter-section" class="reveal" style="margin-top:1rem;padding:1rem 1.25rem;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg)">
       <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.75rem">
         <i class="fas fa-hashtag" style="color:var(--accent-cyan);font-size:0.85rem"></i>
-        <span style="font-size:0.8rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em">Filtrer par tags</span>
+        <span style="font-size:0.8rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em" data-i18n="blog.filter.tags">Filtrer par tags</span>
         <button id="clear-tags-btn" onclick="clearTagFilter()" style="display:none;margin-left:auto;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;border-radius:999px;padding:0.2rem 0.65rem;font-size:0.72rem;cursor:pointer;font-family:inherit">
           <i class="fas fa-times"></i> Effacer les tags
         </button>
@@ -149,16 +149,16 @@
 <section style="padding:5rem 0;background:var(--bg-secondary);border-top:1px solid var(--border-color)">
   <div class="container">
     <div style="max-width:600px;margin:0 auto;text-align:center">
-      <span class="section-badge" style="margin-bottom:1rem;display:inline-block">NEWSLETTER</span>
-      <h2 class="section-title reveal">Restez <span>informé</span></h2>
-      <p style="color:var(--text-muted);margin:1rem 0 2rem;reveal">Recevez nos derniers articles et insights directement dans votre boîte mail.</p>
+      <span class="section-badge" style="margin-bottom:1rem;display:inline-block" data-i18n="blog.newsletter.badge">NEWSLETTER</span>
+      <h2 class="section-title reveal" data-i18n="blog.newsletter.title">Restez <span>informé</span></h2>
+      <p style="color:var(--text-muted);margin:1rem 0 2rem;reveal" data-i18n="blog.newsletter.subtitle">Recevez nos derniers articles et insights directement dans votre boîte mail.</p>
       <form id="newsletter-form" style="display:flex;gap:0.75rem;max-width:450px;margin:0 auto" onsubmit="handleNewsletterSubmit(event)">
         <input type="email" id="newsletter-email" class="form-input" placeholder="votre@email.com" required style="flex:1" />
         <button type="submit" id="newsletter-btn" class="btn btn-primary" style="white-space:nowrap;padding:0.75rem 1.5rem">
           <i class="fas fa-paper-plane"></i> S'abonner
         </button>
       </form>
-      <p style="font-size:0.75rem;color:var(--text-dim);margin-top:1rem">Pas de spam, désinscription facile à tout moment.</p>
+      <p style="font-size:0.75rem;color:var(--text-dim);margin-top:1rem" class="newsletter-note" data-i18n="blog.newsletter.note">Pas de spam, désinscription facile à tout moment.</p>
     </div>
   </div>
 </section>

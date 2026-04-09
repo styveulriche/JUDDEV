@@ -624,14 +624,14 @@ function loadServiceDetail() {
 
     <section class="cta-section reveal">
       <div class="container">
-        <h2 class="cta-title">Intéressé par ce service ?</h2>
-        <p class="cta-subtitle">Discutons de votre projet et trouvons la meilleure solution pour vos besoins spécifiques.</p>
+        <h2 class="cta-title" data-i18n="service.cta.title">${typeof JUDDEV_I18N !== 'undefined' ? JUDDEV_I18N.t('service.cta.title') : 'Intéressé par ce service ?'}</h2>
+        <p class="cta-subtitle" data-i18n="service.cta.subtitle">${typeof JUDDEV_I18N !== 'undefined' ? JUDDEV_I18N.t('service.cta.subtitle') : 'Discutons de votre projet et trouvons la meilleure solution pour vos besoins spécifiques.'}</p>
         <div class="cta-buttons">
           <button class="btn btn-primary" onclick="window.openDevisModal && window.openDevisModal()">
-            <i class="fas fa-paper-plane"></i> Demander un Devis
+            <i class="fas fa-paper-plane"></i> <span data-i18n="service.cta.devis">${typeof JUDDEV_I18N !== 'undefined' ? JUDDEV_I18N.t('service.cta.devis') : 'Demander un Devis'}</span>
           </button>
           <a href="contact.html" class="btn btn-outline">
-            <i class="fas fa-phone"></i> Nous Contacter
+            <i class="fas fa-phone"></i> <span data-i18n="service.cta.contact">${typeof JUDDEV_I18N !== 'undefined' ? JUDDEV_I18N.t('service.cta.contact') : 'Nous Contacter'}</span>
           </a>
         </div>
       </div>
@@ -640,8 +640,8 @@ function loadServiceDetail() {
     <section class="section">
       <div class="container">
         <div class="section-header reveal-left">
-          <span class="section-badge">AUTRES SERVICES</span>
-          <h2 class="section-title">Services <span>Connexes</span></h2>
+          <span class="section-badge">${typeof JUDDEV_I18N !== 'undefined' ? JUDDEV_I18N.t('common.related.services.badge') : 'AUTRES SERVICES'}</span>
+          <h2 class="section-title">${typeof JUDDEV_I18N !== 'undefined' ? JUDDEV_I18N.t('common.related.services') : 'Autres <span>Services</span>'}</h2>
         </div>
         <div class="grid-3">
           ${related.map((s, i) => `
@@ -652,7 +652,7 @@ function loadServiceDetail() {
                 <div class="service-card-subtitle">${s.subtitle}</div>
               </div>
               <p class="service-card-desc">${s.shortDesc}</p>
-              <span class="service-card-link">Voir les détails <i class="fas fa-arrow-right"></i></span>
+              <span class="service-card-link">${typeof JUDDEV_I18N !== 'undefined' ? JUDDEV_I18N.t('common.view.details') : 'Voir les détails'} <i class="fas fa-arrow-right"></i></span>
             </a>
           `).join('')}
         </div>
@@ -688,7 +688,10 @@ async function loadRealisationDetail() {
     const res = await fetch(`${API}/realisations/${id}`);
     if (res.ok) {
       project = await res.json();
+      const resolveImg = (p) => (typeof JUDDEV_CONFIG !== 'undefined' && p ? JUDDEV_CONFIG.getImageUrl(p) : p);
+      if (project.image) project.image = resolveImg(project.image);
       if (!project.images || !project.images.length) project.images = [project.image].filter(Boolean);
+      else project.images = project.images.map(resolveImg);
       if (!project.highlights) project.highlights = [];
       if (!project.technologies) project.technologies = [];
       if (!project.longDesc) project.longDesc = project.description || project.shortDesc || '';
@@ -803,7 +806,7 @@ async function loadRealisationDetail() {
     <section class="section" style="background:var(--bg-secondary);border-top:1px solid var(--border-color)">
       <div class="container">
         <div class="section-header reveal-left">
-          <h2 class="section-title">Autres <span>Réalisations</span></h2>
+          <h2 class="section-title">${typeof JUDDEV_I18N !== 'undefined' ? JUDDEV_I18N.t('common.related.realisations') : 'Autres <span>Réalisations</span>'}</h2>
         </div>
         <div class="grid-3">
           ${related.map((r, i) => `
@@ -811,7 +814,7 @@ async function loadRealisationDetail() {
               <div class="realisation-card-img">
                 <img src="${r.image}" alt="${r.title}" onerror="this.style.background='linear-gradient(135deg,#0066ff22,#00d4ff22)'" />
                 <div class="realisation-card-overlay">
-                  <span class="overlay-btn">Voir la Réalisation</span>
+                  <span class="overlay-btn">${typeof JUDDEV_I18N !== 'undefined' ? JUDDEV_I18N.t('common.view.project') : 'Voir la Réalisation'}</span>
                 </div>
               </div>
               <div class="realisation-card-body">
@@ -985,16 +988,16 @@ async function loadArticleDetail() {
               <!-- Page navigation (shown only for multi-page articles) -->
               <div id="article-page-nav" style="display:${isMultiPage ? 'flex' : 'none'};align-items:center;justify-content:center;gap:1rem;margin:2rem 0;padding:1.25rem;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-xl)">
                 <button id="article-page-prev" onclick="_articleChangePage(-1)" class="btn btn-outline btn-sm" ${currentPage === 0 ? 'disabled' : ''} style="min-width:100px">
-                  <i class="fas fa-chevron-left"></i> Précédent
+                  <i class="fas fa-chevron-left"></i> <span data-i18n="article.page.prev">Précédent</span>
                 </button>
                 <span id="article-page-counter" style="color:var(--text-muted);font-size:0.875rem;font-weight:600">Page 1 / ${articlePages.length}</span>
                 <button id="article-page-next" onclick="_articleChangePage(1)" class="btn btn-primary btn-sm" ${articlePages.length <= 1 ? 'disabled' : ''} style="min-width:100px">
-                  Suivant <i class="fas fa-chevron-right"></i>
+                  <span data-i18n="article.page.next">Suivant</span> <i class="fas fa-chevron-right"></i>
                 </button>
               </div>
 
               <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border-color)">
-                <strong style="font-size:0.875rem;color:var(--text-secondary)">Tags :</strong>
+                <strong style="font-size:0.875rem;color:var(--text-secondary)" data-i18n="article.tags">Tags :</strong>
                 <div class="tags-cloud" style="margin-top:0.75rem">
                   ${(article.tags || []).map(t => `<a href="blog.html?tag=${encodeURIComponent(t)}" class="tag" style="text-decoration:none">${t}</a>`).join('')}
                 </div>
@@ -1002,22 +1005,22 @@ async function loadArticleDetail() {
             </div>
 
             <div id="comments-section" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:2rem;margin-top:2rem">
-              <h3 style="font-size:1.25rem;font-weight:700;color:var(--text-primary);margin-bottom:1.5rem">💬 Commentaires</h3>
+              <h3 style="font-size:1.25rem;font-weight:700;color:var(--text-primary);margin-bottom:1.5rem">💬 <span data-i18n="article.comments">Commentaires</span></h3>
               <div id="comments-list" style="margin-bottom:2rem"></div>
               <form id="comment-form">
                 <div class="comment-form-fields">
-                  <input id="comment-name" class="form-input" placeholder="Votre nom *" required />
-                  <input id="comment-email" class="form-input" type="email" placeholder="Votre email (optionnel)" />
+                  <input id="comment-name" class="form-input" placeholder="Votre nom *" data-i18n-placeholder="article.comment.name" required />
+                  <input id="comment-email" class="form-input" type="email" placeholder="Votre email (optionnel)" data-i18n-placeholder="article.comment.email" />
                 </div>
-                <textarea id="comment-text" class="form-input" rows="4" placeholder="Votre commentaire..." required style="width:100%;margin-bottom:1rem"></textarea>
-                <button type="submit" class="btn btn-primary" id="comment-submit-btn">Envoyer le commentaire</button>
+                <textarea id="comment-text" class="form-input" rows="4" placeholder="Votre commentaire..." data-i18n-placeholder="article.comment.text" required style="width:100%;margin-bottom:1rem"></textarea>
+                <button type="submit" class="btn btn-primary" id="comment-submit-btn" data-i18n="article.comment.submit">Envoyer le commentaire</button>
               </form>
             </div>
           </div>
 
           <div class="article-sidebar">
             <div class="sidebar-widget reveal stagger-2">
-              <h3 class="sidebar-widget-title">Articles récents</h3>
+              <h3 class="sidebar-widget-title" data-i18n="article.recent">Articles récents</h3>
               ${recent.map(a => `
                 <div class="recent-article-item" onclick="location.href='article-detail.html?id=${a.id}'">
                   <div class="recent-article-thumb">
@@ -1032,7 +1035,7 @@ async function loadArticleDetail() {
             </div>
 
             <div class="sidebar-widget reveal stagger-3">
-              <h3 class="sidebar-widget-title">Catégories</h3>
+              <h3 class="sidebar-widget-title" data-i18n="article.categories">Catégories</h3>
               <div style="display:flex;flex-direction:column;gap:0.5rem">
                 ${[...new Set(JUDDEV_DATA.articles.map(a => a.category))].map(cat => `
                   <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.04)">
@@ -1051,9 +1054,9 @@ async function loadArticleDetail() {
             </div>
 
             <div class="sidebar-widget reveal stagger-5" style="background:linear-gradient(135deg,rgba(0,102,255,0.1),rgba(0,212,255,0.05));border-color:rgba(0,102,255,0.25)">
-              <h3 style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem">Besoin d'un projet ?</h3>
-              <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1.25rem">Transformons votre idée en réalité numérique.</p>
-              <button class="btn btn-primary btn-sm" style="width:100%" onclick="window.openDevisModal && window.openDevisModal()">Demander un Devis</button>
+              <h3 style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem" data-i18n="article.devis.title">Besoin d'un projet ?</h3>
+              <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1.25rem" data-i18n="article.devis.subtitle">Transformons votre idée en réalité numérique.</p>
+              <button class="btn btn-primary btn-sm" style="width:100%" onclick="window.openDevisModal && window.openDevisModal()" data-i18n="article.devis.btn">Demander un Devis</button>
             </div>
           </div>
         </div>
@@ -1064,9 +1067,9 @@ async function loadArticleDetail() {
     <section class="section" style="background:var(--bg-secondary);border-top:1px solid var(--border-color)">
       <div class="container">
         <div class="section-header reveal-left" style="margin-bottom:2rem">
-          <span class="section-badge" style="background:rgba(0,102,255,0.1);border-color:rgba(0,102,255,0.3)"><i class="fas fa-link" style="margin-right:0.4rem"></i>DANS LA MÊME THÉMATIQUE</span>
-          <h2 class="section-title">Articles <span>Connexes</span></h2>
-          <p class="section-subtitle" style="font-size:0.95rem">Ces articles traitent des mêmes sujets que l'article que vous venez de lire.</p>
+          <span class="section-badge" style="background:rgba(0,102,255,0.1);border-color:rgba(0,102,255,0.3)"><i class="fas fa-link" style="margin-right:0.4rem"></i>${typeof JUDDEV_I18N !== 'undefined' ? JUDDEV_I18N.t('article.related.badge') : 'DANS LA MÊME THÉMATIQUE'}</span>
+          <h2 class="section-title" data-i18n="article.related">Articles <span>Connexes</span></h2>
+          <p class="section-subtitle" style="font-size:0.95rem" data-i18n="article.related.subtitle">Ces articles traitent des mêmes sujets que l'article que vous venez de lire.</p>
         </div>
         <div class="grid-3">
           ${connexes.map((a, i) => blogCardHtml(a, i)).join('')}
@@ -1078,15 +1081,15 @@ async function loadArticleDetail() {
     <section class="section" style="border-top:1px solid var(--border-color)">
       <div class="container">
         <div class="section-header reveal-left" style="margin-bottom:2rem">
-          <span class="section-badge" style="background:rgba(0,212,255,0.08);border-color:rgba(0,212,255,0.25)"><i class="fas fa-newspaper" style="margin-right:0.4rem"></i>EXPLOREZ AUSSI</span>
-          <h2 class="section-title">Autres <span>Articles</span></h2>
-          <p class="section-subtitle" style="font-size:0.95rem">D'autres sujets qui pourraient vous intéresser.</p>
+          <span class="section-badge" style="background:rgba(0,212,255,0.08);border-color:rgba(0,212,255,0.25)"><i class="fas fa-newspaper" style="margin-right:0.4rem"></i>${typeof JUDDEV_I18N !== 'undefined' ? JUDDEV_I18N.t('article.others.badge') : 'EXPLOREZ AUSSI'}</span>
+          <h2 class="section-title" data-i18n="article.others">Autres <span>Articles</span></h2>
+          <p class="section-subtitle" style="font-size:0.95rem" data-i18n="article.others.subtitle">D'autres sujets qui pourraient vous intéresser.</p>
         </div>
         <div class="grid-3">
           ${autresArticles.map((a, i) => blogCardHtml(a, i)).join('')}
         </div>
         <div style="text-align:center;margin-top:2.5rem">
-          <a href="blog.html" class="btn btn-outline"><i class="fas fa-th-large"></i> Voir tous les articles</a>
+          <a href="blog.html" class="btn btn-outline"><i class="fas fa-th-large"></i> <span data-i18n="section.blog.cta">${typeof JUDDEV_I18N !== 'undefined' ? JUDDEV_I18N.t('section.blog.cta') : 'Voir tous les articles'}</span></a>
         </div>
       </div>
     </section>` : ''}
