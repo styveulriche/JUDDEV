@@ -73,8 +73,22 @@ router.put('/:id', auth, uploadImage.single('image'), async (req, res) => {
     const showYoutubeBtn = req.body.showYoutubeBtn === 'true' || req.body.showYoutubeBtn === true;
 
     const updateData = { title, category, service, sector, shortDesc, longDesc, client, year, technologies, highlights, url: url || '#', youtubeUrl, showSiteBtn, showYoutubeBtn, order: order || 0 };
-    if (req.file) updateData.image = await safeUpload(req.file, 'juddev/realisations');
-    else if (req.body.image) updateData.image = req.body.image;
+    if (req.file) {
+      const newImage = await safeUpload(req.file, 'juddev/realisations');
+      if (newImage) {
+        updateData.image = newImage;
+        // Also update images[0] so detail page shows the new image
+        const current = await Realisation.findOne({ id: req.params.id });
+        if (current) {
+          const imgs = (current.images || []).slice();
+          if (imgs.length > 0) imgs[0] = newImage;
+          else imgs.push(newImage);
+          updateData.images = imgs;
+        }
+      }
+    } else if (req.body.image) {
+      updateData.image = req.body.image;
+    }
 
     const realisation = await Realisation.findOneAndUpdate({ id: req.params.id }, updateData, { new: true });
     if (!realisation) return res.status(404).json({ message: 'Réalisation non trouvée.' });

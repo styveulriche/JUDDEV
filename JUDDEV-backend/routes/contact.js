@@ -2,7 +2,7 @@ const express = require('express');
 const ContactInfo = require('../models/ContactInfo');
 const ContactMessage = require('../models/ContactMessage');
 const auth = require('../middleware/auth');
-const { uploadImage } = require('../middleware/upload');
+const { uploadImage, uploadToCloudinary } = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -44,7 +44,10 @@ router.put('/info', auth, async (req, res) => {
 router.post('/partner', auth, uploadImage.single('image'), async (req, res) => {
   try {
     const { name, url } = req.body;
-    const image = req.file ? `/uploads/images/${req.file.filename}` : (req.body.image || '');
+    let image = req.body.image || '';
+    if (req.file) {
+      try { image = await uploadToCloudinary(req.file, 'juddev/partners'); } catch(e) { image = ''; }
+    }
     let info = await ContactInfo.findOne();
     if (!info) info = new ContactInfo({});
     info.partners.push({ name: name || '', image, url: url || '#' });
@@ -64,7 +67,9 @@ router.put('/partner/:index', auth, uploadImage.single('image'), async (req, res
     const { name, url } = req.body;
     if (name !== undefined) info.partners[idx].name = name;
     if (url !== undefined) info.partners[idx].url = url;
-    if (req.file) info.partners[idx].image = `/uploads/images/${req.file.filename}`;
+    if (req.file) {
+      try { info.partners[idx].image = await uploadToCloudinary(req.file, 'juddev/partners'); } catch(e) {}
+    }
     info.markModified('partners');
     await info.save();
     res.json(info.partners);

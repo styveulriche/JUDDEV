@@ -61,6 +61,13 @@ const JUDDEV_TRANSLATIONS = {
     'footer.legal': 'Mentions légales',
     'footer.privacy': 'Politique de confidentialité',
     'footer.terms': 'CGU',
+    'footer.svc.web': 'Développement Web',
+    'footer.svc.mobile': 'Applications Mobiles',
+    'footer.svc.saas': 'Produits SaaS',
+    'footer.svc.cloud': 'Cloud Engineering',
+    'footer.svc.ia': 'IA & Automatisation',
+    'footer.svc.cyber': 'Cybersécurité',
+    'footer.hours': 'Lun - Ven: 8h00 - 18h00',
 
     // MODALS
     'modal.devis.title': 'Demander un Devis',
@@ -393,6 +400,13 @@ const JUDDEV_TRANSLATIONS = {
     'footer.legal': 'Legal Notice',
     'footer.privacy': 'Privacy Policy',
     'footer.terms': 'Terms of Use',
+    'footer.svc.web': 'Web Development',
+    'footer.svc.mobile': 'Mobile Applications',
+    'footer.svc.saas': 'SaaS Products',
+    'footer.svc.cloud': 'Cloud Engineering',
+    'footer.svc.ia': 'AI & Automation',
+    'footer.svc.cyber': 'Cybersecurity',
+    'footer.hours': 'Mon - Fri: 8:00 AM - 6:00 PM',
 
     // MODALS
     'modal.devis.title': 'Request a Quote',
@@ -771,15 +785,42 @@ const JUDDEV_I18N = {
     if (footerLegal) footerLegal.textContent = this.t('footer.legal');
     const footerPrivacy = document.querySelector('.footer-bottom-links a:last-child');
     if (footerPrivacy) footerPrivacy.textContent = this.t('footer.privacy');
-    // Also translate footer navigation links (same href-map as navbar)
+    // Translate footer column titles
+    document.querySelectorAll('.footer-col-title').forEach(el => {
+      const txt = el.textContent.trim();
+      if (txt === 'Navigation') el.textContent = this.t('footer.nav');
+      else if (txt === 'Services') el.textContent = this.t('footer.services');
+      else if (txt === 'Contact') el.textContent = this.t('footer.contact');
+    });
+    // Translate footer navigation links (same href-map as navbar)
     document.querySelectorAll('.footer-links a').forEach(link => {
       const href = link.getAttribute('href');
-      if (href && navMap[href]) link.textContent = navMap[href];
+      if (href && navMap[href]) { link.textContent = navMap[href]; return; }
+      // Translate service links by text content
+      const svcMap = {
+        'Développement Web': this.t('footer.svc.web'),
+        'Applications Mobiles': this.t('footer.svc.mobile'),
+        'Produits SaaS': this.t('footer.svc.saas'),
+        'Cloud Engineering': this.t('footer.svc.cloud'),
+        'IA & Automatisation': this.t('footer.svc.ia'),
+        'Cybersécurité': this.t('footer.svc.cyber'),
+        'UI/UX Design': 'UI/UX Design'
+      };
+      const linkText = link.textContent.trim();
+      if (svcMap[linkText]) link.textContent = svcMap[linkText];
+    });
+    // Footer contact-item hours
+    document.querySelectorAll('.footer-contact-item span').forEach(span => {
+      const txt = span.textContent.trim();
+      if (txt.startsWith('Lun') || txt.startsWith('Lundi')) span.textContent = this.t('footer.hours');
     });
 
     // 5. Page-specific static text (identified by unique selectors)
     const page = window.location.pathname.split('/').pop() || 'index.html';
     this._translatePage(page);
+
+    // 5b. Chrome-like text-node walker: translate remaining plain-text nodes
+    this._translateAllTextNodes();
 
     // 5. Update html lang attribute
     document.documentElement.lang = this.currentLang;
@@ -927,6 +968,51 @@ const JUDDEV_I18N = {
     if (devisSubmit) devisSubmit.innerHTML = `<i class="fas fa-paper-plane"></i> ${t('modal.devis.submit')}`;
     document.querySelectorAll('[data-i18n-devis]').forEach(el => {
       el.textContent = t(el.getAttribute('data-i18n-devis'));
+    });
+  },
+
+  // Chrome-like full-page text-node translation
+  _translateAllTextNodes() {
+    const fr = JUDDEV_TRANSLATIONS.fr;
+    const target = JUDDEV_TRANSLATIONS[this.currentLang] || fr;
+
+    // Build plain-text FR → target map (skip entries with HTML tags)
+    const map = new Map();
+    for (const key of Object.keys(fr)) {
+      const frVal = fr[key];
+      const tVal = target[key];
+      if (!tVal || frVal === tVal) continue;
+      if (/<[a-z]/i.test(frVal)) continue; // skip HTML entries
+      map.set(frVal.trim(), tVal);
+    }
+
+    if (map.size === 0) return;
+
+    // Walk all text nodes, skip script/style/input/data-i18n parents
+    const walker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode(node) {
+          const p = node.parentElement;
+          if (!p) return NodeFilter.FILTER_REJECT;
+          const tag = p.tagName;
+          if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEXTAREA', 'INPUT'].includes(tag)) return NodeFilter.FILTER_REJECT;
+          if (p.closest('[data-i18n]')) return NodeFilter.FILTER_REJECT;
+          if (node.nodeValue.trim()) return NodeFilter.FILTER_ACCEPT;
+          return NodeFilter.FILTER_REJECT;
+        }
+      }
+    );
+
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+
+    nodes.forEach(node => {
+      const trimmed = node.nodeValue.trim();
+      if (map.has(trimmed)) {
+        node.nodeValue = node.nodeValue.replace(trimmed, map.get(trimmed));
+      }
     });
   },
 

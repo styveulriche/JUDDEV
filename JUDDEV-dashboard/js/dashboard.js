@@ -724,7 +724,7 @@ function getArticleForm(a = {}) {
       ${formField('Auteur', `<input id="a-author" style="${inputStyle}" value="${escapeHtml(a.author)}" placeholder="JAYSON STANLEY" />`)}
     </div>
     ${a.updatedAt ? `<div style="font-size:0.75rem;color:var(--accent-cyan);margin-bottom:0.5rem"><i class="fas fa-clock"></i> Dernière modification : ${new Date(a.updatedAt).toLocaleString('fr-FR')}</div>` : ''}
-    ${formField('Tags', `<div style="display:flex;flex-wrap:wrap;gap:0.5rem;padding:0.75rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:0.5rem">${['IA','Web','Mobile','Cloud','Design','Innovation','Startup','Architecture','DevOps','Sécurité','Machine Learning','Afrique','Éthique','Fintech','CI/CD','Infrastructure','Cybersécurité','OWASP','Productivité','Développement','Technologie'].map(tag=>`<label style="display:flex;align-items:center;gap:0.35rem;padding:0.3rem 0.65rem;border:1px solid rgba(255,255,255,0.1);border-radius:999px;cursor:pointer;font-size:0.78rem;color:var(--text-muted);background:rgba(255,255,255,0.03)"><input type="checkbox" name="a-tag" value="${tag}" ${(a.tags||[]).includes(tag)?'checked':''} style="accent-color:var(--accent-blue);width:13px;height:13px" />${tag}</label>`).join('')}</div>`, 'Cochez les tags correspondants')}
+    ${formField('Tags', `<div id="a-tags-container" style="display:flex;flex-wrap:wrap;gap:0.5rem;padding:0.75rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:0.5rem 0.5rem 0 0">${['IA','Web','Mobile','Cloud','Design','Innovation','Startup','Architecture','DevOps','Sécurité','Machine Learning','Afrique','Éthique','Fintech','CI/CD','Infrastructure','Cybersécurité','OWASP','Productivité','Développement','Technologie'].map(tag=>`<label style="display:flex;align-items:center;gap:0.35rem;padding:0.3rem 0.65rem;border:1px solid rgba(255,255,255,0.1);border-radius:999px;cursor:pointer;font-size:0.78rem;color:var(--text-muted);background:rgba(255,255,255,0.03)"><input type="checkbox" name="a-tag" value="${tag}" ${(a.tags||[]).includes(tag)?'checked':''} style="accent-color:var(--accent-blue);width:13px;height:13px" />${tag}</label>`).join('')}</div><div style="display:flex;gap:0.5rem;padding:0.5rem 0.75rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.1);border-top:none;border-radius:0 0 0.5rem 0.5rem"><input id="a-custom-tag" style="${inputStyle};flex:1;margin:0" placeholder="Ajouter un tag personnalisé..." /><button type="button" onclick="addCustomArticleTag()" style="background:var(--gradient-primary);border:none;color:white;padding:0.5rem 1rem;border-radius:0.375rem;font-size:0.8rem;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit"><i class="fas fa-plus"></i> Ajouter</button></div>`, 'Cochez les tags ou ajoutez un tag personnalisé')}
     ${formField('Description courte', `<textarea id="a-shortdesc" style="${textareaStyle};min-height:60px" placeholder="Résumé de l'article...">${escapeHtml(a.shortDesc)}</textarea>`)}
 
     <!-- Manual mode content -->
@@ -753,6 +753,22 @@ function getArticleForm(a = {}) {
       ${formField('Fichier PDF *', `<input type="file" id="a-pdf" accept=".pdf" style="${inputStyle};padding:0.5rem" />`, 'Taille max: 50MB')}
     </div>
   `;
+}
+
+function addCustomArticleTag() {
+  const input = document.getElementById('a-custom-tag');
+  const container = document.getElementById('a-tags-container');
+  if (!input || !container) return;
+  const tag = input.value.trim();
+  if (!tag) return;
+  // Check for duplicate
+  const existing = [...container.querySelectorAll('input[name="a-tag"]')].map(cb => cb.value.toLowerCase());
+  if (existing.includes(tag.toLowerCase())) { input.value = ''; return; }
+  const label = document.createElement('label');
+  label.style.cssText = 'display:flex;align-items:center;gap:0.35rem;padding:0.3rem 0.65rem;border:1px solid rgba(0,102,255,0.3);border-radius:999px;cursor:pointer;font-size:0.78rem;color:var(--text-primary);background:rgba(0,102,255,0.08)';
+  label.innerHTML = `<input type="checkbox" name="a-tag" value="${tag}" checked style="accent-color:var(--accent-blue);width:13px;height:13px" />${tag}`;
+  container.appendChild(label);
+  input.value = '';
 }
 
 function insertArticleFormat(tagOpen, tagClose) {
@@ -916,7 +932,8 @@ async function loadFormations() {
       onAdd: 'showAddFormation',
       items: allFormations,
       renderItem: (f) => itemCard({
-        icon: f.icon, title: `${f.icon || '📚'} ${f.title}`,
+        icon: (f.icon && !/<[a-z]/i.test(f.icon) ? f.icon : '📚'),
+        title: f.title,
         subtitle: `${f.duration || ''} · ${f.level || ''} · ${f.price || ''}${f.updatedAt ? ` · <span style="color:var(--accent-cyan)"><i class="fas fa-pen-to-square"></i> modifié ${new Date(f.updatedAt).toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</span>` : ''}`,
         onEdit: `editFormation('${f.id}')`, onDelete: `deleteFormation('${f.id}')`
       })
@@ -1027,12 +1044,10 @@ async function loadContacts() {
         <h3 style="font-size:0.9rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem">Réseaux Sociaux</h3>
         <div class="dash-form-grid-2">
           ${formField('<i class="fab fa-linkedin" style="color:#0077b5"></i> LinkedIn', `<input id="c-linkedin" style="${inputStyle}" value="${info.social?.linkedin||''}" placeholder="https://linkedin.com/..." />`)}
-          ${formField('<i class="fab fa-twitter" style="color:#1da1f2"></i> Twitter/X', `<input id="c-twitter" style="${inputStyle}" value="${info.social?.twitter||''}" placeholder="https://x.com/..." />`)}
           ${formField('<i class="fab fa-facebook" style="color:#1877f2"></i> Facebook', `<input id="c-facebook" style="${inputStyle}" value="${info.social?.facebook||''}" placeholder="https://facebook.com/..." />`)}
           ${formField('<i class="fab fa-youtube" style="color:#ff0000"></i> YouTube', `<input id="c-youtube" style="${inputStyle}" value="${info.social?.youtube||''}" placeholder="https://youtube.com/..." />`)}
           ${formField('<i class="fab fa-whatsapp" style="color:#25d366"></i> WhatsApp', `<input id="c-whatsapp" style="${inputStyle}" value="${info.social?.whatsapp||''}" placeholder="https://wa.me/..." />`)}
           ${formField('<i class="fab fa-github" style="color:#6e5494"></i> GitHub', `<input id="c-github" style="${inputStyle}" value="${info.social?.github||''}" placeholder="https://github.com/..." />`)}
-          ${formField('<i class="fab fa-instagram" style="color:#e4405f"></i> Instagram', `<input id="c-instagram" style="${inputStyle}" value="${info.social?.instagram||''}" placeholder="https://instagram.com/..." />`)}
         </div>
       </div>
 
@@ -1055,12 +1070,10 @@ async function saveContactInfo() {
       hours: document.getElementById('c-hours')?.value,
       social: {
         linkedin: document.getElementById('c-linkedin')?.value || '',
-        twitter: document.getElementById('c-twitter')?.value || '',
         facebook: document.getElementById('c-facebook')?.value || '',
         youtube: document.getElementById('c-youtube')?.value || '',
         whatsapp: document.getElementById('c-whatsapp')?.value || '',
-        github: document.getElementById('c-github')?.value || '',
-        instagram: document.getElementById('c-instagram')?.value || ''
+        github: document.getElementById('c-github')?.value || ''
       }
     });
     showToast('success', 'Sauvegardé', 'Informations de contact mises à jour.');

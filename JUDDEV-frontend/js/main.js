@@ -754,9 +754,7 @@ async function loadRealisationDetail() {
               </div>
 
               <div style="margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap">
-                <a href="${project.url && project.url !== '#' ? project.url : '#'}" ${project.url && project.url !== '#' ? 'target="_blank"' : ''} class="btn btn-primary" ${!project.url || project.url === '#' ? 'style="opacity:0.5;cursor:default"' : ''}>
-                  <i class="fas fa-external-link-alt"></i> Visiter le projet
-                </a>
+                ${project.showSiteBtn !== false && project.url && project.url !== '#' ? `<a href="${project.url}" target="_blank" rel="noopener noreferrer" class="btn btn-primary"><i class="fas fa-external-link-alt"></i> Visiter le projet</a>` : ''}
                 <a href="${project.youtubeUrl || '#'}" ${project.youtubeUrl ? 'target="_blank"' : ''} class="btn btn-outline" style="border-color:#ff0000;color:#ff4444${!project.youtubeUrl ? ';opacity:0.5;cursor:default' : ''}">
                   <i class="fab fa-youtube"></i> Voir la démo YouTube
                 </a>
