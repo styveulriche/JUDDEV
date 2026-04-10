@@ -309,6 +309,15 @@ const ARTICLES_PER_PAGE = 9;
 let articlesPage = 1;
 let filteredArticles = [];
 
+// Lang-aware field accessor for articles
+function getArticleField(a, field) {
+  if (typeof JUDDEV_I18N !== 'undefined' && JUDDEV_I18N.currentLang === 'en') {
+    const en = a?.translations?.en?.[field];
+    if (en && en.trim()) return en;
+  }
+  return a[field] || '';
+}
+
 function renderArticlesPage(page) {
   articlesPage = page;
   const grid = document.getElementById('articles-grid');
@@ -319,17 +328,17 @@ function renderArticlesPage(page) {
   grid.innerHTML = slice.map((a, i) => `
     <a href="article-detail.html?id=${a.id}" class="blog-card reveal stagger-${(i % 3) + 1}" style="text-decoration:none" data-filter-cat="${a.category}">
       <div class="blog-card-img">
-        <img src="${a.image}" alt="${a.title}" loading="lazy" onerror="this.style.background='var(--bg-secondary)'" />
+        <img src="${a.image}" alt="${getArticleField(a,'title')}" loading="lazy" onerror="this.style.background='var(--bg-secondary)'" />
       </div>
       <div class="blog-card-body">
         <div class="blog-card-meta">
           <span class="blog-card-category">${a.category}</span>
           <span class="blog-card-date">${formatDate(a.date)}</span>
         </div>
-        <h3 class="blog-card-title">${a.title}</h3>
-        <p class="blog-card-excerpt">${a.shortDesc}</p>
+        <h3 class="blog-card-title">${getArticleField(a,'title')}</h3>
+        <p class="blog-card-excerpt">${getArticleField(a,'shortDesc')}</p>
         <div style="margin-top:1rem">
-          <span class="blog-card-link">Lire <i class="fas fa-arrow-right"></i></span>
+          <span class="blog-card-link">${typeof JUDDEV_I18N !== 'undefined' ? JUDDEV_I18N.t('blog.readmore') : 'Lire'} <i class="fas fa-arrow-right"></i></span>
         </div>
       </div>
     </a>
@@ -387,24 +396,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const carouselDots = document.getElementById('carousel-dots');
   const featuredArticles = JUDDEV_DATA.articles.slice(0, 3);
 
-  if (carouselTrack) {
-    carouselTrack.innerHTML = featuredArticles.map(a => `
+  function buildCarousel(articles) {
+    return articles.map(a => `
       <div class="carousel-slide">
-        <img src="${a.image}" alt="${a.title}" onerror="this.style.background='var(--bg-secondary)'" />
+        <img src="${a.image}" alt="${getArticleField(a,'title')}" onerror="this.style.background='var(--bg-secondary)'" />
         <div class="carousel-overlay"></div>
         <div class="carousel-content">
           <div class="carousel-meta">
             <span class="category-tag">${a.category}</span>
             <span style="font-size:0.875rem;color:rgba(255,255,255,0.7)">${formatDate(a.date)}</span>
           </div>
-          <h2 class="carousel-title">${a.title}</h2>
-          <p style="color:rgba(255,255,255,0.7);margin-bottom:1.5rem;max-width:600px;font-size:1rem;line-height:1.6">${a.shortDesc}</p>
+          <h2 class="carousel-title">${getArticleField(a,'title')}</h2>
+          <p style="color:rgba(255,255,255,0.7);margin-bottom:1.5rem;max-width:600px;font-size:1rem;line-height:1.6">${getArticleField(a,'shortDesc')}</p>
           <a href="article-detail.html?id=${a.id}" class="carousel-btn">
-            Lire l'article <i class="fas fa-arrow-right"></i>
+            ${typeof JUDDEV_I18N !== 'undefined' ? JUDDEV_I18N.t('blog.readmore') : 'Lire l\'article'} <i class="fas fa-arrow-right"></i>
           </a>
         </div>
       </div>
     `).join('');
+  }
+
+  if (carouselTrack) {
+    carouselTrack.innerHTML = buildCarousel(featuredArticles);
   }
 
   if (carouselDots) {
@@ -564,6 +577,18 @@ document.addEventListener('DOMContentLoaded', () => {
     filteredArticles = base;
     articlesPage = 1;
     renderArticlesPage(1);
+    // Also refresh carousel with updated data
+    const track = document.getElementById('carousel-track');
+    if (track) track.innerHTML = buildCarousel(articles.slice(0, 3));
+  });
+
+  // Re-render cards and carousel when language switches
+  document.addEventListener('juddev:langChanged', () => {
+    renderArticlesPage(articlesPage);
+    const track = document.getElementById('carousel-track');
+    if (track && typeof JUDDEV_DATA !== 'undefined') {
+      track.innerHTML = buildCarousel(JUDDEV_DATA.articles.slice(0, 3));
+    }
   });
 });
 </script>

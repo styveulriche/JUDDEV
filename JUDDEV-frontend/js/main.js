@@ -26,6 +26,28 @@ function _getSmartPreference(type, fallback) {
 }
 
 // ============================================================
+// ARTICLE LANGUAGE HELPER
+// Returns the translated value if EN mode and translation exists,
+// otherwise falls back to the French field.
+// ============================================================
+function articleLangVal(article, field) {
+  if (!article) return '';
+  if (typeof JUDDEV_I18N !== 'undefined' && JUDDEV_I18N.currentLang === 'en') {
+    const en = article.translations?.en?.[field];
+    if (en && en.trim()) return en;
+  }
+  return article[field] || '';
+}
+
+function articleUiLabel(fr, en) {
+  return (typeof JUDDEV_I18N !== 'undefined' && JUDDEV_I18N.currentLang === 'en') ? en : fr;
+}
+
+function articleUiLocale() {
+  return (typeof JUDDEV_I18N !== 'undefined' && JUDDEV_I18N.currentLang === 'en') ? 'en-US' : 'fr-FR';
+}
+
+// ============================================================
 // ARTICLE CONTENT FORMATTER (plain text → HTML)
 // ============================================================
 function contentToHtml(content) {
@@ -837,6 +859,9 @@ async function loadRealisationDetail() {
   }, 100);
 }
 
+// Module-level article reference for lang-change re-renders
+let _currentArticleDetail = null;
+
 // Article Detail Page
 async function loadArticleDetail() {
   const container = document.getElementById('article-detail-content');
@@ -862,10 +887,13 @@ async function loadArticleDetail() {
     return;
   }
 
-  document.title = `${article.title} - JUDDEV Blog`;
+  // Store for re-render on lang change
+  _currentArticleDetail = article;
+
+  document.title = `${articleLangVal(article, 'title')} - JUDDEV Blog`;
   const heroTitle = document.getElementById('page-hero-title');
   const breadcrumbCurrent = document.getElementById('breadcrumb-current');
-  if (heroTitle) heroTitle.textContent = article.title;
+  if (heroTitle) heroTitle.textContent = articleLangVal(article, 'title');
   if (breadcrumbCurrent) breadcrumbCurrent.textContent = article.category;
 
   // Hero bg
@@ -917,7 +945,7 @@ async function loadArticleDetail() {
     return pages;
   }
 
-  const articlePages = buildArticlePages(contentToHtml(article.content || ''));
+  const articlePages = buildArticlePages(contentToHtml(articleLangVal(article, 'content')));
   const isMultiPage = articlePages.length > 1;
   let currentPage = 0;
 
@@ -945,15 +973,15 @@ async function loadArticleDetail() {
     return `
       <a href="article-detail.html?id=${a.id}" class="blog-card reveal stagger-${i + 1}" style="text-decoration:none">
         <div class="blog-card-img">
-          <img src="${a.image}" alt="${a.title}" onerror="this.style.background='var(--bg-secondary)'" />
+          <img src="${a.image}" alt="${articleLangVal(a, 'title')}" onerror="this.style.background='var(--bg-secondary)'" />
         </div>
         <div class="blog-card-body">
           <div class="blog-card-meta">
             <span class="blog-card-category">${a.category}</span>
             <span class="blog-card-date">${formatDate(a.date)}</span>
           </div>
-          <h3 class="blog-card-title">${a.title}</h3>
-          <p class="blog-card-excerpt">${a.shortDesc}</p>
+          <h3 class="blog-card-title">${articleLangVal(a, 'title')}</h3>
+          <p class="blog-card-excerpt">${articleLangVal(a, 'shortDesc')}</p>
         </div>
       </a>`;
   }
@@ -969,7 +997,7 @@ async function loadArticleDetail() {
                   <span class="category-tag">${article.category}</span>
                   <span style="font-size:0.875rem;color:var(--text-dim)">${formatDate(article.date)}</span>
                 </div>
-                <h1 style="font-size:clamp(1.5rem,3vw,2.25rem);font-weight:800;color:var(--text-primary);margin-bottom:1rem;line-height:1.3">${article.title}</h1>
+                <h1 style="font-size:clamp(1.5rem,3vw,2.25rem);font-weight:800;color:var(--text-primary);margin-bottom:1rem;line-height:1.3">${articleLangVal(article, 'title')}</h1>
                 <div style="display:flex;align-items:center;gap:0.75rem">
                   <div class="author-avatar">${getAuthorInitials(article.author)}</div>
                   <div>
@@ -978,7 +1006,25 @@ async function loadArticleDetail() {
                   </div>
                 </div>
               </div>
-              <img src="${article.image}" alt="${article.title}" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:var(--radius-lg);margin-bottom:2rem" onerror="this.style.display='none'" />
+              <img src="${article.image}" alt="${articleLangVal(article, 'title')}" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:var(--radius-lg);margin-bottom:2rem" onerror="this.style.display='none'" />
+
+              ${article.pdfFile ? `
+              <!-- PDF embed: displays the source PDF with full fidelity -->
+              <div class="pdf-embed-section" id="pdf-embed-section">
+                <div class="pdf-embed-header">
+                  <span><i class="fas fa-file-pdf" style="color:#f59e0b"></i> ${articleUiLabel('Document PDF source', 'Source PDF document')}</span>
+                  <button onclick="toggleArticlePdf()" id="pdf-toggle-btn" class="btn btn-outline btn-sm">
+                    <i class="fas fa-eye"></i> ${articleUiLabel('Afficher le PDF', 'Show PDF')}
+                  </button>
+                </div>
+                <div class="pdf-embed-viewer" id="pdf-viewer-container">
+                  <iframe src="${article.pdfFile}" title="${articleLangVal(article, 'title')}" loading="lazy" allowfullscreen></iframe>
+                  <div class="pdf-embed-footer">
+                    <a href="${article.pdfFile}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm"><i class="fas fa-download"></i> ${articleUiLabel('Télécharger le PDF', 'Download PDF')}</a>
+                  </div>
+                </div>
+              </div>
+              ` : ''}
 
               <!-- Article content with pagination -->
               <div id="article-page-content">${articlePages[0]}</div>
@@ -1003,7 +1049,7 @@ async function loadArticleDetail() {
             </div>
 
             <div id="comments-section" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:2rem;margin-top:2rem">
-              <h3 style="font-size:1.25rem;font-weight:700;color:var(--text-primary);margin-bottom:1.5rem">💬 <span data-i18n="article.comments">Commentaires</span></h3>
+              <h3 style="font-size:1.25rem;font-weight:700;color:var(--text-primary);margin-bottom:1.5rem">💬 ${articleUiLabel('Commentaires', 'Comments')}</h3>
               <div id="comments-list" style="margin-bottom:2rem"></div>
               <form id="comment-form">
                 <div class="comment-form-fields">
@@ -1022,10 +1068,10 @@ async function loadArticleDetail() {
               ${recent.map(a => `
                 <div class="recent-article-item" onclick="location.href='article-detail.html?id=${a.id}'">
                   <div class="recent-article-thumb">
-                    <img src="${a.image}" alt="${a.title}" onerror="this.style.background='var(--bg-secondary)'" />
+                    <img src="${a.image}" alt="${articleLangVal(a, 'title')}" onerror="this.style.background='var(--bg-secondary)'" />
                   </div>
                   <div>
-                    <div class="recent-article-title">${a.title}</div>
+                    <div class="recent-article-title">${articleLangVal(a, 'title')}</div>
                     <div class="recent-article-date">${formatDate(a.date)}</div>
                   </div>
                 </div>
@@ -1045,7 +1091,7 @@ async function loadArticleDetail() {
             </div>
 
             <div class="sidebar-widget reveal stagger-4">
-              <h3 class="sidebar-widget-title">Tags</h3>
+              <h3 class="sidebar-widget-title">${articleUiLabel('Tags', 'Tags')}</h3>
               <div class="tags-cloud">
                 ${[...new Set(JUDDEV_DATA.articles.flatMap(a => a.tags || []))].map(t => `<a href="blog.html?tag=${encodeURIComponent(t)}" class="tag" style="text-decoration:none">${t}</a>`).join('')}
               </div>
@@ -1098,6 +1144,18 @@ async function loadArticleDetail() {
     el.classList.add('visible');
   });
 
+  // PDF toggle function
+  window.toggleArticlePdf = function() {
+    const viewer = document.getElementById('pdf-viewer-container');
+    const btn = document.getElementById('pdf-toggle-btn');
+    if (!viewer) return;
+    const isOpen = viewer.classList.toggle('open');
+    if (btn) btn.innerHTML = isOpen
+      ? `<i class="fas fa-eye-slash"></i> ${articleUiLabel('Masquer le PDF', 'Hide PDF')}`
+      : `<i class="fas fa-eye"></i> ${articleUiLabel('Afficher le PDF', 'Show PDF')}`;
+    if (isOpen) viewer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
   // Load comments for this article
   loadArticleComments(id);
 
@@ -1111,7 +1169,7 @@ async function loadArticleDetail() {
       const text = document.getElementById('comment-text').value.trim();
       const btn = document.getElementById('comment-submit-btn');
       btn.disabled = true;
-      btn.textContent = 'Envoi...';
+      btn.textContent = articleUiLabel('Envoi...', 'Sending...');
       try {
         const res = await fetch(JUDDEV_CONFIG.API_URL + '/articles/' + id + '/comments', {
           method: 'POST',
@@ -1120,17 +1178,29 @@ async function loadArticleDetail() {
         });
         if (res.ok) {
           commentForm.reset();
-          showNotification('success', 'Commentaire envoyé !', 'Votre commentaire a été publié.');
+          showNotification(
+            'success',
+            articleUiLabel('Commentaire envoyé !', 'Comment posted!'),
+            articleUiLabel('Votre commentaire a été publié.', 'Your comment has been published.')
+          );
           loadArticleComments(id);
         } else {
           const data = await res.json().catch(() => ({}));
-          showNotification('error', 'Erreur', data.message || 'Impossible d\'envoyer le commentaire.');
+          showNotification(
+            'error',
+            articleUiLabel('Erreur', 'Error'),
+            data.message || articleUiLabel('Impossible d\'envoyer le commentaire.', 'Unable to send the comment.')
+          );
         }
       } catch (err) {
-        showNotification('error', 'Erreur réseau', 'Veuillez réessayer.');
+        showNotification(
+          'error',
+          articleUiLabel('Erreur réseau', 'Network error'),
+          articleUiLabel('Veuillez réessayer.', 'Please try again.')
+        );
       }
       btn.disabled = false;
-      btn.textContent = 'Envoyer le commentaire';
+      btn.textContent = articleUiLabel('Envoyer le commentaire', 'Post comment');
     });
   }
 }
@@ -1146,7 +1216,7 @@ function renderCommentItem(c) {
         <div style="width:2rem;height:2rem;border-radius:50%;background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.75rem;color:#fff;flex-shrink:0">${(c.name||'?')[0].toUpperCase()}</div>
         <div>
           <div style="font-weight:600;font-size:0.875rem;color:var(--text-primary)">${escapeHtml(c.name)}</div>
-          <div style="font-size:0.75rem;color:var(--text-dim)">${new Date(c.date).toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' })}</div>
+          <div style="font-size:0.75rem;color:var(--text-dim)">${new Date(c.date).toLocaleDateString(articleUiLocale(), { day:'2-digit', month:'long', year:'numeric' })}</div>
         </div>
       </div>
       <p style="color:var(--text-secondary);font-size:0.875rem;line-height:1.6;white-space:pre-wrap;margin:0">${escapeHtml(c.text)}</p>
@@ -1162,7 +1232,7 @@ function renderCommentsVisible() {
   const nextBatch = Math.min(remaining, COMMENTS_PER_PAGE);
   list.innerHTML = items.map(renderCommentItem).join('') + (remaining > 0 ? `
     <button id="comments-load-more" onclick="loadMoreComments()" style="display:flex;align-items:center;gap:0.5rem;margin:0.5rem auto 0;padding:0.65rem 1.4rem;background:transparent;border:1px solid var(--border-color);border-radius:var(--radius-xl);color:var(--text-secondary);font-size:0.875rem;cursor:pointer;transition:all 0.2s">
-      <i class="fas fa-chevron-down"></i> Voir ${nextBatch} commentaire${nextBatch > 1 ? 's' : ''} de plus <span style="opacity:0.55;font-size:0.8rem">(${remaining} restant${remaining > 1 ? 's' : ''})</span>
+      <i class="fas fa-chevron-down"></i> ${articleUiLabel(`Voir ${nextBatch} commentaire${nextBatch > 1 ? 's' : ''} de plus`, `Show ${nextBatch} more comment${nextBatch > 1 ? 's' : ''}`)} <span style="opacity:0.55;font-size:0.8rem">${articleUiLabel(`(${remaining} restant${remaining > 1 ? 's' : ''})`, `(${remaining} remaining)`)}</span>
     </button>
   ` : '');
 }
@@ -1176,7 +1246,7 @@ function renderComments(comments) {
   const list = document.getElementById('comments-list');
   if (!list) return;
   if (!comments || !comments.length) {
-    list.innerHTML = '<p style="color:var(--text-muted);font-size:0.875rem">Aucun commentaire pour l\'instant. Soyez le premier !</p>';
+    list.innerHTML = `<p style="color:var(--text-muted);font-size:0.875rem">${articleUiLabel("Aucun commentaire pour l'instant. Soyez le premier !", 'No comments yet. Be the first!')}</p>`;
     return;
   }
   _allComments = comments;
@@ -1203,6 +1273,13 @@ document.addEventListener('DOMContentLoaded', () => {
   loadServiceDetail();
   loadRealisationDetail();
   loadArticleDetail();
+});
+
+// Re-render article content when language changes
+document.addEventListener('juddev:langChanged', () => {
+  if (_currentArticleDetail && document.getElementById('article-detail-content')) {
+    loadArticleDetail();
+  }
 });
 
 // ============================================================

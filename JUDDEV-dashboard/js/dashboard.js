@@ -739,7 +739,7 @@ function getArticleForm(a = {}) {
           <button type="button" onclick="insertArticleFormat('<blockquote>','</blockquote>')" title="Citation" style="padding:0.3rem 0.65rem;border-radius:0.35rem;border:1px solid var(--border-color);background:rgba(255,255,255,0.05);color:var(--text-muted);font-size:0.78rem;cursor:pointer;font-family:inherit;transition:all 0.15s">❝ Citation</button>
           <button type="button" onclick="insertArticleFormat('<strong>','</strong>')" title="Texte en gras" style="padding:0.3rem 0.65rem;border-radius:0.35rem;border:1px solid var(--border-color);background:rgba(255,255,255,0.05);color:var(--text-muted);font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s">G Gras</button>
         </div>
-        <textarea id="a-content" style="${textareaStyle};min-height:200px;border-radius:0 0 0.5rem 0.5rem" placeholder="Sélectionnez du texte puis cliquez un bouton de format, ou cliquez un bouton puis tapez votre texte...">${a.content||''}</textarea>
+        <textarea id="a-content" style="${textareaStyle};min-height:200px;border-radius:0 0 0.5rem 0.5rem" placeholder="Sélectionnez du texte puis cliquez un bouton de format, ou cliquez un bouton puis tapez votre texte...">${escapeHtml(a.content||'')}</textarea>
         <p style="font-size:0.72rem;color:var(--text-dim);margin-top:0.3rem"><i class="fas fa-info-circle"></i> Sélectionnez du texte puis cliquez un bouton pour formater. Sans sélection, la balise est insérée à la position du curseur.</p>
       </div>
     </div>
@@ -748,9 +748,32 @@ function getArticleForm(a = {}) {
     <div id="pdf-section" style="display:none">
       <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:0.75rem;padding:1rem;margin-bottom:1rem">
         <p style="font-size:0.82rem;color:#fbbf24;margin-bottom:0.5rem;font-weight:600"><i class="fas fa-circle-info"></i> Comment ça marche ?</p>
-        <p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6">Le système va extraire automatiquement le texte de votre PDF et le formater en contenu HTML pour votre article. Vous devrez toujours ajouter le titre et l'image.</p>
+        <p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6">Le PDF sera <strong style="color:var(--text-primary)">embarqué directement</strong> dans l'article pour un rendu fidèle (mise en forme + images préservées). Le texte est aussi extrait pour l'accessibilité et la recherche.</p>
       </div>
       ${formField('Fichier PDF *', `<input type="file" id="a-pdf" accept=".pdf" style="${inputStyle};padding:0.5rem" />`, 'Taille max: 50MB')}
+    </div>
+
+    ${a.pdfFile ? `
+    <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:0.75rem;padding:1rem;margin-top:0.75rem">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem">
+        <i class="fas fa-file-pdf" style="color:#f59e0b"></i>
+        <span style="font-size:0.82rem;font-weight:600;color:var(--text-primary)">PDF actuel embarqué</span>
+      </div>
+      <a href="${a.pdfFile}" target="_blank" style="font-size:0.78rem;color:var(--accent-light);word-break:break-all">${a.pdfFile}</a>
+    </div>` : ''}
+
+    <!-- Version Anglaise (optionnel) -->
+    <div style="margin-top:1rem;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.18);border-radius:0.75rem;overflow:hidden">
+      <button type="button" onclick="var s=document.getElementById('a-en-section');s.style.display=s.style.display==='block'?'none':'block';this.querySelector('.en-chevron').style.transform=s.style.display==='block'?'rotate(180deg)':'rotate(0deg)'"
+        style="width:100%;padding:0.75rem 1rem;display:flex;align-items:center;gap:0.5rem;background:none;border:none;color:var(--text-secondary);font-family:inherit;font-size:0.82rem;font-weight:600;cursor:pointer;text-align:left">
+        <span>🇬🇧</span> Version Anglaise (optionnel)
+        <i class="fas fa-chevron-down en-chevron" style="margin-left:auto;font-size:0.72rem;opacity:0.6;transition:transform 0.2s"></i>
+      </button>
+      <div id="a-en-section" style="display:${(a.translations?.en?.title||a.translations?.en?.shortDesc||a.translations?.en?.content)?'block':'none'};padding:0 1rem 1rem">
+        ${formField('Titre (EN)', `<input id="a-title-en" style="${inputStyle}" value="${escapeHtml(a.translations?.en?.title||'')}" placeholder="Article title in English..." />`)}
+        ${formField('Description courte (EN)', `<textarea id="a-shortdesc-en" style="${textareaStyle};min-height:60px" placeholder="Short description in English...">${escapeHtml(a.translations?.en?.shortDesc||'')}</textarea>`)}
+        ${formField('Contenu (EN)', `<textarea id="a-content-en" style="${textareaStyle};min-height:120px" placeholder="Article content in English (HTML or plain text)...">${escapeHtml(a.translations?.en?.content||'')}</textarea>`, 'Collez le contenu HTML ou tapez le texte en anglais')}
+      </div>
     </div>
   `;
 }
@@ -810,6 +833,12 @@ function switchArticleMode(mode) {
   }
 }
 
+function appendEnFields(fd) {
+  fd.append('titleEn', document.getElementById('a-title-en')?.value || '');
+  fd.append('shortDescEn', document.getElementById('a-shortdesc-en')?.value || '');
+  fd.append('contentEn', document.getElementById('a-content-en')?.value || '');
+}
+
 function saveNewArticle() {
   const fd = new FormData();
   fd.append('title', document.getElementById('a-title').value);
@@ -817,6 +846,7 @@ function saveNewArticle() {
   fd.append('author', document.getElementById('a-author').value);
   fd.append('tags', [...document.querySelectorAll('input[name="a-tag"]:checked')].map(cb => cb.value).join(', '));
   fd.append('shortDesc', document.getElementById('a-shortdesc').value);
+  appendEnFields(fd);
   const imgFile = document.getElementById('a-image')?.files[0];
   if (imgFile) fd.append('image', imgFile);
   let endpoint = '/articles';
@@ -852,6 +882,7 @@ function saveEditArticle(id) {
   fd.append('tags', [...document.querySelectorAll('input[name="a-tag"]:checked')].map(cb => cb.value).join(', '));
   fd.append('shortDesc', document.getElementById('a-shortdesc').value);
   fd.append('content', document.getElementById('a-content')?.value || '');
+  appendEnFields(fd);
   const imgFile = document.getElementById('a-image')?.files[0];
   if (imgFile) fd.append('image', imgFile);
   closeModal();

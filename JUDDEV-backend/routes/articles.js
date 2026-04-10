@@ -12,7 +12,135 @@ async function safeUpload(file, folder) {
   catch (e) { console.error('[Cloudinary]', e.message); return ''; }
 }
 
+// ============================================================
+// PDF TEXT → HTML CONVERTER (improved)
+// Produces clean, structured HTML from raw PDF text output.
+// Cannot extract images (pdf-parse limitation) — use PDF embed instead.
+// ============================================================
+function pdfTextToHtml(rawText) {
+  if (!rawText || !rawText.trim()) return '<p>Contenu non disponible.</p>';
+
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const lines = rawText.split('\n');
+  const html = [];
+  let i = 0;
+
+  function peek(offset = 0) { return (lines[i + offset] || '').trim(); }
+  function skipBlanks() { while (i < lines.length && !lines[i].trim()) i++; }
+
+  skipBlanks();
+
+  while (i < lines.length) {
+    const raw = lines[i];
+    const line = raw.trim();
+
+    // Empty line — skip
+    if (!line) { i++; continue; }
+
+    // ── ALL-CAPS single line ≤ 100 chars → <h2>
+    const isAllCaps = line.length >= 3 && line.length <= 100
+      && line === line.toUpperCase()
+      && /[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ]{3,}/.test(line)
+      && !/[a-z0-9àâäéèêëîïôùûüç]/.test(line);
+
+    if (isAllCaps) {
+      html.push(`<h2>${esc(line)}</h2>`);
+      i++;
+      continue;
+    }
+
+    // ── Numbered/outline section: "1.", "1.1", "I.", "A." + content → <h3>
+    if (/^(\d+\.){1,3}\s+\S/.test(line) || /^[IVX]+\.\s+\S/.test(line) || /^[A-Z][\.\)]\s+\S/.test(line)) {
+      if (line.length < 120) {
+        html.push(`<h3>${esc(line)}</h3>`);
+        i++;
+        continue;
+      }
+    }
+
+    // ── Bullet / numbered list block
+    const isBullet = l => /^[\-\•\*\–\—✓✔▶►◦→⚫•]\s/.test(l);
+    const isNumber = l => /^\d+[\.\)]\s+\S/.test(l);
+
+    if (isBullet(line) || isNumber(line)) {
+      const isOl = isNumber(line);
+      const items = [];
+      while (i < lines.length) {
+        const l = lines[i].trim();
+        if (!l) { i++; break; }
+        if (isBullet(l) || isNumber(l)) {
+          const text = l.replace(/^[\-\•\*\–\—✓✔▶►◦→⚫•]\s+/, '').replace(/^\d+[\.\)]\s+/, '');
+          items.push(`<li>${esc(text)}</li>`);
+          i++;
+        } else if (items.length && l.length < 200 && !isAllCapsStr(l) && !isBullet(l) && !isNumber(l)) {
+          // Continuation of last bullet item
+          const last = items[items.length - 1];
+          items[items.length - 1] = last.replace('</li>', ` ${esc(l)}</li>`);
+          i++;
+        } else {
+          break;
+        }
+      }
+      if (items.length) {
+        html.push(`<${isOl ? 'ol' : 'ul'}>${items.join('')}</${isOl ? 'ol' : 'ul'}>`);
+      }
+      continue;
+    }
+
+    // ── Paragraph: collect consecutive non-blank lines
+    const paraLines = [];
+    while (i < lines.length && lines[i].trim()) {
+      paraLines.push(lines[i].trim());
+      i++;
+    }
+    if (!paraLines.length) continue;
+
+    const combined = paraLines.join(' ').trim();
+
+    // Single short line, starts with uppercase, no terminal sentence punctuation
+    // AND next non-blank line is a long paragraph → treat as <h3>
+    if (paraLines.length === 1 && combined.length >= 3 && combined.length <= 80
+      && /^[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ]/.test(combined)
+      && !/[.!?]$/.test(combined)) {
+
+      let j = i;
+      while (j < lines.length && !lines[j].trim()) j++;
+      const nextLine = (lines[j] || '').trim();
+      if (nextLine.length > 60) {
+        html.push(`<h3>${esc(combined)}</h3>`);
+        continue;
+      }
+    }
+
+    // Multi-line paragraph: if first line is short + bold-ish lead-in
+    if (paraLines.length > 1 && paraLines[0].length < 60 && !/[.!?]$/.test(paraLines[0])) {
+      html.push(`<p><strong>${esc(paraLines[0])}</strong> ${paraLines.slice(1).map(esc).join(' ')}</p>`);
+    } else {
+      html.push(`<p>${esc(combined)}</p>`);
+    }
+  }
+
+  return html.filter(Boolean).join('\n') || '<p>Contenu non disponible.</p>';
+}
+
+function isAllCapsStr(s) {
+  return s === s.toUpperCase() && /[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ]{3,}/.test(s) && !/[a-z]/.test(s);
+}
+
+// Extract EN translations from request body
+function extractTranslations(body) {
+  return {
+    en: {
+      title: body.titleEn || '',
+      shortDesc: body.shortDescEn || '',
+      content: body.contentEn || ''
+    }
+  };
+}
+
+// ============================================================
 // GET /api/articles
+// ============================================================
 router.get('/', async (req, res) => {
   try {
     const articles = await Article.find({ published: true }).sort({ date: -1 });
@@ -22,7 +150,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/articles/comments - All comments from all articles (admin)
+// GET /api/articles/comments - All comments (admin)
 router.get('/comments', auth, async (req, res) => {
   try {
     const articles = await Article.find({ 'comments.0': { $exists: true } }, 'id title comments');
@@ -30,13 +158,8 @@ router.get('/comments', auth, async (req, res) => {
     articles.forEach(a => {
       a.comments.forEach(c => {
         allComments.push({
-          articleId: a.id,
-          articleTitle: a.title,
-          commentId: c._id,
-          name: c.name,
-          email: c.email,
-          text: c.text,
-          date: c.date
+          articleId: a.id, articleTitle: a.title, commentId: c._id,
+          name: c.name, email: c.email, text: c.text, date: c.date
         });
       });
     });
@@ -58,24 +181,29 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/articles - Create article manually
+// ============================================================
+// POST /api/articles - Manual creation
+// ============================================================
 router.post('/', auth, uploadMixed.fields([{ name: 'image', maxCount: 1 }]), async (req, res) => {
   try {
     const { title, category, author, shortDesc, content } = req.body;
-    const tags = req.body.tags ? (Array.isArray(req.body.tags) ? req.body.tags : req.body.tags.split(',').map(t => t.trim()).filter(Boolean)) : [];
-    const image = req.files?.image?.[0] ? await safeUpload(req.files.image[0], 'juddev/articles') : (req.body.image || '');
+    const tags = req.body.tags
+      ? (Array.isArray(req.body.tags) ? req.body.tags : req.body.tags.split(',').map(t => t.trim()).filter(Boolean))
+      : [];
+    const image = req.files?.image?.[0]
+      ? await safeUpload(req.files.image[0], 'juddev/articles')
+      : (req.body.image || '');
 
     const id = `article-${Date.now()}`;
     const article = new Article({
       id, title, category, author, shortDesc,
       content: content || '',
-      image,
-      tags,
+      image, tags,
       sourceType: 'manual',
+      translations: extractTranslations(req.body),
       date: new Date()
     });
     await article.save();
-    // Notify newsletter subscribers
     notifySubscribers(article).catch(() => {});
     res.status(201).json(article);
   } catch (err) {
@@ -83,15 +211,23 @@ router.post('/', auth, uploadMixed.fields([{ name: 'image', maxCount: 1 }]), asy
   }
 });
 
-// POST /api/articles/from-pdf - Create article from PDF
+// ============================================================
+// POST /api/articles/from-pdf - Create from PDF
+// Embeds the PDF URL for perfect fidelity display.
+// Also extracts HTML text as accessible fallback content.
+// ============================================================
 router.post('/from-pdf', auth, uploadMixed.fields([
   { name: 'image', maxCount: 1 },
   { name: 'pdfFile', maxCount: 1 }
 ]), async (req, res) => {
   try {
     const { title, category, author, shortDesc } = req.body;
-    const tags = req.body.tags ? (Array.isArray(req.body.tags) ? req.body.tags : req.body.tags.split(',').map(t => t.trim()).filter(Boolean)) : [];
-    const image = req.files?.image?.[0] ? await safeUpload(req.files.image[0], 'juddev/articles') : (req.body.image || '');
+    const tags = req.body.tags
+      ? (Array.isArray(req.body.tags) ? req.body.tags : req.body.tags.split(',').map(t => t.trim()).filter(Boolean))
+      : [];
+    const image = req.files?.image?.[0]
+      ? await safeUpload(req.files.image[0], 'juddev/articles')
+      : (req.body.image || '');
 
     if (!req.files?.pdfFile?.[0]) {
       return res.status(400).json({ message: 'Fichier PDF requis.' });
@@ -99,89 +235,23 @@ router.post('/from-pdf', auth, uploadMixed.fields([
 
     const pdfFile = req.files.pdfFile[0];
 
-    // Extract text from PDF with formatting detection
-    let content = '';
-    let pdfFilename = '';
+    // 1. Upload PDF to Cloudinary → stored as pdfFile URL for iframe embed
+    let pdfUrl = '';
     try {
-      const pdfParse = require('pdf-parse/lib/pdf-parse.js');
-      const dataBuffer = pdfFile.buffer;
-      const pdfData = await pdfParse(dataBuffer);
-
-      const rawText = pdfData.text || '';
-      const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
-      // Split into lines and group them smartly
-      const lines = rawText.split('\n');
-      const blocks = [];
-      let currentBlock = [];
-
-      for (const raw of lines) {
-        const line = raw.trimEnd();
-        if (line.trim() === '') {
-          if (currentBlock.length) { blocks.push(currentBlock); currentBlock = []; }
-        } else {
-          currentBlock.push(line);
-        }
-      }
-      if (currentBlock.length) blocks.push(currentBlock);
-
-      const htmlParts = [];
-      for (const block of blocks) {
-        const text = block.join(' ').trim();
-        if (!text || text.length < 3) continue;
-
-        // H1: very short, all-caps, no punctuation mid-text
-        if (block.length === 1 && text.length < 60 && text === text.toUpperCase() && /^[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ0-9\s\-:&'«»()]+$/u.test(text)) {
-          htmlParts.push(`<h2>${esc(text)}</h2>`);
-          continue;
-        }
-
-        // H2: short single line that looks like a heading (title-case, ends with colon, or numbered)
-        if (block.length === 1 && text.length < 100 && (
-          text.endsWith(':') ||
-          /^\d+[\.\)]\s/.test(text) ||
-          /^[IVX]+\.\s/.test(text) ||
-          (/^[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ]/.test(text) && text.length < 60 && !/[.!?]$/.test(text))
-        )) {
-          htmlParts.push(`<h3>${esc(text)}</h3>`);
-          continue;
-        }
-
-        // List items: lines starting with bullet-like chars
-        const listLines = block.filter(l => /^[\-\•\*\–\—✓✔▶►]\s/.test(l.trim()) || /^\d+[\.\)]\s/.test(l.trim()));
-        if (listLines.length > 0 && listLines.length >= block.length * 0.6) {
-          const items = block.map(l => {
-            const stripped = l.trim().replace(/^[\-\•\*\–\—✓✔▶►]\s+/, '').replace(/^\d+[\.\)]\s+/, '');
-            return `<li>${esc(stripped)}</li>`;
-          }).join('');
-          htmlParts.push(`<ul style="padding-left:1.5rem;margin:0.75rem 0">${items}</ul>`);
-          continue;
-        }
-
-        // Bold detection: lines that are short and at start of block (likely bold lead-in)
-        const paraLines = block.map((l, i) => {
-          const trimmed = l.trim();
-          // First line short and followed by more content → likely bold
-          if (i === 0 && block.length > 1 && trimmed.length < 80 && !trimmed.endsWith(',')) {
-            return `<strong>${esc(trimmed)}</strong>`;
-          }
-          return esc(trimmed);
-        });
-        htmlParts.push(`<p>${paraLines.join(' ')}</p>`);
-      }
-
-      content = htmlParts.join('\n') || '<p>Contenu non disponible.</p>';
-
-    } catch (pdfErr) {
-      console.error('PDF parse error:', pdfErr);
-      content = `<p>Contenu extrait du PDF. Erreur de parsing: ${pdfErr.message}</p>`;
+      pdfUrl = await uploadToCloudinary(pdfFile, 'juddev/pdfs');
+    } catch (e) {
+      console.error('[PDF Cloudinary]', e.message);
     }
 
-    // Upload PDF to Cloudinary if parse succeeded (optional)
+    // 2. Extract text with improved HTML conversion (fallback / accessible content)
+    let content = '';
     try {
-      pdfFilename = await uploadToCloudinary(pdfFile, 'juddev/pdfs');
-    } catch (e) {
-      console.error('PDF Cloudinary upload error:', e.message);
+      const pdfParse = require('pdf-parse/lib/pdf-parse.js');
+      const pdfData = await pdfParse(pdfFile.buffer);
+      content = pdfTextToHtml(pdfData.text || '');
+    } catch (pdfErr) {
+      console.error('[PDF parse]', pdfErr.message);
+      content = `<p>Le contenu de cet article est disponible dans le PDF ci-dessus.</p>`;
     }
 
     const id = `article-${Date.now()}`;
@@ -191,11 +261,11 @@ router.post('/from-pdf', auth, uploadMixed.fields([
       image,
       tags,
       sourceType: 'pdf',
-      pdfFile: pdfFilename,
+      pdfFile: pdfUrl,
+      translations: extractTranslations(req.body),
       date: new Date()
     });
     await article.save();
-    // Notify newsletter subscribers
     notifySubscribers(article).catch(() => {});
     res.status(201).json(article);
   } catch (err) {
@@ -203,13 +273,22 @@ router.post('/from-pdf', auth, uploadMixed.fields([
   }
 });
 
-// PUT /api/articles/:id
+// ============================================================
+// PUT /api/articles/:id - Update
+// ============================================================
 router.put('/:id', auth, uploadMixed.fields([{ name: 'image', maxCount: 1 }]), async (req, res) => {
   try {
     const { title, category, author, shortDesc, content, published } = req.body;
-    const tags = req.body.tags ? (Array.isArray(req.body.tags) ? req.body.tags : req.body.tags.split(',').map(t => t.trim()).filter(Boolean)) : [];
+    const tags = req.body.tags
+      ? (Array.isArray(req.body.tags) ? req.body.tags : req.body.tags.split(',').map(t => t.trim()).filter(Boolean))
+      : [];
 
-    const updateData = { title, category, author, shortDesc, content, tags };
+    const updateData = {
+      title, category, author, shortDesc, content, tags,
+      'translations.en.title': req.body.titleEn || '',
+      'translations.en.shortDesc': req.body.shortDescEn || '',
+      'translations.en.content': req.body.contentEn || ''
+    };
     if (published !== undefined) updateData.published = published === 'true' || published === true;
     if (req.files?.image?.[0]) updateData.image = await safeUpload(req.files.image[0], 'juddev/articles');
     else if (req.body.image) updateData.image = req.body.image;
@@ -222,7 +301,9 @@ router.put('/:id', auth, uploadMixed.fields([{ name: 'image', maxCount: 1 }]), a
   }
 });
 
+// ============================================================
 // DELETE /api/articles/:id
+// ============================================================
 router.delete('/:id', auth, async (req, res) => {
   try {
     const article = await Article.findOneAndDelete({ id: req.params.id });
@@ -233,7 +314,9 @@ router.delete('/:id', auth, async (req, res) => {
   }
 });
 
+// ============================================================
 // POST /api/articles/:id/comments - Public
+// ============================================================
 router.post('/:id/comments', async (req, res) => {
   try {
     const { name, email, text } = req.body;
@@ -259,7 +342,7 @@ router.delete('/:id/comments/:commentId', auth, async (req, res) => {
     await article.save();
     res.json({ message: 'Commentaire supprimé.' });
   } catch (err) {
-    res.status(500).json({ message: 'Erreur serveur: ' + err.message });
+    res.status(500).json({ message: 'Erreur serveur.' });
   }
 });
 

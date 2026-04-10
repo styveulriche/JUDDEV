@@ -20,6 +20,14 @@ const articleSchema = new mongoose.Schema({
   sourceType: { type: String, enum: ['manual', 'pdf'], default: 'manual' },
   pdfFile: { type: String, default: '' },
   published: { type: Boolean, default: true },
+  // Bilingual translations (optional — fallback to FR fields if EN missing)
+  translations: {
+    en: {
+      title: { type: String, default: '' },
+      shortDesc: { type: String, default: '' },
+      content: { type: String, default: '' }
+    }
+  },
   comments: [commentSchema]
 }, { timestamps: true });
 
