@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["nodejs_20", "npm-9_x"]
+
+[phases.install]
+cmds = ["cd JUDDEV-backend && npm ci --omit=dev"]
+
+[phases.build]
+cmds = []
+
+[start]
+cmd = "cd JUDDEV-backend && node server.js"

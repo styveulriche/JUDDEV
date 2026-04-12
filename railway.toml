@@ -1,0 +1,10 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "cd JUDDEV-backend && npm ci --omit=dev"
+
+[deploy]
+startCommand = "cd JUDDEV-backend && node server.js"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10

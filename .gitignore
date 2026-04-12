@@ -1,5 +1,6 @@
 # Environnement - NE JAMAIS PUSHER
 JUDDEV-backend/.env
+JUDDEV-backend/.env.railway
 .env
 
 # Dépendances Node
